@@ -220,7 +220,7 @@ New goal:
 
 ** Paths & transforms
 #+CAPTION: Paths and transforms select pieces from the app-state and transform them into what a component expects
-[[./img/paths_transforms.png]]
+[[img/paths_transforms.png]]
 
 
 ** Example
