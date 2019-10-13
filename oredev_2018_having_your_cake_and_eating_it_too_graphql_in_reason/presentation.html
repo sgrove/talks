@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+
+<link rel="stylesheet" href="css/custom.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<section id="slide-org6247043">
+<h2 id="org6247043">ReasonML + GraphQL = &lt;3</h2>
+</section>
+</section>
+<section>
+<section id="slide-org19e6899">
+<h2 id="org19e6899">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>), from SF</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>YC S11 / VP Eng / YC S18</li>
+<li>Background in Clojure(Script)/Reason/Rust</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org9cf6209">
+<h2 id="org9cf6209">Intro</h2>
+<p>
+What's the promise of typed languages?
+</p>
+
+<p>
+More difficult to represent incorrect programs
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="js" >function insertCustomer(name, subName, org, rating, order) {
+...
+}
+</code></pre>
+</div>
+<ul>
+<li>What's `subName`? What does it refer to?</li>
+<li>What is `org`?</li>
+
+</ul>
+<p>
+Ambiguous and difficult
+</p>
+</section>
+<section >
+<p>
+So, the promise we <b>really</b> about is being happier, by being more productive
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org77664c8">
+<h2 id="org77664c8">What's Reason(ml)?</h2>
+<ul>
+<li>A typed language that tries to - <b>ultimately</b> - make us happier</li>
+<li>~25 years old</li>
+<li>Lots of academic investment</li>
+<li>Fantastically broad reach
+<ul>
+<li>JS</li>
+<li>Native</li>
+<li>Mobile</li>
+<li>Unikernels</li>
+
+</ul></li>
+<li>Careful attention to developer experience
+<ul>
+<li>Including very similar syntax to JavaScript ("ES2030")</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Early days
+<ul>
+<li>First ReasonConf in Vienna this May</li>
+<li>Second ReasonConf announced for <a href="https://www.reason-conf.com">April 2019</a></li>
+<li>200 people</li>
+<li>Tight-knit, welcoming, close community</li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section >
+<p>
+Reason focuses explicitly in making web UIs &amp; frontends as easy as possible:
+</p>
+<ul>
+<li>Syntax (JSX)</li>
+<li>Web UIs
+<ul>
+<li>Component state + transitions</li>
+<li>Routing</li>
+<li>Interop with JS, including every React component in the <b>npm</b> ecosystem</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+<p>
+We're all sold on Reason!
+</p>
+</section>
+<section >
+<p>
+Still, there are challenges <b>within</b> typed languages:
+</p>
+<ul>
+<li>Difficult to know how to represent certain ideas
+<ul>
+<li>React.js prototype (SML)</li>
+
+</ul></li>
+<li>Some valid (or valid <b>enough</b>) programs are impossible to represent
+<ul>
+<li>Dependent types, etc.</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+<p>
+Even so, typed languages like Reason are vastly more productive in their <b>internal</b> domains and systems
+</p>
+
+<p>
+&#x2026;and vastly <b>less so</b> outside those domains
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgf7ec777">
+<h2 id="orgf7ec777">The new domain</h2>
+<p>
+Reason, Elm, Haskell, etc. all are beautiful internally, but break down as soon as we reach outside their system.
+</p>
+
+<p>
+Definitely/ReasonablyTyped is a symptom of this (not as prominent in ClojureScript, for example)
+</p>
+</section>
+<section >
+<p>
+Code libraries, ecosystems are important, but the pervasive requirement for apps today is external API dependencies.
+</p>
+
+<p>
+Very few companies implement everything from the ground up now: Analytics, A/B testing, payment processing, etc.
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org42257da">
+<h2 id="org42257da">Basic problem: Parsing JSON</h2>
+<p>
+Interacting with external services requires speaking the lingua franca: JSON
+</p>
+
+<p>
+Here's our beautiful record type:
+</p>
+<div class="org-src-container">
+
+<pre><code class="reason" >type person = {
+  name: string,
+  city: string
+}
+</code></pre>
+</div>
+
+<p>
+And here is our JSON:
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >{"name": "Sean", "city": "Malmö"}
+</code></pre>
+</div>
+<p>
+They look similar to us, but they're completely different to the computer
+</p>
+</section>
+<section >
+<p>
+So let's consume JSON and make a record instance
+</p>
+<div class="org-src-container">
+
+<pre><code class="reason" >let parsePersonJson = personJson : person => {
+  let parsedName =
+    switch (get(personJson, "name")) {
+    | None => raise(Failure("Field doesn't exist"))
+    | Some(value) =>
+      switch (decodeString(value)) {
+      | None => raise(Failure("Wrong value type"))
+      | Some(value) => value
+      }
+    };
+  let parsedCity =
+    switch (get(personJson, "city")) {
+    | None => raise(Failure("Field doesn't exist"))
+    | Some(value) =>
+      switch (decodeString(value)) {
+      | None => raise(Failure("Wrong value type"))
+      | Some(value) => value
+      }
+    };
+  {name: parsedName, city: parsedCity};
+};
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Problem solved!
+</p>
+
+<p>
+Next: Clean it up!
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="reason" >let pluckField = (field, obj, decoder) =>
+  obj |> Js.Dict.get(_, field) |> Option.getExn |> decoder |> Option.getExn;
+
+let parsePersonJson = personJson : person => {
+  let parsedName = pluckField("name", personJson, decodeString);
+  let parsedCity = pluckField("city", personJson, decodeString);
+  {name: parsedName, city: parsedCity};
+};
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Real-world example in Emacs
+</p>
+</section>
+<section >
+<p>
+Solution? Meta-program!
+</p>
+<div class="org-src-container">
+
+<pre><code class="reason" >[@bs.deriving abstract]
+type person = {
+  name: string,
+  city: string
+}
+
+let personToJs: person =>
+      {. personTo "name": string, "city": string};
+
+let personFromJs: {.. "name": string, "city": string} => person
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Problem solved, again!
+</p>
+
+<p>
+&#x2026; as long as we're still within our system.
+</p>
+
+<p>
+What if the server sends us some bad-ish JSON?
+</p>
+</section>
+<section >
+<blockquote nil>
+<p>
+"Properly Use Js.Json"
+</p>
+
+<p>
+Technically, the correct way to handle JSON is to recursively parse each field, and handle invalid data accordingly. Js.Json provides such low-level building blocks. See the examples in the API docs.
+</p>
+</blockquote>
+</section>
+<section >
+<p>
+Yeah, right.
+</p>
+</section>
+<section >
+<p>
+One the client, we have to always trust all of the JSON we get
+</p>
+
+<p>
+&#x2026; even though services are not always trustworthy.
+</p>
+
+<p>
+Also, we may not <b>know</b> the shape of the record ahead of time.
+</p>
+</section>
+<section >
+<p>
+Let's jump right into a big, real-world API: a Repository response from GitHub's REST API
+</p>
+
+<p>
+In this case, we don't know the record shape exactly. This is going to take awhile to transcribe into Reason's type system:
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >{
+  "id": 1296269,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "Hello-World",
+  "full_name": "octocat/Hello-World",
+  "owner": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/octocat/Hello-World",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/Hello-World",
+  "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+  "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+  "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+  "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+  "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+  "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+  "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+  "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+  "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+  "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+  "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+  "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+  "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+  "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+  "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+  "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+  "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+  "git_url": "git:github.com/octocat/Hello-World.git",
+  "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+  "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+  "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+  "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+  "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+  "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+  "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+  "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+  "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+  "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+  "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+  "ssh_url": "git@github.com:octocat/Hello-World.git",
+  "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+  "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+  "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+  "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+  "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+  "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+  "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+  "clone_url": "https://github.com/octocat/Hello-World.git",
+  "mirror_url": "git:git.example.com/octocat/Hello-World",
+  "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+  "svn_url": "https://svn.github.com/octocat/Hello-World",
+  "homepage": "https://github.com",
+  "language": null,
+  "forks_count": 9,
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "size": 108,
+  "default_branch": "master",
+  "open_issues_count": 0,
+  "topics": [
+    "octocat",
+    "atom",
+    "electron",
+    "API"
+  ],
+  "has_issues": true,
+  "has_projects": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "has_downloads": true,
+  "archived": false,
+  "pushed_at": "2011-01-26T19:06:43Z",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
+  "subscribers_count": 42,
+  "network_count": 0,
+  "license": {
+    "key": "mit",
+    "name": "MIT License",
+    "spdx_id": "MIT",
+    "url": "https://api.github.com/licenses/mit",
+    "node_id": "MDc6TGljZW5zZW1pdA=="
+  },
+  "organization": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "parent": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  },
+  "source": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+It'll take so much time in fact, that we should just write a tool to do it for us!
+</p>
+
+<p>
+The tool should:
+</p>
+<ol>
+<li>Enumerate the keys of a JSON object</li>
+<li>Check the type of the value</li>
+<li>Spit out a record definition</li>
+
+</ol>
+
+<p>
+Et voilà, the computer's doing our work for us!
+</p>
+
+</section>
+<section >
+<p>
+Now look at <span class="underline">this</span> respository response from GitHub. What changed? Does our code still work?
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >{
+  "id": 1296269,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "Hello-World",
+  "full_name": "octocat/Hello-World",
+  "owner": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": null,
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/octocat/Hello-World",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/Hello-World",
+  "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+  "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+  "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+  "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+  "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+  "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+  "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+  "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+  "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+  "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+  "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+  "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+  "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+  "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+  "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+  "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+  "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+  "git_url": "git:github.com/octocat/Hello-World.git",
+  "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+  "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+  "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+  "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+  "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+  "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+  "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+  "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+  "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+  "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+  "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+  "ssh_url": "git@github.com:octocat/Hello-World.git",
+  "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+  "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+  "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+  "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+  "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+  "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+  "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+  "clone_url": "https://github.com/octocat/Hello-World.git",
+  "mirror_url": "git:git.example.com/octocat/Hello-World",
+  "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+  "svn_url": "https://svn.github.com/octocat/Hello-World",
+  "homepage": "https://github.com",
+  "language": null,
+  "forks_count": 9,
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "size": 108,
+  "default_branch": "master",
+  "open_issues_count": 0,
+  "topics": [
+    "octocat",
+    "atom",
+    "electron",
+    "API"
+  ],
+  "has_issues": true,
+  "has_projects": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "has_downloads": true,
+  "archived": false,
+  "pushed_at": "2011-01-26T19:06:43Z",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
+  "subscribers_count": 42,
+  "network_count": 0,
+  "license": {
+    "key": "mit",
+    "name": "MIT License",
+    "spdx_id": "MIT",
+    "url": "https://api.github.com/licenses/mit",
+    "node_id": "MDc6TGljZW5zZW1pdA=="
+  },
+  "organization": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "parent": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  },
+  "source": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Whoops, null field.
+</p>
+
+<p>
+`string` isn't the same as `option(string)`.
+</p>
+
+<p>
+The example didn't cover the nullability of fields.
+</p>
+</section>
+<section >
+<p>
+Ok, so maybe we can change our tool a bit:
+</p>
+
+<ol>
+<li>Take <b>lots and lots</b> of examples</li>
+<li>Each time we see a key at some level of nesting, record it in a set of the types we've witnessed for each key</li>
+<li>Generate more accurate records</li>
+<li>Generate sub-records as well, probably</li>
+
+</ol>
+<p>
+4a. How do we automatically name them? We can base the record name off of the field name, but carefully mangle them to ensure they're valid Reason identifiers.
+</p>
+</section>
+<section >
+<p>
+Hope now that if we have enough examples (1? 2? 10? 1,000? 1,000,000?) we'll capture all the edge cases in the backend.
+</p>
+
+<ul>
+<li>Now we have a programmatic understanding of the JSON type structure!</li>
+<li>We can generate lots of different targets!</li>
+<li>Reason record type, or object type, or a typescript definition, or maybe even something more interesting.</li>
+
+</ul>
+
+<p>
+Let me show you a demo combining these two ideas
+</p>
+</section>
+<section >
+<p>
+json-&gt;ATD demo
+</p>
+</section>
+<section >
+<p>
+This is the same thing you'd do in JavaScript, ClojureScript, Elm, anything.
+</p>
+
+<p>
+You rely on enough data to hope to be right.
+</p>
+
+<p>
+"Undefined is not a function" / "`name` is not a field of undefined" comes from not understanding enough of the variability of an API.
+</p>
+</section>
+<section >
+<p>
+Sooooo, finally - problem solved!
+</p>
+</section>
+<section >
+<p>
+&#x2026; you can guess what's coming, right?
+</p>
+</section>
+<section >
+<p>
+Look at <span class="underline">this</span> repository response:
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >{
+  "id": 1296269,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "Hello-World",
+  "full_name": "octocat/Hello-World",
+  "owner": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "owned_gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": null,
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/octocat/Hello-World",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/Hello-World",
+  "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+  "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+  "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+  "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+  "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+  "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+  "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+  "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+  "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+  "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+  "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+  "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+  "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+  "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+  "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+  "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+  "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+  "git_url": "git:github.com/octocat/Hello-World.git",
+  "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+  "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+  "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+  "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+  "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+  "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+  "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+  "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+  "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+  "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+  "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+  "ssh_url": "git@github.com:octocat/Hello-World.git",
+  "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+  "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+  "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+  "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+  "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+  "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+  "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+  "clone_url": "https://github.com/octocat/Hello-World.git",
+  "mirror_url": "git:git.example.com/octocat/Hello-World",
+  "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+  "svn_url": "https://svn.github.com/octocat/Hello-World",
+  "homepage": "https://github.com",
+  "language": null,
+  "forks_count": 9,
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "size": 108,
+  "default_branch": "master",
+  "open_issues_count": 0,
+  "topics": [
+    "octocat",
+    "atom",
+    "electron",
+    "API"
+  ],
+  "has_issues": true,
+  "has_projects": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "has_downloads": true,
+  "archived": false,
+  "pushed_at": "2011-01-26T19:06:43Z",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
+  "subscribers_count": 42,
+  "network_count": 0,
+  "license": {
+    "key": "mit",
+    "name": "MIT License",
+    "spdx_id": "MIT",
+    "url": "https://api.github.com/licenses/mit",
+    "node_id": "MDc6TGljZW5zZW1pdA=="
+  },
+  "organization": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "followers_url": "https://api.github.com/users/octocat/followers",
+    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+    "organizations_url": "https://api.github.com/users/octocat/orgs",
+    "repos_url": "https://api.github.com/users/octocat/repos",
+    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/octocat/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "parent": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  },
+  "source": {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "Hello-World",
+    "full_name": "octocat/Hello-World",
+    "owner": {
+      "login": "octocat",
+      "id": 1,
+      "node_id": "MDQ6VXNlcjE=",
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/octocat",
+      "html_url": "https://github.com/octocat",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "private": false,
+    "html_url": "https://github.com/octocat/Hello-World",
+    "description": "This your first repo!",
+    "fork": false,
+    "url": "https://api.github.com/repos/octocat/Hello-World",
+    "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
+    "assignees_url": "http://api.github.com/repos/octocat/Hello-World/assignees{/user}",
+    "blobs_url": "http://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}",
+    "branches_url": "http://api.github.com/repos/octocat/Hello-World/branches{/branch}",
+    "collaborators_url": "http://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}",
+    "comments_url": "http://api.github.com/repos/octocat/Hello-World/comments{/number}",
+    "commits_url": "http://api.github.com/repos/octocat/Hello-World/commits{/sha}",
+    "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
+    "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
+    "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
+    "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
+    "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
+    "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
+    "git_commits_url": "http://api.github.com/repos/octocat/Hello-World/git/commits{/sha}",
+    "git_refs_url": "http://api.github.com/repos/octocat/Hello-World/git/refs{/sha}",
+    "git_tags_url": "http://api.github.com/repos/octocat/Hello-World/git/tags{/sha}",
+    "git_url": "git:github.com/octocat/Hello-World.git",
+    "issue_comment_url": "http://api.github.com/repos/octocat/Hello-World/issues/comments{/number}",
+    "issue_events_url": "http://api.github.com/repos/octocat/Hello-World/issues/events{/number}",
+    "issues_url": "http://api.github.com/repos/octocat/Hello-World/issues{/number}",
+    "keys_url": "http://api.github.com/repos/octocat/Hello-World/keys{/key_id}",
+    "labels_url": "http://api.github.com/repos/octocat/Hello-World/labels{/name}",
+    "languages_url": "http://api.github.com/repos/octocat/Hello-World/languages",
+    "merges_url": "http://api.github.com/repos/octocat/Hello-World/merges",
+    "milestones_url": "http://api.github.com/repos/octocat/Hello-World/milestones{/number}",
+    "notifications_url": "http://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}",
+    "pulls_url": "http://api.github.com/repos/octocat/Hello-World/pulls{/number}",
+    "releases_url": "http://api.github.com/repos/octocat/Hello-World/releases{/id}",
+    "ssh_url": "git@github.com:octocat/Hello-World.git",
+    "stargazers_url": "http://api.github.com/repos/octocat/Hello-World/stargazers",
+    "statuses_url": "http://api.github.com/repos/octocat/Hello-World/statuses/{sha}",
+    "subscribers_url": "http://api.github.com/repos/octocat/Hello-World/subscribers",
+    "subscription_url": "http://api.github.com/repos/octocat/Hello-World/subscription",
+    "tags_url": "http://api.github.com/repos/octocat/Hello-World/tags",
+    "teams_url": "http://api.github.com/repos/octocat/Hello-World/teams",
+    "trees_url": "http://api.github.com/repos/octocat/Hello-World/git/trees{/sha}",
+    "clone_url": "https://github.com/octocat/Hello-World.git",
+    "mirror_url": "git:git.example.com/octocat/Hello-World",
+    "hooks_url": "http://api.github.com/repos/octocat/Hello-World/hooks",
+    "svn_url": "https://svn.github.com/octocat/Hello-World",
+    "homepage": "https://github.com",
+    "language": null,
+    "forks_count": 9,
+    "stargazers_count": 80,
+    "watchers_count": 80,
+    "size": 108,
+    "default_branch": "master",
+    "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
+    "has_issues": true,
+    "has_projects": true,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_downloads": true,
+    "archived": false,
+    "pushed_at": "2011-01-26T19:06:43Z",
+    "created_at": "2011-01-26T19:01:12Z",
+    "updated_at": "2011-01-26T19:14:43Z",
+    "permissions": {
+      "admin": false,
+      "push": false,
+      "pull": true
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+&#x2026; The server moved fields.
+</p>
+
+<ul>
+<li>We didn't know! No one told us!</li>
+<li>So now what do we do? Take lots more updated examples, re-generate our code?</li>
+
+</ul>
+</section>
+<section >
+<p>
+3 big, big problems when typed languages meet the outside world:
+</p>
+
+<ol>
+<li>Boilderplate converting between JSON data into Records/Objects</li>
+<li>Confidence in the accuracy and safety of conversion</li>
+<li>The server can change with no warning, destroying our run-time safety and causing us a lot of work to track down API response diffs</li>
+
+</ol>
+</section>
+<section >
+<p>
+So what do we want in Reason?
+</p>
+
+<ol>
+<li>Access to all of the data types in an API</li>
+<li>Automatic conversion, access, safety</li>
+<li>Guaranteed contracts between server/client</li>
+<li>All of the above in an automated, programmatic way</li>
+
+</ol>
+</section>
+<section >
+<p>
+Meet GraphQL
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org8d3365e">
+<h2 id="org8d3365e">GitHub GraphQL Demo</h2>
+<p>
+Access to the same data, but with lots of important advatanges
+</p>
+
+<p>
+GraphQL is introspectable
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="reason" >type projectState =
+  | OPEN
+  | CLOSED
+</code></pre>
+</div>
+
+<div class="org-src-container">
+
+<pre><code class="js" >{
+  "data": {
+    "__schema": {
+      "queryType": {
+        "name": "Query"
+      },
+      "mutationType": {
+        "name": "Mutation"
+      },
+      "subscriptionType": null,
+      "types": [
+        {
+          "kind": "ENUM",
+          "name": "ProjectState",
+          "description": "State of the project; either 'open' or 'closed'",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "OPEN",
+              "description": "The project is open.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CLOSED",
+              "description": "The project is closed.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="reason" >type user = {
+  avatarUrl: (string, option(int))
+};
+</code></pre>
+</div>
+
+<div class="org-src-container">
+
+<pre><code class="js" >{
+  "data": {
+    "__schema": {
+      "types": [
+        {
+        "kind" : "OBJECT",
+        "name" : "User",
+        "description" : "A user is an individual's account on GitHub that owns repositories and can make new content.",
+        "fields" : [ {
+          "name" : "avatarUrl",
+          "description" : "A URL pointing to the user's public avatar.",
+          "args" : [ {
+            "name" : "size",
+            "description" : "The size of the resulting square image.",
+            "type" : {
+              "kind" : "SCALAR",
+              "name" : "Int",
+              "ofType" : null
+            },
+            "defaultValue" : null
+          } ],
+          "type" : {
+            "kind" : "NON_NULL",
+            "name" : null,
+            "ofType" : {
+              "kind" : "SCALAR",
+              "name" : "URI",
+              "ofType" : null
+            }
+          },
+          "isDeprecated" : false,
+          "deprecationReason" : null
+        }],
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+GraphQL's type system
+</p>
+
+<ul>
+<li></li>
+
+</ul>
+
+<p>
+Reason's type system = <code>love</code>
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org22bfdbf">
+<h2 id="org22bfdbf">Editor demo</h2>
+<p>
+<a href="https://www.youtube.com/watch?v=yMqE37LqRLA">Video demo</a>
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgdfe8a95">
+<h2 id="orgdfe8a95">Frontend</h2>
+<div class="outline-text-2" id="text-orgdfe8a95">
+</div>
+</section>
+<section id="slide-orgd3b198a">
+<h3 id="orgd3b198a"><span class="underline">What</span> do we get?</h3>
+<ul>
+<li>Powerful clients
+<ul>
+<li>Get exactly what you want (no over/under fetching)</li>
+<li>Reduced latency and network calls (huge for mobile)</li>
+
+</ul></li>
+<li>Safe client
+<ul>
+<li>Won't even compile if server can't satisfy query</li>
+<li>Usage of query results are type-checked</li>
+<li>Nullable fields are enforced - no more run-time errors!</li>
+
+</ul></li>
+<li>Easy clients
+<ul>
+<li>Don't even think about network coordination</li>
+<li>Declaratively express requirements alongside components</li>
+
+</ul></li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orge079084">
+<h2 id="orge079084"><span class="underline">How</span> does it work?</h2>
+<p>
+Read <a href="https://github.com/apollographql/reason-apollo">https://github.com/apollographql/reason-apollo</a>
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org59ad863">
+<h2 id="org59ad863">Backend</h2>
+<div class="outline-text-2" id="text-org59ad863">
+</div>
+</section>
+<section id="slide-orgdf10e56">
+<h3 id="orgdf10e56"><span class="underline">Why</span> in Reason(Native)?</h3>
+<p>
+As mindful server developers, we have to remember the goals of the clients:
+</p>
+<ul>
+<li>Productivity</li>
+<li>Safety</li>
+<li>Stability</li>
+<li>Guarantees
+<ul>
+<li>If you say you'll return an Int, return an int</li>
+<li>If you say a field is not nullable, do not return a null</li>
+<li>To be courteous, do this checking at compile time, not at run time
+(otherwise the client gets more error responses than they'd like)</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section id="slide-orgebc769f">
+<h3 id="orgebc769f">Ever-vigilant</h3>
+<p>
+Make sure you're adhering to all the previous points:
+</p>
+<ul>
+<li>Even as your schema grows</li>
+<li>Even as your team grows</li>
+<li>Even as you're pushing a commit in a hurry on a rainy Friday at 19:30</li>
+
+</ul>
+</section>
+<section id="slide-orgaa9261d">
+<h3 id="orgaa9261d"><span class="underline">How</span> in Reason(Native)?</h3>
+<p>
+<a href="https://github.com/andreas/ocaml-graphql-server">ocaml-graphql-server</a>
+</p>
+
+<ul>
+<li>Best GraphQL Server in the world</li>
+
+</ul>
+<p>
+bar none.※
+</p>
+
+
+
+
+
+
+
+<p class="fragment appear">
+※ &#x2026; having not really used any others
+</p>
+</section>
+<section >
+<p>
+Easily create a compile-time safe GraphQL engine:
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >type user = {
+  id: int,
+  name: string,
+};
+
+/* User object */
+let user =
+  Schema.(
+    obj("user", ~doc="A user in the system", ~fields=_ =>
+      [
+        field(
+          "id",
+          ~doc="Unique user identifier",
+          ~typ=non_null(int),
+          ~args=Arg.[],
+          ~resolve=(ctx, p) =>
+          p.id
+        ),
+        field("name", ~typ=non_null(string), ~args=Arg.[], ~resolve=(ctx, p) =>
+          p.name
+        ),
+      ]
+    )
+  );
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Combine objects together into an explicit schema for your clients
+</p>
+<div class="org-src-container">
+
+<pre><code class="js" >/* Schema that clients will see */
+let schema =
+  Schema.(
+    schema([
+      field(
+        "users",
+        ~typ=non_null(list(non_null(user))),
+        ~args=Arg.[],
+        ~resolve=(ctx, ()) =>
+        users
+      ),
+    ])
+  );
+</code></pre>
+</div>
+</section>
+<section id="slide-org3b115b0">
+<h3 id="org3b115b0">Example of breaking schema</h3>
+
+<div class="figure">
+<p><img src="./img/no_breaking_changes.png" alt="no_breaking_changes.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org5b6fd99">
+<h2 id="org5b6fd99">Limitations</h2>
+<p>
+Both GraphQL <b>and</b> Reason are still figuring lots of things out.
+</p>
+
+<p>
+What you see is usable today, but isn't the final product.
+</p>
+</section>
+<section id="slide-org585aab1">
+<h3 id="org585aab1">Frontend</h3>
+<p>
+Not <span class="underline">all</span> of the GraphQL spec covered (though most of it is now)
+</p>
+
+
+<p>
+Probably won't be able to easily get GraphiQL-like auto-complete in-editor (maybe atom?)
+</p>
+</section>
+<section id="slide-org2063378">
+<h3 id="org2063378">Backend</h3>
+<p>
+Still figuring lots of things out:
+</p>
+<ul>
+<li><del>How to propagate errors</del></li>
+<li><del>Unions/Interfaces</del></li>
+<li><del>Subscriptions</del></li>
+<li>Directives</li>
+<li>Integrating into e.g. Apollo Engine</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org327ae84">
+<h2 id="org327ae84">Wider implications of GraphQL and typed languages</h2>
+<ul>
+<li>ClojureScript before/after React.js</li>
+
+</ul>
+<p>
+GraphQL wrappers make dealing with APIs in typed languages easier than any alternative:
+</p>
+<ul>
+<li>In-editor autocomplete</li>
+<li>Type safety</li>
+<li>Data-structure hints</li>
+
+</ul>
+
+<p>
+What does it mean for Reason (or Elm/Purescript/etc.) client and server devs if every service has a GraphQL wrapper?
+</p>
+</section>
+<section >
+<p>
+Let's imagine the future:
+</p>
+
+<p>
+Eveyone has a GraphQL server
+</p>
+
+<p>
+What's that look like?
+</p>
+</section>
+<section >
+<p>
+(this is already available in <a href="https://onegraph.com/">https://onegraph.com/</a>)
+</p>
+</section>
+<section >
+<p>
+Go build GraphQL APIs if you want to see <span class="underline">any</span> typed languages become more practical!
+</p>
+</section>
+<section >
+<p>
+Thank you!
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

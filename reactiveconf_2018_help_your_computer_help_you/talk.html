@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org2d13ded">
+<h2 id="org2d13ded">Help your computer help you</h2>
+<p>
+Sean Grove @sgrove
+</p>
+
+<p>
+Work on @onegraphio
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org3270737">
+<h2 id="org3270737">Opening statement</h2>
+<p>
+<span class="underline">We, as programmers, we do too much work manually</span>
+</p>
+
+</section>
+<section id="slide-org54e2360">
+<h3 id="org54e2360">Time spent:</h3>
+<p>
+<span class="underline">Manual vs tool-assisted work</span>
+</p>
+
+<p>
+What we do : what's quickly achievable
+</p>
+<p class="fragment appear">
+[=========|*] Current: 90%
+</p>
+<p class="fragment appear">
+[==|********] Goal: 20%
+</p>
+</section>
+<section id="slide-org927ea46">
+<h3 id="org927ea46">Precedent</h3>
+<div class="outline-text-3" id="text-org927ea46">
+</div>
+</section>
+<section id="slide-org1c6560a">
+<h4 id="org1c6560a">Example: Compilers</h4>
+<ul>
+<li>Before:</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Microprocessor code was designed with <b>humans</b> in mind.</li>
+<li>Computers couldn't introspect code - only execute it.</li>
+<li><img src="./images/x86_instructions.png" alt="x86_instructions.png" /></li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Now:</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Nearly <b>No</b> instruction sets are designed for humans.</li>
+<li>They're <b>designed <span class="underline">exclusively</span></b> for computers (compilers).</li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Result</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Computer can <b>write</b> our code for us!</li>
+<li>We write very little of our own code</li>
+<li>They write it <b>faster</b> than any of us</li>
+<li>They write more performant code than most of us!</li>
+
+</ul>
+</section>
+<section id="slide-orgd038651">
+<h4 id="orgd038651">Example: Babel!</h4>
+<ul>
+<li>Before:</li>
+
+</ul>
+
+<ul class="fragment appear">
+<li>JavaScript was pure text</li>
+<li>Computers couldn't <b>read</b> it - only execute it.</li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Now:</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Babel has turned code into something computers can <b>read</b></li>
+<li>Computers know how to work with syntax trees!</li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Result</li>
+
+</ul>
+<ul class="fragment appear">
+<li>The JavaScript ecosystem accelerated so much faster</li>
+<li>Much better tooling</li>
+
+</ul>
+
+</section>
+<section id="slide-orgdf3cccc">
+<h4 id="orgdf3cccc">Example: Performance profiling</h4>
+<p>
+Two choices:
+</p>
+<ol>
+<li>Dump profiling data into a text file - yay, you can read it!</li>
+<li>Encode the data into a form for the computer</li>
+
+</ol>
+</section>
+<section >
+
+<p>
+Before:
+</p>
+<ul>
+<li>Profiling data meant for humans</li>
+<li>Computers couldn't introspect the performance of code at run-time
+<ul>
+<li><img src="./images/clojure_trace.png" alt="clojure_trace.png" /></li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section >
+
+<ul>
+<li>Now:</li>
+
+</ul>
+<p>
+Profiling data is <b>intended exclusively</b> for computers to read.
+</p>
+
+</section>
+<section >
+<ul>
+<li>Result
+<ul>
+<li>Tools that can order output by slowest, deepest, memory usage, etc.</li>
+<li>Beautiful, invaluable tools!</li>
+<li><img src="./images/flame_graph.png" alt="flame_graph.png" /></li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section id="slide-org2ac2ea5">
+<h4 id="org2ac2ea5">Why exclusively for computers?</h4>
+<ol>
+<li>They'll do the <b>most</b> of the reading</li>
+<li>They can present a human-readable version themselves</li>
+<li>Computer-readable allows for <b>human composable</b> ideas!</li>
+
+</ol>
+</section>
+<section id="slide-org00129c9">
+<h4 id="org00129c9">Composable ideas</h4>
+<p class="fragment appear">
+Computer-understanding of run-time performance
+</p>
+<p class="fragment appear">
+⨥ Computer-generated code
+</p>
+<hr />
+<p class="fragment appear">
+JIT compilers!
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgbc38492">
+<h2 id="orgbc38492">Human-readable layer?</h2>
+<ol>
+<li>Should be very, <span class="underline">very</span> thin</li>
+<li>Always the <b>last</b> stage in the <b>pipeline</b></li>
+
+</ol>
+</section>
+<section id="slide-org099f3b9">
+<h3 id="org099f3b9">Human layer: Last stage in the pipeline</h3>
+<p>
+<span class="underline">misery (<i>ˈmɪz(ə)ri</i>) [noun]</span>
+</p>
+<p class="fragment appear">
+Building a <b>computer</b>-program on top of a human-readable form
+</p>
+
+<p class="fragment appear">
+See:
+</p>
+<ul class="fragment appear">
+<li>SQL (string interpolation, injections, etc.)</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Every production-grade scraper ever written (ugh)</li>
+
+</ul>
+</section>
+<section id="slide-org44007a9">
+<h3 id="org44007a9">Human layer: Thin</h3>
+<p>
+Nearly everything should be done by computers underneath.
+</p>
+
+<p>
+If too much invested in human-readable form, painful
+</p>
+</section>
+<section >
+<p>
+Going computer-readable-&gt;human-readable
+</p>
+
+<p>
+is better than
+</p>
+
+<p>
+Going human-readable-&gt;computer-readable
+</p>
+</section>
+<section >
+
+<p>
+Goal: Write autocomplete for an API
+</p>
+
+<p class="fragment appear">
+Scenario 1: From beautiful human-oriented docs
+<img src="./images/trello_api_1.png" alt="trello_api_1.png" class="fragment appear" />
+</p>
+</section>
+<section >
+<p>
+Scenario 1: From beautiful human-oriented docs
+<img src="./images/trello_api_2.png" alt="trello_api_2.png" />
+</p>
+</section>
+<section >
+<p>
+Scenario 1: From beautiful human-oriented docs
+<img src="./images/trello_api_3.png" alt="trello_api_3.png" />
+</p>
+</section>
+<section >
+<p>
+Result
+</p>
+<div class="org-src-container">
+
+<pre><code class="javascript" >{"actions": 
+  [{"name": "GET board", 
+    "method": "GET",
+    "params":
+      [{"name": "id", 
+        "type": "string"}]}
+    ...]}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Scenario 2: From JSON description of API
+</p>
+</section>
+<section >
+<p>
+Scenario 2: From JSON description of API
+</p>
+<div class="org-src-container">
+
+<pre><code class="javascript" >{"actions": 
+  [{"name": "GET board", 
+    "method": "GET",
+    "params":
+      [{"name": "id", 
+        "type": "string"}]}
+    ...]}
+</code></pre>
+</div>
+<p>
+&#x2026; the same thing!
+</p>
+</section>
+<section >
+
+<p>
+&#x2026; <b>and</b> you can generate those nice docs!
+<img src="./images/trello_api_1.png" alt="trello_api_1.png" />
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org0583c65">
+<h2 id="org0583c65">Where else do we suffer from lack of computer help?</h2>
+<ul>
+<li>Integration
+<ul>
+<li>Pagination</li>
+<li>Rate-limits</li>
+
+</ul></li>
+<li>Analytics</li>
+<li>Documentation</li>
+<li>Testing</li>
+<li>Mocking</li>
+<li>Operational management</li>
+
+</ul>
+
+<p>
+Nearly all of these are bespoke, manual today
+</p>
+
+</section>
+<section id="slide-org9c79820">
+<h3 id="org9c79820">Lack of help: Integration</h3>
+<p>
+[computer program] &lt;===&gt; [computer program]
+</p>
+
+<p>
+Not humans!
+</p>
+
+<p>
+Computer communicating data or effects to/from another system
+</p>
+</section>
+<section id="slide-org0c42a6f">
+<h4 id="org0c42a6f">Lack of help: Pagination</h4>
+<p>
+As a client: What pagination strategies do we see?
+</p>
+
+<ul>
+<li>Page based</li>
+<li>Offset based</li>
+<li>Cursor based</li>
+
+</ul>
+
+<p>
+Any others?
+</p>
+</section>
+<section >
+<p>
+So few patterns yet no universal `hasMore` or `getNextSet` function.
+</p>
+
+<p>
+Why?
+</p>
+
+<p>
+Every endpoint is human-oriented, unable to describe itself to its clients
+</p>
+
+</section>
+<section id="slide-org0db058a">
+<h4 id="org0db058a">Lack of help: Rate-limits</h4>
+<p>
+As a client:
+</p>
+
+<ul>
+<li>Generally esoteric, few guides on how to handle generally</li>
+<li>Incredibly painful</li>
+
+</ul>
+<p>
+Exponential backoff across production program requires centralized app-wide queuing to correctly balance
+</p>
+</section>
+<section id="slide-org9fb39cd">
+<h4 id="org9fb39cd">API Analytics</h4>
+<p>
+As a provider: Who's hitting what fields?
+</p>
+</section>
+<section >
+<p>
+If you remove/break a field, which client authors do you tell to migrate?
+</p>
+
+<p>
+If you find an existing bug in a field, how do you know who to warn to review their data?
+</p>
+
+</section>
+<section >
+<p>
+How do you help them automate the migration as much as possible?
+</p>
+</section>
+<section id="slide-org27a46ac">
+<h4 id="org27a46ac">Documentation</h4>
+<p>
+As a provider:
+</p>
+<ul>
+<li>How do you keep code/docs in sync?</li>
+
+</ul>
+<ul class="fragment appear">
+<li>Analytics can help with this - prioritize documentation by what fields 90% of your users are hitting</li>
+
+</ul>
+</section>
+<section >
+<p>
+As a client:
+<span class="underline">Discoverability</span>:What functionality is available to me?
+</p>
+
+<p>
+Given I'm at point X in my integration, what's the best path to destination Z?
+</p>
+</section>
+<section id="slide-org45309de">
+<h4 id="org45309de">Mocking</h4>
+<p>
+As a client:
+How can I generate fake data from your API?
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org597170f">
+<h2 id="org597170f">Language-specific clients</h2>
+<p>
+e.g. Ruby+GitHub, Node+GitHub, Ruby+Zendesk
+</p>
+
+<p>
+&#x2026; they should be generated!
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org63e1078">
+<h2 id="org63e1078">We've seen this before</h2>
+<ul>
+<li>SOAP vs REST</li>
+
+<li>OData vs GraphQL</li>
+
+<li>RPC vs SQL</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org4be4d0c">
+<h2 id="org4be4d0c">Caveats</h2>
+<ul>
+<li>Uncanny valley</li>
+
+</ul>
+<p>
+Generated tooling output vs production, consumer-facing output
+</p>
+
+<p>
+Demo Zeit purchase domain on OneGraph vs production site
+</p>
+
+</section>
+<section id="slide-orga5538a4">
+<h3 id="orga5538a4">Double-edged sword</h3>
+<p>
+Purchasing demo in via Zeit in OneGraphiQL is <b>amazing</b> as a exploration + developer tool!
+</p>
+
+<p>
+It would be (possible, but) <b>terrible</b> to deliver to a non-developer
+</p>
+
+<p>
+Be wise.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org04efd9d">
+<h2 id="org04efd9d">Final demo</h2>
+<ul>
+<li>Mocking</li>
+<li>Documentation</li>
+<li>Discoverability</li>
+<li><span class="underline">Composable ideas</span> (in unexpected ways)</li>
+
+</ul>
+
+</section>
+<section >
+
+</section>
+</section>
+<section>
+<section id="slide-orgde47027">
+<h2 id="orgde47027">Demo recap</h2>
+<p>
+✓ Mocking
+</p>
+
+<p>
+✓ Documentation
+</p>
+
+<p>
+✓ Discoverability
+</p>
+
+<p>
+✓ <span class="underline">Composable ideas</span> (in unexpected ways)
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org8733011">
+<h2 id="org8733011">Start making your APIs self-documenting!</h2>
+<p>
+When writing docs, start with data!
+</p>
+<ul>
+<li>See how much of your docs you can generate!</li>
+<li>Then look at tools that do this already - swagger</li>
+<li>Or just use GraphQL</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org15674cd">
+<h2 id="org15674cd">Summary</h2>
+</section>
+</section>
+<section>
+<section id="slide-org0d64912">
+<h2 id="org0d64912">Thank you!</h2>
+</section>
+</section>
+<section>
+<section id="slide-orgac96d27">
+<h2 id="orgac96d27">Misc</h2>
+</section>
+<section >
+
+<p>
+Stop doing manual, bespoke work
+But computers have to be able to read your APIs.
+</p>
+
+<p>
+How much work
+</p>
+<ul>
+<li>Testing</li>
+<li>Documentation</li>
+<li>Mocking</li>
+<li>Integration</li>
+<li>Analytics</li>
+
+</ul>
+
+<p>
+Challenges:
+</p>
+<ul>
+<li>Pagination</li>
+<li>Rate-limits</li>
+<li>Documentation
+<ul>
+<li>Analytics can help with this - prioritize documentation by what fields 90% of your users are hitting</li>
+
+</ul></li>
+<li>Updating an API
+<ul>
+<li>How do you know who you're breaking?</li>
+
+</ul></li>
+
+</ul>
+
+
+<p>
+The paths:
+</p>
+<ul>
+<li>Non-self describing apis: do nothing, get nothing</li>
+<li>Now you documented something</li>
+<li>Now you have swagger, not even connected to code (swagger is by hand)</li>
+<li>Next generate swagger/api-description from code</li>
+
+</ul>
+
+
+<p>
+Don’t focus on your top-notch api docs website, focus on more robust self-describing api for other projects
+</p>
+
+
+
+<p>
+REPLs
+</p>
+
+<p>
+-&gt; About seeing the transformation of data at each step
+</p>
+
+<p>
+Good documentation sites (README.io)
+API/data-format migrations
+Monitoring sites
+Pagination
+Client-side handling rate-limits
+Mocking
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: none
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+
+* Accelerating API adoption through developer happiness with GraphQL
+
+* Quick Graph
+
+[[file:./img/tech_comparison_graph.png]]
+
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- VP Eng @ Payments company
+- Background in Clojure(Script)/Reason/Rust, dev-tooling
+[[file:./img/onegraph_website.png]]
+
+* Accelerating API adoption through developer happiness with GraphQL
+Two Points to keep in mind when talking about api adoption:
+- Content is king
+- Competition is fierce (not always from other APIs)
+
+** Content is king
+First and foremost, the _primary_ attraction of your API:
+- Its _data_
+- Its _effects_
+
+#+BEGIN_QUOTE
+"How do you help me achieve my business goal?"
+#+END_QUOTE
+
+** Competition is fierce
+- Engineering resources are always stretched
+
+At any given time, 20+% of an API-based company's deal-flow is delayed for 6-8 months on engineering resources to get over integration challenges
+
+"The business lead was about to buy, but realized they don't have engineering resources."
+
+- Competition isn't always with other APIs
+"Consumer" APIs like Spotify are competing for my attention against other interests I have
+
+** Two components 
+
+- _Engineering resource constraint_
+Reflects amount of energy *required* to complete a task
+
+- _Developer happiness_
+Reflects amount of intrinsic energy *available* to complete a task
+
+* APIs are _rarely_ known for sparking joy
+- Lack of empathy (broken feedback loop)
+- Limited resources for design/documentation/testing/tooling, etc.
+#+REVEAL: split
+Setting the scene...
+* Perception of our API's adoption
+[[file:./img/api_perception.png]]
+** Reality of our API's adoption curve
+
+#+REVEAL: split
+[[file:./img/api_reality_1_0.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_1.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_2.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_3.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_4.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_5.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_6.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_7.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_8.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_9.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_10.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_11.png]]
+
+#+REVEAL: split
+"Though I walk through the valley of the shadow of auth..."
+[[file:./img/api_reality_1_13.png]]
+
+#+REVEAL: split
+[[file:./img/api_reality_1_12.png]]
+
+#+REVEAL: split
+[Developer PSA]
+[[file:./img/programmer_productivity_0.png]]
+
+#+REVEAL: split
+[[file:./img/programmer_productivity_1.png]]
+
+#+REVEAL: split
+[[file:./img/tab_competition_graph.png]]
+
+#+REVEAL: split
+[[file:./img/tab_competition_proof.png]]
+
+* Three metrics for dev happiness
+Evaluate your API with the following criteria:
+- Time to initial success (Success ASAP)
+- Intensity of success (Biggest "wow" moments possible)
+- Interval between subsequent success states (make success frequent)
+
+#+REVEAL: split
+Criteria => Maxims:
+- Deliver quickest initial success
+- Maximize "wow" factor
+- Make success frequent
+
+* How does GraphQL help?
+
+- GraphQL is inherently machine-readable (at multiple levels!)
+- The tooling possible is intensely powerful
+- A positive feedback loop
+
+** GraphQL Help: Demoathon
+GraphiQL - Auto-complete APIs!
+#+REVEAL: split
+GraphiQL Explorer
+#+REVEAL: split
+GraphiQL Smart Forms
+#+REVEAL: split
+Next level: Auto-parameterize existing queries
+[[file:./img/explorer_parameterize_example_1.png]]
+#+REVEAL: split
+[[file:./img/explorer_parameterize_example_2.png]]
+#+REVEAL: split
+[[file:./img/explorer_parameterize_example_3.png]]
+#+REVEAL: split
+[[file:./img/explorer_parameterize_example_4.png]]
+#+REVEAL: split
+[[file:./img/explorer_parameterize_example_5.png]]
+#+REVEAL: split
+[[file:./img/explorer_parameterize_example_6.png]]
+#+REVEAL: split
+GraphiQL Code Exporter
+#+REVEAL: split
+Compare to existing fragmented experiences:
+- Documentation is often "inert"
+- Examples aren't generalizable
+- Initial experimentation isn't reusable in code
+#+REVEAL: split
+Who can traverse graphs?
+#+ATTR_REVEAL: :frag (appear)
+- Humans
+- Computers
+#+ATTR_REVEAL: :frag (appear)
+Who's generally better?
+#+REVEAL: split
+Computers.
+#+REVEAL: split
+[[file:./img/explorer_breadth_first_search.png]]
+
+#+REVEAL: split
+Multi-APIs
+#+REVEAL: split
+[[file:./img/hasura.svg]]
+Hasura: Instant Realtime GraphQL on Postgres
+ 
+Like Firebase++, but:
+#+ATTR_REVEAL: :frag (appear)
+- On Postgres
+- Standard GraphQL
+- Open-source
+
+#+REVEAL: split
+Automatically combining APIs
+#+ATTR_REVEAL: :frag (appear)
+- Remote schema integration
+- "Remote-service joins"
+- Compare:
+  - Stripe-as-a-library
+  - Stripe-as-an-introspectable-graph
+
+#+REVEAL: split
+Auto-complete inside IDE
+
+#+REVEAL: split
+GraphQL goes _everywhere_
+#+ATTR_REVEAL: :frag (appear)
+- Sales VP, CFO, etc.
+- Managers: "I need a list of new users for the past 30 days"
+
+#+REVEAL: split
+GraphQL as async server-to-server events: Webhook delivery
+#+REVEAL: split
+
+GraphQL Cortex
+#+REVEAL: split
+GraphQL Cortex: sean@onegraph.com
+
+** Conquering Auth
+Auth is difficult, and deeply unpleasant.
+#+REVEAL: split
+Build it into your API.
+#+REVEAL: split
+~[Auto "Log in to <X>" example]~
+*** Progressive Auth
+Progressive auth is the right thing to do.
+
+It's also even more unpleasant!
+#+REVEAL: split
+Build it into your API.
+#+REVEAL: split
+#+BEGIN_SRC java
+type Company {
+  id: String!
+  name: String!
+  createdAt: DateTime!
+  accountBalance: Int @permissions(scopes: ["account:read"])
+}
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC json
+{
+  "errors": [
+    {
+      "message": "Missing scope for accountBalance. Please grant additional permissions.",
+      "path": [
+        "company"
+        "accountBalance"
+      ],
+      "extensions": {
+        "type": "auth/insufficient-auth",
+        "requiredScope": "account:read",
+      }
+    }
+  ],
+  "data": {
+    "company": {
+      "id": "hZd773dvb"
+      "name": "Globodex, Inc."
+    }
+  }
+}
+#+END_SRC
+
+* Virtuous-data cycle
+[[file:./img/virtuous_cycle.png]]
+
+
+* Deep Analytics: What can we do?
+*** Iterative API design
+Solution to ivory-tower API design problem - inherent loop
+** Example of breaking schema
+#+ATTR_REVEAL: :frag (appear)
+- Deprecate old fields
+- Identify *specific* clients who have accessed in the past
+- Reach out to work on migration
+  - Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)
+- Write query transformers to update client queries automatically
+- Compare to REST: small tweaks indiscriminately affect all clients OR fork the world
+#+REVEAL: split
+   [[./img/no_breaking_changes.png]]
+*** Schema changelog automation
+  - https://developer.github.com/v4/changelog/
+*** Living, responding, *accurate* API Docs
+#+ATTR_REVEAL: :frag (appear)
+- "Lies, damn lies, and API documentation"
+- Accurate docs and consistent APIs
+- "For the new users who signed up two weeks ago, what fields have they been accessing?"
+- Humans classify unrecognized new use-cases
+- Insert into documentation as annotated example
+- Sort ranking based on trends in new users
+  - Potentially even per client-group via tagging clients
+
+*** Auto-classify fields for mocking use for mocking to help users without accounts
+What's better than auto-auth?
+
+No auth!
+#+REVEAL: split
+[[file:./img/auto_classification.png]]
+- First/Last/Full name
+  - Language distribution
+- Email
+- Address, Zip Code, Country
+- URI
+#+REVEAL: split
+GraphQL Muse: sean@onegraph.com
+
+*** Deep performance monitoring
+#+ATTR_REVEAL: :frag (appear)
+- Performance/timing
+- Error rates
+- Audit-logs
+- Total requests, bytes
+#+ATTR_REVEAL: :frag (appear)
+... per *field*
+
+*** GDPR, COPPA, HIPAA, PII
+Combine client+field-level access with server-awareness of data sensitivity:
+#+BEGIN_SRC java
+type User @ GDPR {
+  id: String!
+  name: String!
+  birthdate: DateTime! @PII
+  lastMedicalAppointment: DateTime @HIPAA
+  socialSecurityNumber: String @PII
+}
+#+END_SRC
+- Automate permissions + privilege
+- Track data exposure
+
+* Getting over the hurdle
+- Analyze current network traffic
+- Track "novelty" over time
+- Derive *actual* API contract
+  - Authentication
+  - Pagination
+  - Relationships
+  - Types
+- Generate GraphQL
+#+REVEAL: split
+...
+#+REVEAL: split
+- Self-contained binary
+- Runs next to your webserver
+- OSS
+- On-premise
+#+REVEAL: split
+Appiderv: sean@onegraph.com
+
+* Summary
+GraphQL itself offers substantial benefits out of the box.
+
+The tooling today and tomorrow take developer happiness to the next level:
+- For API providers
+- For data-infrastructure managers
+- For client-side developers
+- And even for non-traditional devs: CFOs, VP Sales, Managers, Data-scientists, etc.
+
+#+REVEAL: split
+- Ultimately the data and effects of your API are king - focus on *that* exclusively.
+- But if you want your api to adopted in 2019, it must plug into next-level tooling:
+ - Familiar
+ - Exploration
+ - Documentation
+ - Code generation
+ - Client migration
+ - Analytics-lifecycle
+#+REVEAL: split
+- Pick standards that can give you as much of the above in an evolve-able way out of the box
+- Designing apis still involves humans, but checking for consistency can be automated
+
+#+REVEAL: split
+
+1. Content is king
+1. Competition is fierce
+
+#+ATTR_REVEAL: :frag (appear)
+A word of caution:
+#+ATTR_REVEAL: :frag (appear)
+- This is a 'wow' moment now.
+- ....In a few years, it will simply be table-stakes.
+- OneGraph tooling has started to spread and become standard!
+- How is your API going to fit into that world?
+
+#+ATTR_REVEAL: :frag (appear)
+Adopt GraphQL & focus on #1
+
+* My offers
+** _The_ GraphQL Book
+5 copies of the new GraphQL book by our friends [[https://twitter.com/MoonHighway][@MoonHighway]], the premier GraphQL training group:
+
+[[file:./img/learning_graphql.jpg]]
+#+REVEAL: split
+Tweet your best GraphQL questions ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- GraphQL adoption
+- Tooling possibilities
+- Etc.
+
+** GraphQL, APIs, Dev-Tooling & Coffee
+** Developer happiness for your company
+Want this tooling for your api and for your developers?
+
+We can make it happen for you, public or on-premise.
+
+* Thank you!
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+[[file:./img/onegraph_website.png]]
+
+* Misc
+** Overview
+*** Client-side DX
+*** Meta-API
+*** Maintainers
+** Demos
+ - GraphiQL autocomplete
+ - Explorer
+ - Smart forms
+ - Exporter - figure out trello api?
+ - Excel
+   - GraphQL goes everywhere - even into Excel!
+ - Multi-APIs
+ - Automatic progressive authorization
+ - Hasura DB-access
+  - We've seen internal devs who - when they're so frustrated with an inscrutable api - stand up a hasura instance to build and prototype instead
+ - Hasura remote-joins
+ - Draftbit
+ - npm (salesforce) api redesign
+ - in-editor autocomplete
+ - Breaking schema changes
+ - GraphQL Pipelines
+ - Webhooks
+ - Generating JWT with GraphQL for authorization and authentication
+** Ideas
+ - Inferring API design from traffic
+   - Generate GraphQL Layer
+ - API analytics
+   - "Living API Docs" - can even be generated per client-group ("Fintech devs want to see these cases first", "startups want these cases first") if you tag the clients and see what fields they query in common
+   - Migrating existing clients (affects api maintainers)
+ - Auto-classify fields and use for mocking to help users without accounts
+** CTAs
+ - Ask me out for coffee
+ - Best 5 tweets get GraphQL book
+ - Waitlist for products
+   - GraphQL Pipelines
+   - Analytics classifier/mocking
+   - API inferrer
+ - Want this tooling for your api, for your developers? We can make it happen for you, public or internal
+
+"This is a 'wow' moment now. It won't be in a few years - it'll be table-stakes. How is your API going to fit into that world?"
+"The developer has remained in a state of constant success"
+"If you give your developers super-powers, they'll love you"

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org61dffe7">
+<h2 id="org61dffe7">JAMStack Meetup SF</h2>
+<p>
+Mold any GraphQL query into a serverless function with persisted queries
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgd45d10d">
+<h2 id="orgd45d10d">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>VP Eng @ Payments company</li>
+<li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orge35cde9">
+<h2 id="orge35cde9">What's GraphQL?</h2>
+<p>
+[GraphiQL Explorer Demo]
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgdedac13">
+<h2 id="orgdedac13">What are persisted queries?</h2>
+<p>
+[Precursor doc]
+</p>
+</section>
+<section id="slide-orgdba88a4">
+<h3 id="orgdba88a4">Where are they used?</h3>
+<ul>
+<li class="fragment appear">Apollo "optimistic" queries</li>
+<li class="fragment appear">Solving for speed</li>
+<li class="fragment appear">Only first request pays the price, then future users benefit</li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Relay persisted query</li>
+
+</ul>
+</section>
+<section >
+<p>
+Both initially solving the same thing:
+Performance
+</p>
+</section>
+<section >
+<p>
+&#x2026; is there anything more though?
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgb90350d">
+<h2 id="orgb90350d">Security</h2>
+<p>
+APIs are cool.
+</p>
+
+<p>
+But a little (or much!) too powerful.
+</p>
+
+</section>
+<section >
+<p>
+Stripe example:
+</p>
+
+<p>
+Want to share two stats from Stripe internally for your company:
+</p>
+<ul>
+<li class="fragment appear">Monthly revenue</li>
+<li class="fragment appear">Monthly refunds</li>
+
+</ul>
+
+<p>
+&#x2026; How do you expose <b>just</b> those two?
+</p>
+</section>
+<section >
+<p>
+Other examples:
+</p>
+<ul>
+<li class="fragment appear">Contact form for Zendesk</li>
+<li class="fragment appear">Party DJ Spotify control</li>
+<li class="fragment appear">etc.</li>
+
+</ul>
+
+</section>
+<section id="slide-org3c88b7a">
+<h3 id="org3c88b7a">Other benefits</h3>
+<ul>
+<li>Security: Queries are locked down and can't be edited by unknown clients anymore.</li>
+
+</ul>
+
+<p>
+Only variations can come from variables - means it's easy to lock down the exact semantics of each query.
+</p>
+</section>
+<section >
+<ul>
+<li>Cacheing: Because the query is locked down, cacheing is much easier.</li>
+
+</ul>
+
+<p>
+What can change for a query?
+</p>
+<ul>
+<li>Variables</li>
+<li>Auth</li>
+
+</ul>
+
+<p>
+Figuring out the cache-key is now trivial!
+</p>
+</section>
+<section >
+<ul>
+<li>Simplicity: Sending GraphQL query vs. hitting a single endpoint with json</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org1bfaa2f">
+<h2 id="org1bfaa2f">Demo</h2>
+<p>
+[Demo time!]
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org606cb94">
+<h2 id="org606cb94">Review</h2>
+<p>
+Persisted queries:
+</p>
+<ul>
+<li class="fragment appear">Size</li>
+<li class="fragment appear">Speed</li>
+<li class="fragment appear">Security</li>
+<li class="fragment appear">Power</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orgc495498">
+<h2 id="orgc495498">Thank you!</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org4db2623">
+<h2 id="org4db2623">Misc</h2>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

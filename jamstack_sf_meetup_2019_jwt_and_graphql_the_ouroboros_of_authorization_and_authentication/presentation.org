@@ -1,0 +1,301 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: none
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+
+* JAMStack Meetup SF
+JWT & GraphQL: The Ouroboros of Authorization & Authentication
+[[file:./img/ouroboros.png]]
+
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- VP Eng @ Payments company
+- Background in Clojure(Script)/Reason/Rust, dev-tooling
+[[file:./img/onegraph_website.png]]
+
+* What challenge are we trying to overcome?
+JAMstack
+#+ATTR_REVEAL: :frag (appear)
+- JavaScript
+- APIs
+- Markup
+#+REVEAL: split
+APIs: What is the JavaScript talking to?
+#+ATTR_REVEAL: :frag (appear)
+- Twilio
+- Trello
+- GitHub
+- Asana
+- Spotify
+- Google Calendar
+#+REVEAL: split
+How do they know...
+#+ATTR_REVEAL: :frag (appear)
+- Who you are?
+- What your allowed to do?
+- What to call you?
+* What's a JWT?
+#+ATTR_REVEAL: :frag (appear)
+"JSON Web Token"
+** What's inside a JWT?
+*** Payload
+#+BEGIN_SRC javascript
+{
+  "iss": "OneGraph",
+  "aud": "https://serve.onegraph.com/dashboard/app/0b33e830-7cde-4b90-ad7e-2a39c57c0e11",
+  "iat": 1563758630,
+  "exp": 1564968229,
+  "https://onegraph.com/jwt/claims": {
+    "access_token": "3z-kiiioUBTyMOZ_8Yet70xzOzC4"
+  }
+}
+#+END_SRC
+Some common claims:
+#+ATTR_REVEAL: :frag (appear)
+- iss: "Issuer" (Who issued this token?)
+- sub: "Subject" (Who is this token about)
+- aud: "Audience" (Who is this token intended for?)
+- exp: "Expires in" (When does this token expire relative to when it was issued?)
+- iat: "Issued at" (When was this token issued?)
+- alg: "Algorithm" (What algorithm was used to generate this token?)
+#+REVEAL: split
+Cool story.
+
+
+#+ATTR_REVEAL: :frag (appear)
+...who are you again?
+*** Header
+#+BEGIN_SRC javascript
+{
+  "alg": "RS256",
+  "typ": "JWT",
+  "kid": "gXv50C7Jg-xT0wPVAVQp-8C4zIM"
+}
+#+END_SRC
+*** Signature
+#+BEGIN_SRC javascript
+"eL5tvRyGO1CFbw9Dv58xlX00jmpmsVid9q42-4iSj4PrBOVl1MZ_xWYVeHv22Xh8S1Cel-mL9lbu7RBhFDNujf4VKJKElkg3J7xd5XpvYFGRHgtT3jj1J0Nx2xM1_9qhn8E0kOOCUIkJqagdG2Mtex7cl_BJ5i5k1PoGbO5PPMzRkdj5QvZbwKbRLi0LzWMiYgWf8C6_IVNt1My3FDwbs-Lg2xvB0aWf2gYIpISp8gRTuZMwTA2B8ugAzDtg-23Xb8OlNH-0DoG2N6MgSoBvDpoRuAJTWUEs2mHbA5HJNvGZUCrggDObbyhPPIu8u"
+
+#+ATTR_REVEAL: :frag (appear)
+- Looks like gibberish, actually critical
+#+END_SRC
+** How are they protected?
+*** HMAC: Shared-secret
+#+ATTR_REVEAL: :frag (appear)
+- Parties who know the secret can verify
+- Parties who know the secret can write
+*** JWKs: Public/private
+#+ATTR_REVEAL: :frag (appear)
+- Everyone can verify
+- Only one party can generate tokens
+- Generally safer than HMAC (also, better disaster story)
+** Where are JWTs stored?
+When making an API request, JavaScript can store/read JWT from:
+- LocalStorage
+- Cookies
+** A note about size
+- JWT are used with stateless APIs
+- JWT is sent with every request
+- Previous example is ~740 bytes - nearly 1kb!
+- Not amenable to gzipping
+** A note about safety
+#+ATTR_REVEAL: :frag (appear)
+- JWTs are *not* encrypted
+- JWTs are *not* encrypted
+- JWTs are *not* encrypted
+- Let's take a look!
+* Using a JWT in GraphQL
+** Annotating GraphQL Schemas
+#+BEGIN_SRC java
+// SDL (Schema Definition Language)
+directive @isAuthenticated on QUERY | FIELD
+directive @hasRole(role: [String]) on QUERY | FIELD
+
+type Query {
+  companies : [Company] @isAuthenticated
+}
+
+type Company {
+  id: String!
+  name: String!
+  createdAt: DateTime!
+  accountBalance: Int @hasRole(roles: ["admin", "finance"])
+}
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC javascript
+isAuthenticatedDirective: (next, source, args, context) => {
+  const token = context.headers.authorization;
+  if (!token) {
+    throw new AuthorizationError({
+      message: "You must supply a JWT for authentication!"
+    });
+  }
+  try {
+    const decoded = jwt.verify(
+      token.replace("Bearer ", ""),
+      process.env.JWT_SECRET
+    );
+    context.user = decoded;
+    return next();
+  } catch (err) {
+    throw new AuthorizationError({
+      message: "You are not authentication."
+    });
+  }
+};
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC javascript
+hasRoleDirective: (next, source, args, context) => {
+  const token = context.headers.authorization;
+  const expectedRoles = args.roles;
+  if (!token) {
+    throw new AuthorizationError({
+      message: 'You must supply a JWT for authorization!'
+    });
+  }
+  try {
+    const decoded = jwt.verify(
+      token.replace('Bearer ', ''),
+      process.env.JWT_SECRET
+    );
+    const roles = decoded.roles.split(' ');
+    if (expectedRole.some(role => roles.indexOf(role) !== -1)) {
+      return next();
+    }
+  } catch (err) {
+    return Promise.reject(
+      new AuthorizationError({
+        message: `To access ${source.name}, You must be assigned one of the following roles: ${expectedRoles.join(
+            ', '
+          )}`
+      })
+    );
+  }
+}
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC javascript
+const schema = makeExecutableSchema({
+  typeDefs,
+  schemaDirectives: {
+    hasRole: hasRoleDirective,
+    isAuthenticated: isAuthenticatedDirective
+  }
+});
+#+END_SRC
+
+* Generating a JWT
+Given we now trust the contents of a token, we need to figure out 2 things:
+#+ATTR_REVEAL: :frag (appear)
+1. Who is this person who holds the token?
+1. What are they authorized to do?
+** Authentication
+1. What is the primary key we're tracking for this person?
+#+ATTR_REVEAL: :frag (appear)
+- ~userId~ from database (custom)
+- ~sub~ from OAuth provider (Google, etc.)
+- ~userId~ from API provider (Spotify, GitHub, etc.)
+- ~email~ from database/service
+** Authorization
+2. What is this person allowed to do? Based on...
+#+ATTR_REVEAL: :frag (appear)
+- Database columns
+- Membership in organizations
+- Age
+- Manual verification
+* Generating a JWT with GraphQL
+#+ATTR_REVEAL: :frag (appear)
+1. Data => Authentication
+2. Logic => Authorization
+** Step 1: Query
+#+BEGIN_SRC javascript
+query WhoAmI {
+  me {
+    github {
+      email
+      id
+      databaseId
+      organizations(first: 100) {
+        nodes {
+          id
+          email
+          login
+          name
+        }
+      }
+    }
+    spotify {
+      email
+      id
+    }
+  }
+}
+#+END_SRC
+#+REVEAL: split
+[Demo GraphiQL Explorer]
+** Step 2: Logic
+#+BEGIN_SRC javascript
+if (
+    gitHubEmail === "sean@onegraph.com" ||
+    gitHubEmail === "daniel@onegraph.com" ||
+    gitHubOrganizations.find(
+      organization => organization.name === "OneGraph"
+    )
+  ) {
+    finalJwt["role"] = "admin";
+  } else {
+    finalJwt["role"] = "user";
+}
+#+END_SRC
+* Examples
+** Hasura
+#+ATTR_REVEAL: :frag (appear)
+- Common claims are cool
+- Custom claims... better?
+#+REVEAL: split
+#+BEGIN_SRC javascript
+finalJwt["https://hasura.io/jwt/claims"]["x-hasura-default-role"] = "user";
+
+if (
+    (gitHubCollaboratorRepositories.find(
+      repository =>
+        repository.nameWithOwner === "yukims19/wasm-gameboy-emulator"
+    ) && spotifyEmail === "sean@gmail.com")
+  ) {
+    finalJwt["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"] = "admin";
+  }
+#+END_SRC
+
+** Netlify
+#+BEGIN_SRC javascript
+if (
+    (gitHubContributedRepositories.find(
+      repository.nameWithOwner === "sgrove/riseos-static"
+    )) &&
+    (twitterFollowers.find(
+      follower => follower.screenName === "@sgrove"
+    ))
+  ) {
+    finalJwt["app_metadata"]["authorization"]["roles"] = "moderator";
+  }
+#+END_SRC
+* Next Level DX: Tooling!
+- Well-known rules/values
+- Reflect for UI
+
+* The Ouroboros of Authorization & Authentication
+#+ATTR_REVEAL: :frag (appear)
+1. Use JWTs to authenticate and authorize with your GraphQL APIs
+1. Use your GraphQL APIs to generate your JWTs
+* Thank you!
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+[[file:./img/onegraph_website.png]]
+
+* Misc

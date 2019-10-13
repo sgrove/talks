@@ -1,0 +1,324 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: linear
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+
+* Help your computer help you
+Sean Grove @sgrove
+
+Work on @onegraphio
+
+* Opening statement
+
+_We, as programmers, we do too much work manually_
+
+**  Time spent:
+_Manual vs tool-assisted work_
+
+What we do : what's quickly achievable
+#+ATTR_REVEAL: :frag appear
+[=========|*] Current: 90%
+#+ATTR_REVEAL: :frag appear
+[==|********] Goal: 20%
+** Precedent
+*** Example: Compilers
+- Before:
+#+ATTR_REVEAL: :frag appear
+ - Microprocessor code was designed with *humans* in mind.
+ - Computers couldn't introspect code - only execute it. 
+ - [[./images/x86_instructions.png]]
+#+REVEAL: split
+- Now:
+#+ATTR_REVEAL: :frag appear
+ - Nearly *No* instruction sets are designed for humans.
+ - They're *designed _exclusively_* for computers (compilers).
+#+REVEAL: split
+- Result
+#+ATTR_REVEAL: :frag appear
+ - Computer can *write* our code for us!
+ - We write very little of our own code
+ - They write it *faster* than any of us
+ - They write more performant code than most of us!
+*** Example: Babel!
+- Before:
+
+#+ATTR_REVEAL: :frag appear
+ - JavaScript was pure text
+ - Computers couldn't *read* it - only execute it. 
+#+REVEAL: split
+- Now:
+#+ATTR_REVEAL: :frag appear
+ - Babel has turned code into something computers can *read*
+ - Computers know how to work with syntax trees!
+#+REVEAL: split
+- Result
+#+ATTR_REVEAL: :frag appear
+ - The JavaScript ecosystem accelerated so much faster
+ - Much better tooling
+
+*** Example: Performance profiling
+Two choices:
+1. Dump profiling data into a text file - yay, you can read it!
+2. Encode the data into a form for the computer
+#+REVEAL: split
+
+Before:
+- Profiling data meant for humans
+- Computers couldn't introspect the performance of code at run-time
+ - [[./images/clojure_trace.png]]
+
+#+REVEAL: split
+
+- Now:
+Profiling data is *intended exclusively* for computers to read.
+
+#+REVEAL: split
+- Result
+ - Tools that can order output by slowest, deepest, memory usage, etc.
+ - Beautiful, invaluable tools!
+ - [[./images/flame_graph.png]]
+
+*** Why exclusively for computers?
+1. They'll do the *most* of the reading
+1. They can present a human-readable version themselves
+1. Computer-readable allows for *human composable* ideas!
+*** Composable ideas
+#+ATTR_REVEAL: :frag appear
+Computer-understanding of run-time performance
+#+ATTR_REVEAL: :frag appear
+⨥ Computer-generated code
+#+ATTR_REVEAL: :frag appear
+------------------------------
+#+ATTR_REVEAL: :frag appear
+JIT compilers!
+* Human-readable layer?
+1. Should be very, _very_ thin
+1. Always the *last* stage in the *pipeline*
+** Human layer: Last stage in the pipeline
+_misery (/ˈmɪz(ə)ri/) [noun]_
+#+ATTR_REVEAL: :frag appear
+Building a *computer*-program on top of a human-readable form
+
+#+ATTR_REVEAL: :frag appear
+See:
+#+ATTR_REVEAL: :frag appear
+- SQL (string interpolation, injections, etc.)
+#+ATTR_REVEAL: :frag appear
+- Every production-grade scraper ever written (ugh)  
+** Human layer: Thin
+Nearly everything should be done by computers underneath.
+
+If too much invested in human-readable form, painful
+#+REVEAL: split
+Going computer-readable->human-readable
+
+is better than
+
+Going human-readable->computer-readable
+#+REVEAL: split
+
+Goal: Write autocomplete for an API
+
+#+ATTR_REVEAL: :frag appear
+Scenario 1: From beautiful human-oriented docs
+[[./images/trello_api_1.png]]
+#+REVEAL: split
+Scenario 1: From beautiful human-oriented docs
+[[./images/trello_api_2.png]]
+#+REVEAL: split
+Scenario 1: From beautiful human-oriented docs
+[[./images/trello_api_3.png]]
+#+REVEAL: split
+Result
+#+BEGIN_SRC javascript
+{"actions": 
+  [{"name": "GET board", 
+    "method": "GET",
+    "params":
+      [{"name": "id", 
+        "type": "string"}]}
+    ...]}
+#+END_SRC
+#+REVEAL: split
+Scenario 2: From JSON description of API
+#+REVEAL: split
+Scenario 2: From JSON description of API
+#+BEGIN_SRC javascript
+{"actions": 
+  [{"name": "GET board", 
+    "method": "GET",
+    "params":
+      [{"name": "id", 
+        "type": "string"}]}
+    ...]}
+#+END_SRC
+... the same thing!
+#+REVEAL: split
+
+... *and* you can generate those nice docs!
+[[./images/trello_api_1.png]]
+
+* Where else do we suffer from lack of computer help?
+
+- Integration
+  - Pagination
+  - Rate-limits
+- Analytics
+- Documentation
+- Testing
+- Mocking
+- Operational management
+
+Nearly all of these are bespoke, manual today
+
+** Lack of help: Integration
+[computer program] <===> [computer program]
+
+Not humans!
+
+Computer communicating data or effects to/from another system
+*** Lack of help: Pagination
+As a client: What pagination strategies do we see?
+
+- Page based
+- Offset based
+- Cursor based
+
+Any others?
+#+REVEAL: split
+So few patterns yet no universal `hasMore` or `getNextSet` function.
+
+Why?
+
+Every endpoint is human-oriented, unable to describe itself to its clients
+
+*** Lack of help: Rate-limits
+As a client:
+
+- Generally esoteric, few guides on how to handle generally
+- Incredibly painful
+Exponential backoff across production program requires centralized app-wide queuing to correctly balance
+*** API Analytics
+As a provider: Who's hitting what fields?
+#+REVEAL: split
+If you remove/break a field, which client authors do you tell to migrate?
+
+If you find an existing bug in a field, how do you know who to warn to review their data?
+
+#+REVEAL: split
+How do you help them automate the migration as much as possible?
+*** Documentation
+As a provider:
+- How do you keep code/docs in sync?
+#+ATTR_REVEAL: :frag appear
+  - Analytics can help with this - prioritize documentation by what fields 90% of your users are hitting
+#+REVEAL: split
+As a client:
+_Discoverability_:What functionality is available to me?
+
+Given I'm at point X in my integration, what's the best path to destination Z?
+*** Mocking
+As a client:
+How can I generate fake data from your API?
+
+* Language-specific clients
+e.g. Ruby+GitHub, Node+GitHub, Ruby+Zendesk
+
+... they should be generated!
+
+* We've seen this before
+
+- SOAP vs REST
+
+- OData vs GraphQL
+
+- RPC vs SQL
+
+* Caveats
+- Uncanny valley
+Generated tooling output vs production, consumer-facing output
+
+Demo Zeit purchase domain on OneGraph vs production site
+
+** Double-edged sword
+
+   Purchasing demo in via Zeit in OneGraphiQL is *amazing* as a exploration + developer tool!
+
+   It would be (possible, but) *terrible* to deliver to a non-developer
+
+   Be wise.
+
+* Final demo
+- Mocking
+- Documentation
+- Discoverability
+- _Composable ideas_ (in unexpected ways)
+
+#+REVEAL: split
+
+* Demo recap
+✓ Mocking
+
+✓ Documentation
+
+✓ Discoverability
+
+✓ _Composable ideas_ (in unexpected ways)
+
+* Start making your APIs self-documenting!
+When writing docs, start with data!
+- See how much of your docs you can generate!
+- Then look at tools that do this already - swagger
+- Or just use GraphQL
+
+* Summary
+* Thank you!
+* Misc
+
+#+REVEAL: split
+
+Stop doing manual, bespoke work
+But computers have to be able to read your APIs.
+
+How much work
+- Testing
+- Documentation
+- Mocking
+- Integration
+- Analytics
+
+Challenges:
+- Pagination
+- Rate-limits
+- Documentation
+ - Analytics can help with this - prioritize documentation by what fields 90% of your users are hitting
+- Updating an API
+  - How do you know who you're breaking?
+
+
+The paths:
+- Non-self describing apis: do nothing, get nothing
+- Now you documented something
+- Now you have swagger, not even connected to code (swagger is by hand)
+- Next generate swagger/api-description from code
+
+
+Don’t focus on your top-notch api docs website, focus on more robust self-describing api for other projects
+
+
+
+REPLs
+
+-> About seeing the transformation of data at each step
+
+Good documentation sites (README.io)
+API/data-format migrations
+Monitoring sites
+Pagination
+Client-side handling rate-limits
+Mocking
+
+

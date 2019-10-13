@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+
+<link rel="stylesheet" href="css/custom.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<section id="slide-org030e105">
+<h2 id="org030e105">Rust for JavaScripters</h2>
+</section>
+</section>
+<section>
+<section id="slide-orgd31f9f8">
+<h2 id="orgd31f9f8">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>), from SF</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>Shipped cross-compiled ARM IoT Rust project</li>
+<li>Background in Clojure(Script)/Reason/Rust</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org14189de">
+<h2 id="org14189de">The opening pitch</h2>
+<p>
+Working with Rust (in the beginning) is like banging your head against the wall
+</p>
+</section>
+<section >
+<p>
+Let's set expectations!
+</p>
+<p class="fragment appear">
+Caveat: Rust code will _always_※ be longer, more verbose, and more intricate than the JS alternative.
+</p>
+
+
+
+
+
+<p class="fragment appear">
+※ &#x2026; not <span class="underline">always</span>, but close enough. It's a healthier mindset to go into Rust expecting thing.
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org987348c">
+<h2 id="org987348c">The language</h2>
+<blockquote nil>
+<p>
+Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
+</p>
+</blockquote>
+</section>
+<section >
+<p>
+Rust for JavaScripters:
+</p>
+
+<ul>
+<li>low-level, but with abstractions</li>
+<li>guaranteed memory safety</li>
+<li>threads without data races</li>
+<li>pattern matching</li>
+<li>type inference</li>
+<li>minimal runtime</li>
+
+</ul>
+</section>
+<section id="slide-org4cf7fbb">
+<h3 id="org4cf7fbb">Why "Low-level, but with abstractions"?</h3>
+<p>
+<span class="underline">Predictable performance</span> from <b>control</b> over e.g. memory layout, collection.
+</p>
+</section>
+<section id="slide-orgf38bc01">
+<h3 id="orgf38bc01">Why "Guaranteed memory safety"?</h3>
+<p>
+Manually ensuring data integrity is <span class="underline">tough</span>
+</p>
+</section>
+<section id="slide-org19e9124">
+<h3 id="org19e9124">Why "Threads without data races"?</h3>
+<p>
+Manually ensuring data integrity with <span class="underline">concurrent access</span> is <span class="underline">beyond tough</span>
+</p>
+</section>
+<section id="slide-orgd27e1c8">
+<h3 id="orgd27e1c8">Why "Type inference"?</h3>
+<p class="fragment appear">
+What are types for?
+</p>
+
+<ul class="fragment appear">
+<li>C: Performance!</li>
+<li>Typescript/flow: Correctness!</li>
+<li>Rust: Correctness&#x2026; and performance!</li>
+
+</ul>
+
+<ul class="fragment appear">
+<li>Java: Correctness&#x2026; and performance?</li>
+
+</ul>
+
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="java" >public class Prime {
+
+    public static void main(String[] args) {
+
+        int num = 29;
+        boolean flag = false;
+        for(int i = 2; i <= num/2; ++i)
+        {
+            if(num % i == 0)
+            {
+                flag = true;
+                break;
+            }
+        }
+
+        if (!flag)
+            System.out.println(num + " is a prime number.");
+        else
+            System.out.println(num + " is not a prime number.");
+    }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Can we do better?
+</p>
+
+<p class="fragment appear">
+Type inference!
+</p>
+</section>
+<section >
+
+<div class="org-src-container">
+
+<pre><code class="rust" >fn main() {
+    // Because of the annotation, the compiler knows that `elem` has type u8.
+    let elem = 5u8;
+    // Create an empty vector (a growable array).
+    let mut vec = Vec::new();
+    // At this point the compiler doesn't know the exact type of `vec`, it
+    // just knows that it's a vector of something (`Vec<_>`).
+    // Insert `elem` in the vector.
+    vec.push(elem);
+    // Aha! Now the compiler knows that `vec` is a vector of `u8`s (`Vec u8`)
+    println!("{:?}", vec);
+}
+</code></pre>
+</div>
+
+<ul class="fragment appear">
+<li>Minimal type annotation of variables needed</li>
+
+</ul>
+<p class="fragment appear">
+the compiler is happy
+</p>
+<p class="fragment appear">
+and so is the programmer!
+</p>
+<ul class="fragment appear">
+<li>Wherever possible, the computer should do work for us</li>
+
+</ul>
+</section>
+<section id="slide-orgd8377ae">
+<h3 id="orgd8377ae">Why "Minimal runtime"?</h3>
+<p>
+Delivery over the web puts pressure on payload size
+</p>
+
+<blockquote  class="fragment appear">
+<p>
+At present, Go generates large Wasm files, with the smallest possible size being around ~2MB. If your Go code imports libraries, this file size can increase dramatically. 10MB+ is common.
+</p>
+</blockquote>
+
+<p class="fragment appear">
+(Go is rapidly improving here, with TinyGo outputting e.g. ~10kB )
+</p>
+
+</section>
+<section id="slide-orgc8fd249">
+<h3 id="orgc8fd249">Why "Pattern matching"?</h3>
+<div class="org-src-container">
+
+<pre><code class="rust" >fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+        }
+    }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Not just pattern matching, <span class="underline">exhaustive pattern matching</span>!
+</p>
+<div class="org-src-container">
+
+<pre><code class="rust" >fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+        }
+    }
+}
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre><code class="rust" >error[E0004]: non-exhaustive patterns: `_` not covered
+--> src/main.rs:6:15
+  |
+6 |         match num {
+  |               ^^^ pattern `_` not covered
+For more information about this error, try `rustc --explain E0004`.
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+$ rustc &#x2013;explain E0004
+</p>
+
+<blockquote nil>
+<p>
+This error indicates that the compiler cannot guarantee a matching pattern for
+one or more possible inputs to a match expression. Guaranteed matches are
+required in order to assign values to match expressions, or alternatively,
+determine the flow of execution. Erroneous code example:
+</p>
+
+<p>
+```
+enum Terminator {
+    HastaLaVistaBaby,
+    TalkToMyHand,
+}
+</p>
+
+<p>
+let x = Terminator::HastaLaVistaBaby;
+</p>
+
+<p>
+match x { // error: non-exhaustive patterns: `HastaLaVistaBaby` not covered
+    Terminator::TalkToMyHand =&gt; {}
+}
+```
+</p>
+
+<p>
+If you encounter this error you must alter your patterns so that every possible
+value of the input type is matched. For types with a small number of variants
+(like enums) you should probably cover all cases explicitly. Alternatively, the
+underscore `_` wildcard pattern can be added after all other patterns to match
+"anything else". Example:
+</p>
+
+<p>
+```
+enum Terminator {
+    HastaLaVistaBaby,
+    TalkToMyHand,
+}
+</p>
+
+<p>
+let x = Terminator::HastaLaVistaBaby;
+</p>
+
+<p>
+match x {
+    Terminator::TalkToMyHand =&gt; {}
+    Terminator::HastaLaVistaBaby =&gt; {}
+}
+</p>
+
+<p>
+// or:
+</p>
+
+<p>
+match x {
+    Terminator::TalkToMyHand =&gt; {}
+    _ =&gt; {}
+}
+</p>
+</blockquote>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="rust" >fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+            _ => println!("Now all our bases are covered!")
+        }
+    }
+}
+</code></pre>
+</div>
+
+<ul class="fragment appear">
+<li>Compiler happy</li>
+<li>Programmer happy</li>
+
+</ul>
+
+</section>
+<section id="slide-org5947f85">
+<h3 id="org5947f85">"Correctness"</h3>
+<p>
+Debugging sucks.
+</p>
+
+<p>
+From easiest to hardest:
+</p>
+<ul class="fragment appear">
+<li>Who should do it?</li>
+<li>When should it be done?</li>
+<li>Where should it be done?</li>
+
+</ul>
+
+</section>
+<section >
+<p>
+Who should do it?
+</p>
+
+<p>
+The Language &gt; the compiler &gt; the linter &gt; the tests &gt; the developer &gt; the user
+</p>
+
+</section>
+<section >
+<p>
+Similar to Elm, Rust pushes the debugging experience <b>up front</b>.
+</p>
+
+<p>
+Very common (though not universal) that a compiling program "just works."
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org91a9c37">
+<h2 id="org91a9c37">The community</h2>
+<ul>
+<li>Warm, welcoming community</li>
+<li>Strong emphasis on empathy</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org0cff892">
+<h2 id="org0cff892">Why would JavaScripters care?</h2>
+<p class="fragment appear">
+Combining JavaScript and Rust
+</p>
+<p class="fragment appear">
+Caveat: Using wasm (and therefore Rust) from JS is uncomfortable and unidiomatic by default.
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org3f7105a">
+<h2 id="org3f7105a">Interop: A naive approach</h2>
+<ul>
+<li>JavaScript initializes</li>
+<li>Fetch and load Rust wasm</li>
+<li>wasm exposes functions for JavaScript to call</li>
+<li>JavaScript calls wasm function which return e.g. a string</li>
+
+</ul>
+</section>
+<section id="slide-orga7c0bd3">
+<h3 id="orga7c0bd3">The problem</h3>
+<p>
+Sending data JavaScript↔WebAssembly by default involves allocations - something we initially wanted to avoid!
+</p>
+
+<pre  class="example">
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+|                   | 1. "hi!"  |2. "hi!" |                     |
+|wasm.greet("hi!")  |-----------+---------&gt; greet(msg..) {      |
+|                   |           |         |        ....         |
+|                   | 2. "hey!" |1. "hey!"|   "hey!"            |
+|                   |&lt;----------+---------| }                   |
++-------------------+           |         +---------------------+
+</pre>
+
+</section>
+<section >
+<p>
+Goals:
+</p>
+
+<ul>
+<li>Minimizing copying into and out of the WebAssembly linear memory. Unnecessary copies impose unnecessary overhead.</li>
+<li>Minimizing serializing and deserializing. Similar to copies, serializing and deserializing also imposes overhead, and often imposes copying as well.</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org94075c1">
+<h2 id="org94075c1">Interop: A different way of thinking.</h2>
+<p>
+How?
+</p>
+<ul>
+<li>Pass opaque handles to a data structure — instead of serializing it on one side, copy it into some known location in the WebAssembly linear memory.</li>
+<li>As a general rule of thumb, large, long-lived data structures are implemented as Rust types
+<ul>
+<li>They live in the Rust linear memory, and are exposed to JS as opaque handles.</li>
+<li>JS calls exported Rust functions with the opaque handles</li>
+<li>Rust transforms the data, perform heavy computations, queries the data</li>
+<li>Rust ultimately returns a small, copy-able result.</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section id="slide-orgb341ef9">
+<h3 id="orgb341ef9">A house divided</h3>
+<pre  class="example">
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
++-------------------+           |         +---------------------+
+</pre>
+</section>
+<section >
+<pre  class="example">
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+| DOM               |           |         |                     |
+| Garbage Collection|           |         |                     |
+| Familiar objects  |           |         |                     |
+| Arrays            |           |         |                     |
+| String            |           |         |                     |
++-------------------+           |         +---------------------+
+</pre>
+</section>
+<section >
+<pre  class="example">
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+| DOM               |           |         | Performance         |
+| Garbage Collection|           |         | Manual memory       |
+| Familiar objects  |           |         | Custom "objects"    |
+| Arrays            |           |         | Custom "arrays"+Vec |
+| String            |           |         | String and str      |
++-------------------+           |         +---------------------+
+</pre>
+</section>
+<section id="slide-org3b747f3">
+<h4 id="org3b747f3">Bridging the gap</h4>
+<blockquote nil>
+<p>
+&gt; WebAssembly has a very simple memory model. A wasm module has access to a single "linear memory", which is essentially a flat array of a bytes.
+</p>
+</blockquote>
+</section>
+<section >
+<pre  class="example">
++-------------------+                     +---------------------+
+|JavaScript         |                     | RUST                |
++-------------------+                     +---------------------+
+| DOM               |                     | Performance         |
+| Garbage Collection|                     | Manual memory       |
+| Familiar objects  |                     | Custom "objects"    |
+| Arrays            |                     | Custom "arrays"+Vec |
+| String            |                     | String and str      |
++-------+-----------+                     +----------+----------+
+        |              +---------------+             |
+        |              | Shared memory |             |
+        |              +---------------+             |
+        |              |               |             |
+        |              |Plain ol' bytes|             |
+        +--------------+               +-------------+
+                       |               |
+                       +---------------+
+</pre>
+</section>
+<section >
+<ul>
+<li>By only returning the small result of the computation, we avoid copying and/or serializing everything back and forth between the JavaScript garbage-collected heap and the WebAssembly linear memory.</li>
+
+</ul>
+<p>
+Lingua franca: [Uint8/etc.]Array
+</p>
+</section>
+<section id="slide-org8f2e2a9">
+<h3 id="org8f2e2a9">Rust toolchain + DX to the rescue</h3>
+<div class="org-src-container">
+
+<pre><code class="rust" >#[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Cell {
+    Dead = 0,
+    Alive = 1,
+}
+
+pub fn tick(&mut self) {
+    let mut next = self.cells.clone();
+
+    for row in 0..self.height {
+        for col in 0..self.width {
+            let idx = self.get_index(row, col);
+            let cell = self.cells[idx];
+            let live_neighbors = self.live_neighbor_count(row, col);
+
+            let next_cell = match (cell, live_neighbors) {
+                // Rule 1: Any cell with fewer than two live neighbors dies
+                (Cell::Alive, x) if x < 2 => Cell::Dead,
+                (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+                (Cell::Alive, x) if x > 3 => Cell::Dead,
+                (Cell::Dead, 3) => Cell::Alive,
+                (otherwise, _) => otherwise,
+            };
+
+            next[idx] = next_cell;
+        }
+    }
+    self.cells = next;
+}
+
+pub fn new() -> Universe {
+    let width = 64;
+    let height = 64;
+
+    let cells = (0..width * height)
+        .map(|i| {
+            if i % 2 == 0 || i % 7 == 0 {
+                Cell::Alive
+            } else {
+                Cell::Dead
+            }
+        }).collect();
+
+    Universe {
+        width,
+        height,
+        cells,
+    }
+}
+
+pub fn render(&self) -> String {
+    self.to_string()
+}
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="typescript" >/* tslint:disable */
+export enum Cell {Dead,Alive,}
+export class Universe {
+free(): void;
+
+ tick(): void;
+
+static  new(): Universe;
+
+ render(): string;
+
+}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org48b22ee">
+<h2 id="org48b22ee">Basic  Examples</h2>
+<div class="outline-text-2" id="text-org48b22ee">
+</div>
+</section>
+<section id="slide-org606a6fa">
+<h3 id="org606a6fa">HTML Components</h3>
+<p>
+Yew ("you") is a modern Rust framework inspired by Elm and ReactJS for creating frontend apps with WebAssembly.
+</p>
+
+<blockquote nil>
+<p>
+The framework supports multi-threading &amp; concurrency out of the box. It uses Web Workers API to spawn actors (agents) in separate threads and uses a local scheduler attached to a thread for concurrent tasks.
+</p>
+</blockquote>
+
+</section>
+<section >
+
+<div class="org-src-container">
+
+<pre><code class="rust" >html! {
+    <section class="todoapp",>
+        <header class="header",>
+            <h1>{ "todos" }</h1>
+            { view_input(&model) }
+        </header>
+        <section class="main",>
+            <input class="toggle-all",
+                   type="checkbox",
+                   checked=model.is_all_completed(),
+                   onclick=|_| Msg::ToggleAll, />
+            { view_entries(&model) }
+        </section>
+    </section>
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-org5bc755e">
+<h3 id="org5bc755e">WebWorkers</h3>
+<div class="org-src-container">
+
+<pre><code class="rust" >#[derive(Serialize, Deserialize, Debug)]
+pub enum Request {
+    Question(String),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Response {
+    Answer(String),
+}
+
+impl Agent for Worker {
+    // Create an instance with a link to agent's environment.
+    fn create(link: AgentLink<Self>) -> Self {
+        Worker { link }
+    }
+
+    // Handle incoming messages from components of other agents.
+    fn handle(&mut self, msg: Self::Input, who: HandlerId) {
+        match msg {
+            Request::Question(_body) => {
+                self.link.response(who, Response::Answer("That's cool!".into()));
+            },
+        }
+    }
+}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgc6847c1">
+<h3 id="orgc6847c1">Canvas drawing</h3>
+<div class="org-src-container">
+
+<pre><code class="javascript" >// Import the WebAssembly memory at the top of the file.
+// The 'hello_world_bg' module is generated by wasm-bindgen,
+// hence the '_bg'.
+import { memory } from "./hello_world_bg";
+
+const getIndex = (row, column) => {
+  return row * width + column;
+};
+
+const drawCells = () => {
+  const cellsPtr = universe.cells();
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
+
+  ctx.beginPath();
+
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      const idx = getIndex(row, col);
+
+      ctx.fillStyle = cells[idx] === DEAD
+        ? DEAD_COLOR
+        : ALIVE_COLOR;
+
+      ctx.fillRect(
+        col * (CELL_SIZE + 1) + 1,
+        row * (CELL_SIZE + 1) + 1,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+    }
+  }
+
+  ctx.stroke();
+};
+</code></pre>
+</div>
+
+<p>
+<a href="https://github.com/likr/rust-webgl2-example/blob/master/src/main.rs">https://github.com/likr/rust-webgl2-example/blob/master/src/main.rs</a>
+</p>
+</section>
+<section id="slide-orga57ca99">
+<h3 id="orga57ca99">Aside about syntax</h3>
+<div class="org-src-container">
+
+<pre><code class="rust" >error: cannot borrow immutable argument `b` as mutable (it's an immutable reference)`.
+ --> <anon>:2:18
+  |
+1 | fn foo(b: &mut u64) {
+  |        - use `mut b` here to make mutable (Or see another option below):
+2 |     let x = &mut b;
+  |                  ^ cannot borrow mutably, but can move it out by removing '&mut'.
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgadbaf31">
+<h2 id="orgadbaf31">Big Demo</h2>
+<ul>
+<li><a href="https://andrewimm.github.io/wasm-gb/">https://andrewimm.github.io/wasm-gb/</a></li>
+<li><a href="https://twitter.com/setimmediate/status/979379609954222080">https://twitter.com/setimmediate/status/979379609954222080</a></li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org8850baf">
+<h2 id="org8850baf">Other crazy ideas</h2>
+<ul>
+<li>AssemblyScript (No-GC subset of TypeScript) -&gt;</li>
+<li>WASM -&gt;</li>
+<li><p>
+Rust
+</p>
+
+
+<div class="figure">
+<p><img src="./img/wasm_to_rust_gb.png" alt="wasm_to_rust_gb.png" />
+</p>
+</div></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgbf86534">
+<h2 id="orgbf86534">Unprecedented opportunity in our industry</h2>
+<p>
+Our industry moves forward via secretion
+</p>
+
+<p class="fragment appear">
+Our implementations, if successful, never die.
+</p>
+
+<p class="fragment appear">
+We have "terminals" that support DEC VT escape sequences, with various extensions added over the decades.
+</p>
+</section>
+<section >
+<p>
+First time we have a chance for a clean-slate, safe implementation to gather sufficient momentum
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orge62b5ab">
+<h2 id="orge62b5ab">Dangerous Prediction</h2>
+<p>
+In the next five-ten years, most JavaScript we <b>run</b> will be written in Rust
+</p>
+
+<p>
+I don't think most people will write Rust on the frontend, but ultimately most people will use it (even if they don't realize it)
+</p>
+</section>
+<section id="slide-org26c83a8">
+<h3 id="org26c83a8">Who will write Rust?</h3>
+<ul>
+<li>Fine-grained performance control</li>
+<li>Safety, security, correctness guarantees</li>
+
+</ul>
+
+<p class="fragment appear">
+&#x2026; Library authors!
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org67db761">
+<h2 id="org67db761">The closing pitch</h2>
+<p>
+Working with Rust (in the beginning) is like banging your head against the wall
+</p>
+
+<p class="fragment appear">
+&#x2026; but at a <span class="underline">very</span> slight angle
+</p>
+
+
+<p class="fragment appear">
+&#x2026; and you'll like it!
+</p>
+
+
+<ul class="fragment appear">
+<li>Rust WebAssembly Book: <a href="https://rustwasm.github.io/book/">https://rustwasm.github.io/book/</a></li>
+<li><a href="https://medium.com/@andrewimm/writing-a-game-boy-emulator-in-wasm-part-1-1ba023eb2c7c">Writing a Game Boy Emulator in WASM, Part 1</a></li>
+<li><a href="https://medium.com/@saschagrunert/a-web-application-completely-in-rust-6f6bdb6c4471">A web application completely in Rust</a> (Yew application)</li>
+
+</ul>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: none
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+
+* JAMStack Meetup SF
+Mold any GraphQL query into a serverless function with persisted queries
+
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- VP Eng @ Payments company
+- Background in Clojure(Script)/Reason/Rust, dev-tooling
+[[file:./img/onegraph_website.png]]
+
+* What's GraphQL?
+[GraphiQL Explorer Demo]
+* What are persisted queries?
+[Precursor doc]
+** Where are they used?
+#+ATTR_REVEAL: :frag (appear)
+- Apollo "optimistic" queries
+- Solving for speed
+- Only first request pays the price, then future users benefit
+#+REVEAL: split
+- Relay persisted query
+#+REVEAL: split
+Both initially solving the same thing:
+Performance
+#+REVEAL: split
+... is there anything more though?
+* Security
+APIs are cool.
+
+But a little (or much!) too powerful.
+
+#+REVEAL: split
+Stripe example:
+
+Want to share two stats from Stripe internally for your company:
+#+ATTR_REVEAL: :frag (appear)
+- Monthly revenue
+- Monthly refunds
+
+... How do you expose *just* those two?
+#+REVEAL: split
+Other examples:
+#+ATTR_REVEAL: :frag (appear)
+- Contact form for Zendesk
+- Party DJ Spotify control
+- etc.
+
+** Other benefits
+- Security: Queries are locked down and can't be edited by unknown clients anymore.
+
+Only variations can come from variables - means it's easy to lock down the exact semantics of each query.
+#+REVEAL: split
+- Cacheing: Because the query is locked down, cacheing is much easier.
+
+What can change for a query?
+- Variables
+- Auth
+
+Figuring out the cache-key is now trivial!
+#+REVEAL: split
+- Simplicity: Sending GraphQL query vs. hitting a single endpoint with json
+* Demo
+[Demo time!]
+* Review
+Persisted queries:
+#+ATTR_REVEAL: :frag (appear)
+- Size
+- Speed
+- Security
+- Power
+* Thank you!
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+[[file:./img/onegraph_website.png]]
+
+* Misc

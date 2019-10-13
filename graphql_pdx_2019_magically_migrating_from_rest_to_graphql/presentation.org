@@ -1,0 +1,358 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: linear
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+REVEAL_EXTRA_CSS: css/custom.css
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+* Magically Migrating from REST to GraphQL
+Or, the power of shutting up and listening.
+
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]]), from SF
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- YC S11 / VP Eng / YC S18
+- Background in Clojure(Script)/Reason/Rust
+- Lots of specific GraphQL experience - server, client, tooling
+* Motivations: Why move from REST to GraphQL?
+[Omitted for this audience]
+
+* The usual REST to GraphQL prologue
+
+Dozens of people productionizing a REST→GraphQL migration with a common narrative:
+#+REVEAL: split
+- Excited about this GraphQL thing!
+- Let’s try it with over a single REST endpoint first
+- We’ll just list out all of the fields this endpoint returns...
+- ...and copy them verbatim into GraphQL resolvers
+- Job done! Let’s share it with the frontend team, and await our shower of roses
+- *confused looks from the devs meant to actually use the API*
+- *lots of follow-up meetings with engineering managers from now on*
+
+* Principles for designing GraphQL API
+
+3 principles:
+
+- Maximal power
+- Minimal cost
+- Constant success
+#+REVEAL: split
+
+At each step along the way, it's best to ask yourself:
+
+#+ATTR_REVEAL: :frag appear
+[Maximal power]: Will this provide the maximum power permissible to the consumer, so they can handle unforeseen demands as independently as possible?
+#+REVEAL: split
+[Minimal cost]: Will this impose the minimal cost on the consumer in terms of graph structure, verbosity, tooling, and documentation?
+#+REVEAL: split
+[Constant success]: Will this design decision maximize the chance the consumer is always in a successful state, in terms of correctness and performance?
+#+REVEAL: split
+
+Example 1: GitHub's ~first~ / ~last~ pagination
+
+#+REVEAL: split
+
+Example 2: npm's downloads design
+- Date input field? 
+- Enums?
+- Dedicated fields?
+
+* GraphQL is a chance to rethink your API design
+... porting it 1:1 will be a missed opportunity!
+
+* Let's get started with a real migration!
+A journey with npm "REST"-ish API to GraphQL
+
+- Step 1: Survey The API endpoints and their return data
+- Step 2: Decide on top level fields, based on the underlying concepts and data
+- Step 3: Think through idiomatic design
+- Step 4: Model the data relationships within your API
+- Step 5: Model the data relationships to the outside of your API
+
+#+REVEAL: split
+
+[[./img/migration_steps.png]]
+
+** Step 1: Survey The API endpoints and their return data
+npm has ~four endpoints on two hosts:
+
+1. Point downloads
+2. Cumulative downloads
+3. Metadata
+4. Search
+
+*** Downloads
+- ~https://api.npmjs.org/downloads/point/{period}[/{package}]~
+Cumulative downloads for a given period ("Point values")
+
+- ~https://api.npmjs.org/downloads/range/{period}[/{package}]~
+Downloads broken down per-day for a given period ("Ranges")
+
+#+REVEAL: split
+ ~https://api.npmjs.org/downloads/range/{period}[/{package}]~
+
+- Package is optional on both endpoints!
+- Two potentially separate ideas conflated. 
+
+#+REVEAL: split
+
+Both endpoints return a similar structure:
+
+#+BEGIN_SRC javascript
+// Common structure returned from both endpoints
+{
+  "start": "date",
+  "end": "date",
+  "package": "string"
+}
+
+// `downloads` is an integer in the "point" (cumulative) downloads endpoint
+{
+  "downloads": "integer",
+}
+
+// `downloads` is an array of downloads by day in the "range" endpoint
+{
+  "downloads": [
+    {
+      "day": "date",
+      "downloads": "integer"
+    }
+  ]
+}
+#+END_SRC
+
+** Step 2: Decide on top level fields, based on the underlying concepts and data
+From these three endpoints so far, we can imagine there are two top level concepts consumers are ultimately looking for:
+
+- Download data (~`downloads`~)
+- Package metadata (~`package`~)
+
+> Note: It’s normal for multiple endpoints in REST to boil down to fewer concepts in GraphQL
+** Step 3: Think through idiomatic design
+A naive approach would be to mimic the concepts and endpoints exactly.
+
+Just like the original API endpoint, we could parameterize our downloads field with a required ~dateIsh~ argument, and an optional ~packageName~ argument.
+
+Similarly the package endpoint would be parameterized by a required ~name~ argument.
+#+REVEAL: split
+
+But let's not do that.
+
+#+REVEAL: split
+
+Let's judge it according to our three goals:
+
+How closely does this design achieve our three goals:
+
+- Do we give our consumer the maximal power we can afford?
+    - Despite being naive, the design is very powerful, as a user can put any `dateIsh` value recognized by the underlying api in, so we're not hiding any flexbility from consumers.
+    - Yes, very powerful.
+#+REVEAL: split
+
+- Do we impose the minimal costs possible on the consumer trying to access the data?
+    -  The cost isn't too bad either, just two arguments (one of which is optional).
+    - Medium, some syntax cost
+
+#+REVEAL: split
+- Did we design our graph for constant success so each step our consumer takes is a valid, useful query?
+    - The design badly fails this test!
+    - We have to understand special-cased enums, the date format, and the range format
+    - It's possible to input effectively infinite malformed values.
+    - Also, it's unclear why `packageName` is optional - what happens when it's omitted?
+
+Let's improve on the third point, while trying to either maintain or improve on the first two!
+
+
+*** Alternative approach
+#+BEGIN_SRC javascript
+{
+  npm {
+    downloads {
+      lastMonth {
+        count
+        perDay {
+          day
+          count
+        }
+      }
+      lastDay { ... }
+      lastWeek { ... }
+      day { ... }
+      period(
+        endDate: "2019-01-01"
+        startDate: "2019-12-01"
+      ) { ... }
+    }
+  }
+}
+#+END_SRC
+
+#+REVEAL: split
+- Conceptually though (and in terms of the `npm` api), the ranges endpoint takes the same arguments as the "point data." There's a relationship between the dates (whether enums, a point date, or a range), and the `point` and `range` download data.
+- Notice how the arguments for both point and range downloads are captured in the graph structure.
+
+> REST endpoints that share exactly the same arguments often share a deeper relationship that’s worth modeling explicitly in your GraphQL API structure
+
+** Step 4: Model the data relationships within your API
+The package metadata host/endpoint returns package name, homepage, source repository, etc.
+
+- No special enums, easily parameterized by a required ~name~ argument.
+- Add in the fields: ~author~, ~description~, ~homepage~, etc.
+#+ATTR_REVEAL: :frag appear
+- But user has *already* specified the package name, which is also an argument to the downloads field...
+#+ATTR_REVEAL: :frag appear
+- So we can add a relation between package->downloads!
+- Makes navigating between the APIs feel incredibly natural:
+
+#+REVEAL: split
+#+BEGIN_SRC javascript
+{
+  npm {
+    package(name: "graphql") {
+      author {
+        name
+      }
+      description
+      homepage
+      downloads {
+        lastMonth {
+          downloads
+          perDay {
+            day
+            count
+          }
+        }
+      }
+    }
+  }
+}
+#+END_SRC
+
+** Step 5: Model the data relationships to the outside of your API
+~npm~'s data is wonderful, but they’re not in a position to also add related external data.
+
+But this is GraphQL, and we can - in fact, we should!
+
+*** Bundlephobia
+Bundlephobia
+> Bundlephobia is a wonderful service by @pastelsky to find the cost of adding an `npm` package to your bundle, because JavaScript bloat is more real today than ever before.
+
+#+BEGIN_SRC javascript
+{
+  npm {
+    package(name: "graphql") {
+      name
+      bundlephobia {
+        dependencyCount
+        version
+        name
+        history {
+          dependencyCount
+          size
+          version
+        }
+      }
+    }
+  }
+}
+#+END_SRC
+*** GitHub
+> GitHub is an up-and-coming little startup that's pretty nifty for hosting source code
+#+REVEAL: split
+:P
+#+REVEAL: split
+- Bundlephobia is extremely straightforward
+- We expect the connection between npm and bundlephobia to remain static
+- No competing service we might merge into the bundlephobia field - it'd naturally fall under its own new field.
+#+REVEAL: split
+~npm~'s package metadata has a repository field with e.g. "repository":
+
+#+BEGIN_SRC javascript
+{
+  "type": "git",
+  "url": "http://github.com/facebook/graphql.git"
+}
+#+END_SRC
+
+Can see that it's a repository hosted on GitHub, so let's add a connection called ~sourceRepository~ 
+
+What could be better than querying into npm and joining GitHub’s repository data to get the stargazer count, the open issues, and most recent commit data? So cool!
+
+#+REVEAL: split
+
+But what if the repository is on Bitbucket or GitLab?
+
+We don't have those in our graph today, it's maybe someday!
+
+Let's make this field a more "open" type than the ~bundlephobia~ field.
+
+#+REVEAL: split
+
+- To make ~sourceRepository~ extensible for future use, we'll create a union type
+- Union initially only has one possible type: ~GitHubRepository~
+#+ATTR_REVEAL: :frag appear
+- We’re imposing some syntactic and conceptual cost for the consumer (more typing and this whole “unions” thing)
+- But extending new repository types will be natural in the future
+
+#+REVEAL: split
+
+With that in place, our consumers can jump from a npm package right into GitHub to get the number of open issues with this simple query:
+
+#+BEGIN_SRC javascript
+{
+  npm {
+    package(name: "graphql") {
+      name
+      repository {
+        sourceRepository {
+          ... on GitHubRepository {
+            name
+            issues(states: CLOSED) {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+  }
+}
+#+END_SRC
+*  REST to GraphQL - what do we have so far?
+- Introspectable, idiomatic GraphQL representation
+- Lots of goodies across three great services
+- Implemented in a way that should minimize ongoing maintenance and breaking changes for us, and
+- Maximize our consumer's power, minimize their cost, and providing a very high level of constant success
+* Other topics: Gotchas!
+- What to do with inconsistent field structures in your API
+- How to represent objects with dynamic keys
+Happy to talk about examples of this
+* Future topics: Going deeper
+- Normalizing pagination
+- Optimizations, both at a high level and in nitty-gritty detail
+- Migration strategies for your clients
+    - How to support both APIs at once
+    - How to switch infrastructure pieces from the old REST to the new GraphQL API as necessary
+- Avoiding N+1 and preventing your REST servers from catching on fire under load
+* Future topics: A whole new world of opportunities
+- API analytics
+- Developer on-boarding
+- Computer-aided consistency
+- Request batching wins
+
+* Demo time: What's that order again?
+
+- Step 1: Survey The API endpoints and their return data
+- Step 2: Decide on top level fields, based on the underlying concepts and data
+- Step 3: Think through idiomatic design
+- Step 4: Model the data relationships within your API
+- Step 5: Model the data relationships to the outside of your API
+
+** How much could we automate?
+[Demo]
+
+ 
+#+REVEAL: split
+Thank you!
+

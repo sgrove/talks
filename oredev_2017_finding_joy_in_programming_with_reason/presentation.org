@@ -1,0 +1,465 @@
+#+REVEAL_THEME: solarized
+#+REVEAL_TRANS: linear
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true
+# * Random points
+# - Multi-paradigm is in many ways a bad thing. It's power that actively distracts from "pit of success"
+# - the differences in philosophy are repeated through lots of different parts of the languages: Elm and Reason overall difference also reflected in just JS interop: Reason easier to get started, Elm better long-term success (+ compare JS)
+# - You could write a graphing tool where you could put in problems, specify how frequently you hit them, how long they take to solve, how that scales with codebase size, and generate share-able and more precise graphs
+* Finding happiness in programming
+... or, success and happiness through restrictions
+* Small caveat
+Mainly focusing on a low/medium level here, but has some bearing on more macro concerns as well
+* This is a Reason talk, but not specific to reason
+
+"Softer" than most talks
+
+Also, focusing on Reason on the client-side
+
+* Original goal of this talk
+
+- I *think* I intrinsically enjoy programming (or its product)
+- I *feel* it makes me happy
+- I am some times *deeply* unhappy (sometimes for long stretches of time) when programming
+- Why? What are the root causes?
+- ...
+- Maybe if we can describe this, some contentious discussions become more clear
+
+* Let's start
+
+And I'll start by talking about a small rant of mine recently, this mantra to...
+
+* "Use the right tool for the job"
+#+REVEAL: split
+- At least give me a rubric to know *what criteria* by which to judge!
+* Sharing understanding => hard!
+- Nearly impossible, in fact!
+- We share information, but understanding (experience + information) is embodied
+- Analogies are so important. I reason through past experiences.
+* Motivations for having a rubric
+
+Discussing trade-offs inherently involves "selling" concepts to some degree.
+** Selling power is easier
+- Look at all the impressive things I can do!
+- Look how quickly I can get started!
+- Why *wouldn't* I want power?
+** Selling restriction significantly more difficult
+- I trust myself, *I* am careful not to do bad/dumb/crazy things/mistakes
+- Difficult sell because requires experience
+ - Pitch relies on experiencing subsequent pain from power
+- Market for restrictions is much smaller as a result
+** "It's so much better, just trust me"
+- Not terribly compelling
+- Asks for *a lot* of potentially wasted investment
+* So, what makes me happy when programming?
+* Happiness when programming = success※
+- Time to initial success
+- Intensity of success
+- Interval between subsequent success states
+※ (success has lots of layers and definitions, run with it)
+** Happiness when programming, cont' 1
+To some degree, a tautology:
+
+#+BEGIN_QUOTE
+Good things sure are good!
+Water sure is wet!
+#+END_QUOTE
+
+But putting specific language is very powerful, see [[https://www.infoq.com/presentations/Simple-Made-Easy][Rich Hickey's "Simple made Easy."]]
+
+** Happiness when programming, cont' 2
+
+Separate concepts with different meaning often used interchangeably.
+
+Teasing them apart gives us much more effective communication, with both other developers, and with non-technical people at times.
+
+** Happiness when programming, cont' 3
+
+- Time to initial success
+- Intensity of success
+- Interval between subsequent success states
+
+If we look through this lens at different discussions, behaviors, and beliefs, a lot of things line up
+
+* Example 1: Starting a new project in JavaScript
+Hypothetical categorization of starting a new project in JavaScript for someone *familiar* with JavaScript
+
+#+CAPTION: JavaScript developer's view of JavaScript
+[[./img/JS view of JS.png]]
+
+
+- Off to a good start, project started quickly, adding features
+- Stop from time to time to look things up
+ - But also have hot module reload, so things go quickly
+- Some bugs along the way, especially as the project gets bigger
+- Dips in success, getting progressively more sustained
+
+** a Haskeller's view of JavaScript
+
+[[./img/Haskell view of JS.png]]
+
+
+- Quick start
+- Quick to minor bugs
+- Progressively worse
+- Lots of discipline (careful about incidental complexity!) required
+- Big risks re: delaying success even more down the road
+
+** Neither is necessarily correct
+
+Not Data.
+Not even an experience report.
+Just a hypothesis.
+
+But communicated in a way where:
+- At least we can compare
+- Pinpoint disagreements
+- See how tweaking contentious parameters affect overall picture
+- Compare visually. We have this huge occipital lobe that we normally never engage!
+
+* (Quick aside)
+Success grows much more slowly that it decays
+
+Any roadblock we hit immediately starts pulling us down
+* Dangers in the absence of success
+#+REVEAL: split
+We're all humans (for now)
+
+We all want success
+
+Sometimes, no matter the cost
+
+#+ATTR_REVEAL: :frag (grow shrink roll-in fade-out none) :frag_idx (4 3 2 1 -)
+** Fake work!
+
+In the absence of success, we seek out any form of short-term success. Canonical example:
+
+- Tech founder whose product has no users.
+- Solution?
+- Rewrite it in X new language/framework/etc!
+
+Solving the real problem will take *significantly* longer until *perceived* success than solving the fake-but-easier ones 
+
+** Drug-addict behavior in development
+
+   We crave success, and prioritize quick-hit over even medium-term concerns
+
+** Caution!
+
+With this in mind, 
+*I'm particularly careful of my decisions if it's been awhile since I felt successful*
+* Pit of despair vs Pit of success
+** Pit of despair
+Started from "Pit of despair," from [[https://ericlippert.com/about-eric-lippert/][Eric Lippert]]:
+
+#+BEGIN_QUOTE
+I often think of C++ as my own personal Pit of Despair Programming Language. Unmanaged C++ makes it so easy to fall into traps. Think buffer overruns, memory leaks, double frees, mismatch between allocator and deallocator, using freed memory, umpteen dozen ways to trash the stack or heap – and those are just some of the memory issues... C++ often throws you into the Pit of Despair
+#+END_QUOTE
+** Pit of success
+Rico Mariani/[[https://blogs.msdn.microsoft.com/brada/2003/10/02/the-pit-of-success/][Brad Abrams]]:
+
+#+BEGIN_QUOTE
+The Pit of Success: in stark contrast to a summit, a peak, or a journey across a desert to find victory through many trials and surprises ... simply fall into winning practices... To the extent that we make it easy to get into trouble we fail.
+#+END_QUOTE
+#+REVEAL: split
+Restrictions can lead to being "*accidentally* successful"
+** Example: React.js
+
+React.js focused on "the pit of success", and continues to make progress over the years
+
+By *default*, React users will mostly do the *right* thing
+
+It's *annoying* (but *possible*) to do the wrong thing
+
+** Accidental success
+
+Accidental success prevents decay from hitting too hard
+
+Less decay -> less likely we are to have counter-productive behavior (from being unhappy) -> more likely to ship product
+#+REVEAL: split
+
+As a result, the React paradigm has been massively powerful in shaping UI library design
+* Patterns, huh! What are they good for?
+React isn't a programming *language*, it's a library and a pattern.
+
+Similar to React, Redux (a state-management library for React applications) has seen massive adoption over past few years
+
+** Redux
+
+Encourages a pattern that's more *restrictive* than alternative, takes *longer* to set up and learn, but promises *predicatability & shared tooling*
+
+Massively affects success rate and intensity
+
+[[./img/Pattern_ With Redux.png]]
+
+** Patterns
+Through this lens, patterns are dampening coefficients on the decay in success rate over time (and code size).
+
+Redux gives you success slower if you're not familiar with it, but from there the rate of success decays more slowly than if you didn't have it
+
+Note it does still decay with codebase size, however
+
+* Another factor in success rate: State-space size
+*How* do the restrictions in React/Redux/Reason's reducers/Elm architecture achieve this?
+
+Tackle one of the largest challenges head-on: how do developers traverse the state-space?
+
+** State-space
+1. Start from initial state of app
+1. User can do ~8 things (log in, read public feed, etc.) = transition state
+1. After transitioning into any new state, the user has ~8 new states they could transition into
+
+Similar to a flow diagram, but not a graph, and continuously expanded
+
+** Redux pattern restrictions 1
+1. Redux (and friends) require explicit enumeration of state transitions - *we can guesstimate* how complicated our application is and how it grows with each step
+1. With right tooling or language, we are much more confident *we're explicitly handling every transition*. Fewer unforeseen edge cases
+
+** Redux pattern restrictions 2
+Another important point: *how* and *where* state can change are highly restricted (by convention and by implementation)
+
+Can track state changes down to very few call sites
+
+** HypotheticalSuperPowerfulJavaScript
+
+Compare to hypothetically *much* more powerful JavaScript app:
+
+- Global variables
+ - Can be updated from anywhere in the codebase
+ - Possibly in straight-line code
+ - Possibly from observers
+ - Possibly from proxies
+ - Possibly from "read-only" *accessors*(!!!) (via proxies)
+- State transitions completely implicit
+- State-space grows significantly more quickly
+- Connections between successive states *very* fuzzy
+
+** Debugging scenario
+
+A user is 5 minutes into your app, some 100 state transitions deep.
+#+REVEAL: split
+They hit a bug.
+
+They're kind enough to report it to you!
+#+REVEAL: split
+Debugging experience is *vastly* different. In both cases:
+
+1. Start from root of app
+1. Search for path that ends up close enough to bug location to discover/reproduce it
+ - Combination of running the program in your head and stepping through it manually/with tools
+
+But in the Redux example, the tree is pre-pruned, and the edges are clear.
+
+With SuperPowerfulJavaScript, you're looking at a potentially *very* long desert of success. During which, you'll generally feel unhappy. Dangerous.
+** Debugging scenario extended
+Re-imagine that same user case, except they can optionally submit a replay of their state through the app.
+
+No other factors affected (time to initial success, etc.), but now we've *drastically* reduced the time to repro + success.
+
+* The Sirens' call: Illusory success
+
+Commonly undiscussed danger of these powerful tools: they often lead to an _illusory success state_.
+
+#+REVEAL: split
+You've traced a line from the app start to success state - must work! But...
+
+- *fuzziness*,
+- *sheer number of states/transitions*,
+- and *untoolable nature* 
+
+...mean it's possible the program is
+ *more broken than it is working*
+
+
+#+REVEAL: split
+The tools *allow* you to (accidentally!) ignore cases.
+
+Often not intentional, just an oversight of being overly focused on subjective happy-path
+#+REVEAL: split
+Having a compiler restrict us from valid types or from accidentally forgetting cases means we're more often aware of failure than we otherwise would be
+
+In this case, SuperPowerfulJavaScript can trick us into thinking we're more successful than we are.
+
+** Note of nuance
+Compilers that restrict us via types or exhaustive case handling come with a cost. Some valid *enough* programs are now either difficult or impossible to express.
+
+* So.... what?
+How's all this relate to Reason?
+
+* Reason: Unusual focus on time-to-initial-success
+TTIS often overlooked in tooling, especially "more serious" sub-disciplines
+
+** Comparison: JavaScript
+Lots of different views on JavaScript, but *most* agree that it's *quick* to get *a little* bit of success.
+
+[[./img/Pattern_ Plain JS.png]]
+
+     #+BEGIN_SRC bash
+npm install the-whoooooooole-world
+create-react-app my-app
+cd my-app && npm start
+     #+END_SRC
+
+Huge ecosystem, dynamic types, a live repl means a working app template with hot-module code reloading instantly!
+
+** The attraction is real
+Usual argument is that the part of the graph to left is short, and therefore less important (or not at all!)
+#+REVEAL: split
+_Not. a. compelling. argument._
+** The trade-offs are often not inherent
+We've seen that with tooling and patterns, we can adjust the dimensions of existing practices. What can we do for Reason?
+#+REVEAL: split
+We can make app templates etc. easily enough:
+     #+BEGIN_SRC bash
+create-react-app my-app --scripts-version reason-scripts
+     #+END_SRC
+#+REVEAL: split
+But what are the other challenges?
+
+- Different syntax
+- Transpiled language
+- Smaller ecosystem
+- Different semantics
+
+*** Challenge: Different syntax
+Phase 1: OCaml syntax
+
+[[./img/Reason_ OCaml.png]]
+#+REVEAL: split
+Phase 2: Initial Reason syntax
+
+[[./img/JS hybrid.png]]
+#+REVEAL: split
+Phase 3: Current Reason syntax
+
+[[./img/Reason_ JS syntax.png]]
+※ NB: Syntax upgrade is completely automated 
+#+REVEAL: split
+Success?
+#+REVEAL: split
+
+[[./img/does_new_syntax_work.png]]
+#+REVEAL: split
+
+[[./img/new_syntax_success.png]]
+#+REVEAL: split
+Success!
+
+There are nuances to a decision like that, but trust me that it's been carefully thought over. Find me afterwards if you have specific questions
+*** Challenge: Transpiled language
+BuckleScript has an explicit goal to output readable JavaScript
+
+Means you can reason by analogy/from experience - look at the output, understand what the Reason code is doing, tweak and repeat
+
+#+REVEAL: split
+Reason input...
+
+#+BEGIN_SRC js
+let port = 3000;
+let hostname = "127.0.0.1";
+let create_server = (http) => {
+  let server =
+    http##createServer(
+      [@bs]
+      (
+        (req, resp) => {
+          resp##statusCode#=200;
+          resp##setHeader("Content-Type", "text/plain");
+          resp##_end("Hello world\n")
+        }
+      )
+    );
+  server##listen(
+    port,
+    hostname,
+    [@bs]
+    (
+      () =>
+        Js.log(
+          "Server running at http://"
+          ++ (hostname ++ (":" ++ (Pervasives.string_of_int(port) ++ "/")))
+        )
+    )
+  )
+};
+let () = create_server(Http_types.http);
+#+END_SRC
+
+#+REVEAL: split
+...JavaScript output!
+#+BEGIN_SRC js
+'use strict';
+var Pervasives = require("bs-platform/lib/js/pervasives");
+var Http       = require("http");
+
+var hostname = "127.0.0.1";
+
+function create_server(http) {
+  var server = http.createServer(function (_, resp) {
+    resp.statusCode = 200;
+    resp.setHeader("Content-Type", "text/plain");
+    return resp.end("Hello world\n");
+  });
+  return server.listen(3000, hostname, function () {
+    console.log("Server running at http://" + (hostname + (":" +
+         (Pervasives.string_of_int(3000) + "/"))));
+    return /* () */0;
+  });
+}
+
+create_server(Http);     
+#+END_SRC
+
+#+REVEAL: split
+Personally, this was very surprising to me
+
+I've worked with ClojureScript for a long time. Worked a bit on the ClojureScript compiler. Worked with js_of_ocaml. I don't mind mangled output. Thought, "you just get used to it."
+
+For onboarding, I was *wrong*.
+#+REVEAL: split
+Workshop with 80+ people, was critical in building up understanding quickly.
+
+[[./img/try_reason.png]]
+
+*** Challenge: Different ecosystem
+NPM ecosystem is practically infinitely larger than Reason ecosystem. Re-inventing everything all at once is a huge gamble, and delays shipping product.
+
+Solution: 
+- Focus heavily on incremental adoption: Don't have to wait for a greenfield project
+- Ease of integration: Use existing libraries and be productive right away
+*** Challenge: Different semantics
+Reason is typed, JavaScript is not.
+Reason has linked-lists *and* arrays *and* sets, is heavily focused on immutability. JavaScript (classic) only has objects, and largely isn't.
+
+(Partial) solution: Editor tooling, good error messages
+[[./img/reason_vs_code.png]]
+* Why the focus on TTIS?
+Because OCaml, which Reason retains 100% compatibility and is simply a new syntax/tooling for, has been focusing on maintaining a high success right for 20+ years
+
+Static typing system focuses on primary success, consistency. However, a consistent-but-unusuably-slow app is not a success, and OCaml has a worrisome focus on performance
+* Finally, a comparison!
+
+[[./img/JS cf Reason cf Elm.png]]
+
+- JavaScript: Heavy emphasis on getting started quickly with big tradeoffs that also come quickly
+- Elm: Heavy emphasis on sustained success in the medium and long term (80k lines of code for two years, *0 run-time exceptions*!), gains that by explicit trade off of ecosystem, integration, getting started, etc.
+#+REVEAL: split
+
+[[./img/JS cf Reason cf Elm.png]]
+
+- Elm: Heavy emphasis on sustained success in the medium and long term (80k lines of code for two years, *0 run-time exceptions*!), gains that by explicit trade off of ecosystem, integration, getting started, etc.
+- Reason: Straddling the middle. No trade-off of TTIS that's without merit, incremental migration and integration are critical, but with improved success rate over plain JavaScript
+
+* Very light on Reason for a "Reason talk"
+Didn't talk about some compelling parts of Reason:
+
+- Unikernels: Boot entire app as VM in milliseconds
+- ARM64 compilation: Compile native iOS/Android/Pi applications from Reason
+- Editor integration, etc.
+- Uniquely Reason solutions to difficult problems
+#+REVEAL: split
+Never fear, lots of good talks covering these points!
+- [[https://www.youtube.com/watch?v=_0T5OSSzxms][Taming meta language]] by Cheng Lou
+- [[https://www.youtube.com/watch?v=24S5u_4gx7w&t=1621s][What's in a language]] by Cheng Lou
+- [[https://www.youtube.com/watch?v=L0xz-ILKsLE][Universal Reason]] by Jacob Bass
+
+* Thank you!

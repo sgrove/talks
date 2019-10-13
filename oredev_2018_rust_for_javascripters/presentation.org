@@ -1,0 +1,587 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: linear
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+REVEAL_EXTRA_CSS: css/custom.css
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+* Rust for JavaScripters
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]]), from SF
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- Shipped cross-compiled ARM IoT Rust project
+- Background in Clojure(Script)/Reason/Rust
+* The opening pitch
+Working with Rust (in the beginning) is like banging your head against the wall
+#+REVEAL: split
+Let's set expectations!
+#+ATTR_REVEAL: :frag appear
+Caveat: Rust code will _always_※ be longer, more verbose, and more intricate than the JS alternative.
+
+
+
+
+
+#+ATTR_REVEAL: :frag appear
+※ ... not _always_, but close enough. It's a healthier mindset to go into Rust expecting thing.
+* The language
+#+BEGIN_QUOTE
+Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
+#+END_QUOTE
+#+REVEAL: split
+Rust for JavaScripters:
+
+- low-level, but with abstractions
+- guaranteed memory safety
+- threads without data races
+- pattern matching
+- type inference
+- minimal runtime
+** Why "Low-level, but with abstractions"?
+
+_Predictable performance_ from *control* over e.g. memory layout, collection.
+** Why "Guaranteed memory safety"?
+
+Manually ensuring data integrity is _tough_
+** Why "Threads without data races"?
+
+Manually ensuring data integrity with _concurrent access_ is _beyond tough_
+** Why "Type inference"?
+
+#+ATTR_REVEAL: :frag appear
+What are types for?
+
+#+ATTR_REVEAL: :frag appear
+- C: Performance!
+- Typescript/flow: Correctness!
+- Rust: Correctness... and performance!
+
+#+ATTR_REVEAL: :frag appear
+- Java: Correctness... and performance?
+
+#+REVEAL: split
+#+BEGIN_SRC java
+public class Prime {
+
+    public static void main(String[] args) {
+
+        int num = 29;
+        boolean flag = false;
+        for(int i = 2; i <= num/2; ++i)
+        {
+            if(num % i == 0)
+            {
+                flag = true;
+                break;
+            }
+        }
+
+        if (!flag)
+            System.out.println(num + " is a prime number.");
+        else
+            System.out.println(num + " is not a prime number.");
+    }
+}
+#+END_SRC
+#+REVEAL: split
+Can we do better?
+
+#+ATTR_REVEAL: :frag appear
+Type inference!
+#+REVEAL: split
+
+#+BEGIN_SRC rust
+fn main() {
+    // Because of the annotation, the compiler knows that `elem` has type u8.
+    let elem = 5u8;
+    // Create an empty vector (a growable array).
+    let mut vec = Vec::new();
+    // At this point the compiler doesn't know the exact type of `vec`, it
+    // just knows that it's a vector of something (`Vec<_>`).
+    // Insert `elem` in the vector.
+    vec.push(elem);
+    // Aha! Now the compiler knows that `vec` is a vector of `u8`s (`Vec u8`)
+    println!("{:?}", vec);
+}
+#+END_SRC
+
+#+ATTR_REVEAL: :frag appear
+- Minimal type annotation of variables needed
+#+ATTR_REVEAL: :frag appear
+the compiler is happy
+#+ATTR_REVEAL: :frag appear
+and so is the programmer!
+#+ATTR_REVEAL: :frag appear
+- Wherever possible, the computer should do work for us
+** Why "Minimal runtime"?
+
+Delivery over the web puts pressure on payload size
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_QUOTE
+At present, Go generates large Wasm files, with the smallest possible size being around ~2MB. If your Go code imports libraries, this file size can increase dramatically. 10MB+ is common.
+#+END_QUOTE
+
+#+ATTR_REVEAL: :frag appear
+(Go is rapidly improving here, with TinyGo outputting e.g. ~10kB )
+
+** Why "Pattern matching"?
+
+#+BEGIN_SRC rust
+fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+        }
+    }
+}
+#+END_SRC
+#+REVEAL: split
+Not just pattern matching, _exhaustive pattern matching_!
+#+BEGIN_SRC rust
+fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+        }
+    }
+}
+#+END_SRC
+#+BEGIN_SRC rust
+error[E0004]: non-exhaustive patterns: `_` not covered
+--> src/main.rs:6:15
+  |
+6 |         match num {
+  |               ^^^ pattern `_` not covered
+For more information about this error, try `rustc --explain E0004`.
+#+END_SRC
+#+REVEAL: split
+$ rustc --explain E0004
+
+#+BEGIN_QUOTE
+This error indicates that the compiler cannot guarantee a matching pattern for
+one or more possible inputs to a match expression. Guaranteed matches are
+required in order to assign values to match expressions, or alternatively,
+determine the flow of execution. Erroneous code example:
+
+```
+enum Terminator {
+    HastaLaVistaBaby,
+    TalkToMyHand,
+}
+
+let x = Terminator::HastaLaVistaBaby;
+
+match x { // error: non-exhaustive patterns: `HastaLaVistaBaby` not covered
+    Terminator::TalkToMyHand => {}
+}
+```
+
+If you encounter this error you must alter your patterns so that every possible
+value of the input type is matched. For types with a small number of variants
+(like enums) you should probably cover all cases explicitly. Alternatively, the
+underscore `_` wildcard pattern can be added after all other patterns to match
+"anything else". Example:
+
+```
+enum Terminator {
+    HastaLaVistaBaby,
+    TalkToMyHand,
+}
+
+let x = Terminator::HastaLaVistaBaby;
+
+match x {
+    Terminator::TalkToMyHand => {}
+    Terminator::HastaLaVistaBaby => {}
+}
+
+// or:
+
+match x {
+    Terminator::TalkToMyHand => {}
+    _ => {}
+}
+#+END_QUOTE
+#+REVEAL: split
+#+BEGIN_SRC rust
+fn main() {
+    let greetings = ["Hello", "안녕하세요", "Hej"];
+
+    for (num, greeting) in greetings.iter().enumerate() {
+        print!("{} : ", greeting);
+        match num {
+            0 => println!("This code is editable and runnable!"),
+            1 => println!("여기에서 코드를 수정하고 실행할 수 있습니다!"),
+            2 => println!("Den här koden kan redigeras och köras!"),
+            _ => println!("Now all our bases are covered!")
+        }
+    }
+}
+#+END_SRC
+
+#+ATTR_REVEAL: :frag appear
+- Compiler happy
+- Programmer happy
+
+** "Correctness"
+Debugging sucks.
+
+From easiest to hardest:
+#+ATTR_REVEAL: :frag appear
+- Who should do it?
+- When should it be done?
+- Where should it be done?
+
+#+REVEAL: split
+Who should do it?
+
+The Language > the compiler > the linter > the tests > the developer > the user
+
+#+REVEAL: split
+Similar to Elm, Rust pushes the debugging experience *up front*.
+
+Very common (though not universal) that a compiling program "just works."
+
+* The community
+- Warm, welcoming community
+- Strong emphasis on empathy
+* Why would JavaScripters care?
+#+ATTR_REVEAL: :frag appear
+Combining JavaScript and Rust
+#+ATTR_REVEAL: :frag appear
+Caveat: Using wasm (and therefore Rust) from JS is uncomfortable and unidiomatic by default.
+* Interop: A naive approach
+- JavaScript initializes
+- Fetch and load Rust wasm
+- wasm exposes functions for JavaScript to call
+- JavaScript calls wasm function which return e.g. a string
+** The problem
+Sending data JavaScript↔WebAssembly by default involves allocations - something we initially wanted to avoid!
+
+#+BEGIN_SRC
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+|                   | 1. "hi!"  |2. "hi!" |                     |
+|wasm.greet("hi!")  |-----------+---------> greet(msg..) {      |
+|                   |           |         |        ....         |
+|                   | 2. "hey!" |1. "hey!"|   "hey!"            |
+|                   |<----------+---------| }                   |
++-------------------+           |         +---------------------+
+#+END_SRC
+
+#+REVEAL: split
+Goals:
+
+- Minimizing copying into and out of the WebAssembly linear memory. Unnecessary copies impose unnecessary overhead.
+- Minimizing serializing and deserializing. Similar to copies, serializing and deserializing also imposes overhead, and often imposes copying as well.
+* Interop: A different way of thinking.
+How?
+- Pass opaque handles to a data structure — instead of serializing it on one side, copy it into some known location in the WebAssembly linear memory.
+- As a general rule of thumb, large, long-lived data structures are implemented as Rust types
+ - They live in the Rust linear memory, and are exposed to JS as opaque handles.
+ - JS calls exported Rust functions with the opaque handles
+ - Rust transforms the data, perform heavy computations, queries the data
+ - Rust ultimately returns a small, copy-able result.
+** A house divided
+#+BEGIN_SRC
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
+|                   |           |         |                     |
++-------------------+           |         +---------------------+
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+| DOM               |           |         |                     |
+| Garbage Collection|           |         |                     |
+| Familiar objects  |           |         |                     |
+| Arrays            |           |         |                     |
+| String            |           |         |                     |
++-------------------+           |         +---------------------+
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC
++-------------------+           |         +---------------------+
+|JavaScript         |           |         | RUST                |
++-------------------+           |         +---------------------+
+| DOM               |           |         | Performance         |
+| Garbage Collection|           |         | Manual memory       |
+| Familiar objects  |           |         | Custom "objects"    |
+| Arrays            |           |         | Custom "arrays"+Vec |
+| String            |           |         | String and str      |
++-------------------+           |         +---------------------+
+#+END_SRC
+*** Bridging the gap
+#+BEGIN_QUOTE
+> WebAssembly has a very simple memory model. A wasm module has access to a single "linear memory", which is essentially a flat array of a bytes.
+#+END_QUOTE
+#+REVEAL: split
+#+BEGIN_SRC
++-------------------+                     +---------------------+
+|JavaScript         |                     | RUST                |
++-------------------+                     +---------------------+
+| DOM               |                     | Performance         |
+| Garbage Collection|                     | Manual memory       |
+| Familiar objects  |                     | Custom "objects"    |
+| Arrays            |                     | Custom "arrays"+Vec |
+| String            |                     | String and str      |
++-------+-----------+                     +----------+----------+
+        |              +---------------+             |
+        |              | Shared memory |             |
+        |              +---------------+             |
+        |              |               |             |
+        |              |Plain ol' bytes|             |
+        +--------------+               +-------------+
+                       |               |
+                       +---------------+
+#+END_SRC
+#+REVEAL: split
+- By only returning the small result of the computation, we avoid copying and/or serializing everything back and forth between the JavaScript garbage-collected heap and the WebAssembly linear memory.
+Lingua franca: [Uint8/etc.]Array
+** Rust toolchain + DX to the rescue
+
+#+BEGIN_SRC rust
+#[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Cell {
+    Dead = 0,
+    Alive = 1,
+}
+
+pub fn tick(&mut self) {
+    let mut next = self.cells.clone();
+
+    for row in 0..self.height {
+        for col in 0..self.width {
+            let idx = self.get_index(row, col);
+            let cell = self.cells[idx];
+            let live_neighbors = self.live_neighbor_count(row, col);
+
+            let next_cell = match (cell, live_neighbors) {
+                // Rule 1: Any cell with fewer than two live neighbors dies
+                (Cell::Alive, x) if x < 2 => Cell::Dead,
+                (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
+                (Cell::Alive, x) if x > 3 => Cell::Dead,
+                (Cell::Dead, 3) => Cell::Alive,
+                (otherwise, _) => otherwise,
+            };
+
+            next[idx] = next_cell;
+        }
+    }
+    self.cells = next;
+}
+
+pub fn new() -> Universe {
+    let width = 64;
+    let height = 64;
+
+    let cells = (0..width * height)
+        .map(|i| {
+            if i % 2 == 0 || i % 7 == 0 {
+                Cell::Alive
+            } else {
+                Cell::Dead
+            }
+        }).collect();
+
+    Universe {
+        width,
+        height,
+        cells,
+    }
+}
+
+pub fn render(&self) -> String {
+    self.to_string()
+}
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC typescript
+/* tslint:disable */
+export enum Cell {Dead,Alive,}
+export class Universe {
+free(): void;
+
+ tick(): void;
+
+static  new(): Universe;
+
+ render(): string;
+
+}
+#+END_SRC
+
+* Basic  Examples
+** HTML Components
+Yew ("you") is a modern Rust framework inspired by Elm and ReactJS for creating frontend apps with WebAssembly.
+
+#+BEGIN_QUOTE
+The framework supports multi-threading & concurrency out of the box. It uses Web Workers API to spawn actors (agents) in separate threads and uses a local scheduler attached to a thread for concurrent tasks.
+#+END_QUOTE
+
+#+REVEAL: split
+
+#+BEGIN_SRC rust
+html! {
+    <section class="todoapp",>
+        <header class="header",>
+            <h1>{ "todos" }</h1>
+            { view_input(&model) }
+        </header>
+        <section class="main",>
+            <input class="toggle-all",
+                   type="checkbox",
+                   checked=model.is_all_completed(),
+                   onclick=|_| Msg::ToggleAll, />
+            { view_entries(&model) }
+        </section>
+    </section>
+}
+#+END_SRC
+** WebWorkers
+
+#+BEGIN_SRC rust
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Request {
+    Question(String),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Response {
+    Answer(String),
+}
+
+impl Agent for Worker {
+    // Create an instance with a link to agent's environment.
+    fn create(link: AgentLink<Self>) -> Self {
+        Worker { link }
+    }
+
+    // Handle incoming messages from components of other agents.
+    fn handle(&mut self, msg: Self::Input, who: HandlerId) {
+        match msg {
+            Request::Question(_body) => {
+                self.link.response(who, Response::Answer("That's cool!".into()));
+            },
+        }
+    }
+}
+#+END_SRC
+
+** Canvas drawing
+#+BEGIN_SRC javascript
+// Import the WebAssembly memory at the top of the file.
+// The 'hello_world_bg' module is generated by wasm-bindgen,
+// hence the '_bg'.
+import { memory } from "./hello_world_bg";
+
+const getIndex = (row, column) => {
+  return row * width + column;
+};
+
+const drawCells = () => {
+  const cellsPtr = universe.cells();
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
+
+  ctx.beginPath();
+
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      const idx = getIndex(row, col);
+
+      ctx.fillStyle = cells[idx] === DEAD
+        ? DEAD_COLOR
+        : ALIVE_COLOR;
+
+      ctx.fillRect(
+        col * (CELL_SIZE + 1) + 1,
+        row * (CELL_SIZE + 1) + 1,
+        CELL_SIZE,
+        CELL_SIZE
+      );
+    }
+  }
+
+  ctx.stroke();
+};
+#+END_SRC
+
+https://github.com/likr/rust-webgl2-example/blob/master/src/main.rs
+** Aside about syntax
+#+BEGIN_SRC rust
+error: cannot borrow immutable argument `b` as mutable (it's an immutable reference)`.
+ --> <anon>:2:18
+  |
+1 | fn foo(b: &mut u64) {
+  |        - use `mut b` here to make mutable (Or see another option below):
+2 |     let x = &mut b;
+  |                  ^ cannot borrow mutably, but can move it out by removing '&mut'.
+#+END_SRC
+* Big Demo
+- https://andrewimm.github.io/wasm-gb/
+- https://twitter.com/setimmediate/status/979379609954222080
+* Other crazy ideas
+- AssemblyScript (No-GC subset of TypeScript) ->
+- WASM ->
+- Rust
+
+   [[./img/wasm_to_rust_gb.png]]
+
+* Unprecedented opportunity in our industry
+Our industry moves forward via secretion
+
+#+ATTR_REVEAL: :frag appear
+Our implementations, if successful, never die.
+
+#+ATTR_REVEAL: :frag appear
+We have "terminals" that support DEC VT escape sequences, with various extensions added over the decades.
+#+REVEAL: split
+First time we have a chance for a clean-slate, safe implementation to gather sufficient momentum
+
+* Dangerous Prediction
+In the next five-ten years, most JavaScript we *run* will be written in Rust
+
+I don't think most people will write Rust on the frontend, but ultimately most people will use it (even if they don't realize it)
+** Who will write Rust?
+- Fine-grained performance control
+- Safety, security, correctness guarantees
+
+#+ATTR_REVEAL: :frag appear
+... Library authors!
+* The closing pitch
+Working with Rust (in the beginning) is like banging your head against the wall
+
+#+ATTR_REVEAL: :frag appear
+... but at a _very_ slight angle
+
+
+#+ATTR_REVEAL: :frag appear
+... and you'll like it!
+
+
+#+ATTR_REVEAL: :frag appear
+- Rust WebAssembly Book: https://rustwasm.github.io/book/
+- [[https://medium.com/@andrewimm/writing-a-game-boy-emulator-in-wasm-part-1-1ba023eb2c7c][Writing a Game Boy Emulator in WASM, Part 1]]
+- [[https://medium.com/@saschagrunert/a-web-application-completely-in-rust-6f6bdb6c4471][A web application completely in Rust]] (Yew application)

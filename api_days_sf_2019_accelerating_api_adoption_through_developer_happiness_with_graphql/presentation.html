@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org6dc10aa">
+<h2 id="org6dc10aa">Accelerating API adoption through developer happiness with GraphQL</h2>
+
+</section>
+</section>
+<section>
+<section id="slide-orgaa64958">
+<h2 id="orgaa64958">Quick Graph</h2>
+
+<div class="figure">
+<p><img src="./img/tech_comparison_graph.png" alt="tech_comparison_graph.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgf8ae460">
+<h2 id="orgf8ae460">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>VP Eng @ Payments company</li>
+<li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgd99ea27">
+<h2 id="orgd99ea27">Accelerating API adoption through developer happiness with GraphQL</h2>
+<p>
+Two Points to keep in mind when talking about api adoption:
+</p>
+<ul>
+<li>Content is king</li>
+<li>Competition is fierce (not always from other APIs)</li>
+
+</ul>
+
+</section>
+<section id="slide-org8dbe5c3">
+<h3 id="org8dbe5c3">Content is king</h3>
+<p>
+First and foremost, the <span class="underline">primary</span> attraction of your API:
+</p>
+<ul>
+<li>Its <span class="underline">data</span></li>
+<li>Its <span class="underline">effects</span></li>
+
+</ul>
+
+<blockquote nil>
+<p>
+"How do you help me achieve my business goal?"
+</p>
+</blockquote>
+
+</section>
+<section id="slide-org4311eff">
+<h3 id="org4311eff">Competition is fierce</h3>
+<ul>
+<li>Engineering resources are always stretched</li>
+
+</ul>
+
+<p>
+At any given time, 20+% of an API-based company's deal-flow is delayed for 6-8 months on engineering resources to get over integration challenges
+</p>
+
+<p>
+"The business lead was about to buy, but realized they don't have engineering resources."
+</p>
+
+<ul>
+<li>Competition isn't always with other APIs</li>
+
+</ul>
+<p>
+"Consumer" APIs like Spotify are competing for my attention against other interests I have
+</p>
+
+</section>
+<section id="slide-org407c6f9">
+<h3 id="org407c6f9">Two components</h3>
+<ul>
+<li><span class="underline">Engineering resource constraint</span></li>
+
+</ul>
+<p>
+Reflects amount of energy <b>required</b> to complete a task
+</p>
+
+<ul>
+<li><span class="underline">Developer happiness</span></li>
+
+</ul>
+<p>
+Reflects amount of intrinsic energy <b>available</b> to complete a task
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org0a6a155">
+<h2 id="org0a6a155">APIs are <span class="underline">rarely</span> known for sparking joy</h2>
+<ul>
+<li>Lack of empathy (broken feedback loop)</li>
+<li>Limited resources for design/documentation/testing/tooling, etc.</li>
+
+</ul>
+</section>
+<section >
+<p>
+Setting the scene&#x2026;
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgb356aaa">
+<h2 id="orgb356aaa">Perception of our API's adoption</h2>
+
+<div class="figure">
+<p><img src="./img/api_perception.png" alt="api_perception.png" />
+</p>
+</div>
+</section>
+<section id="slide-org9deed71">
+<h3 id="org9deed71">Reality of our API's adoption curve</h3>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_0.png" alt="api_reality_1_0.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_1.png" alt="api_reality_1_1.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_2.png" alt="api_reality_1_2.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_3.png" alt="api_reality_1_3.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_4.png" alt="api_reality_1_4.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_5.png" alt="api_reality_1_5.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_6.png" alt="api_reality_1_6.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_7.png" alt="api_reality_1_7.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_8.png" alt="api_reality_1_8.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_9.png" alt="api_reality_1_9.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_10.png" alt="api_reality_1_10.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_11.png" alt="api_reality_1_11.png" />
+</p>
+</div>
+
+</section>
+<section >
+<p>
+"Though I walk through the valley of the shadow of auth&#x2026;"
+<img src="./img/api_reality_1_13.png" alt="api_reality_1_13.png" />
+</p>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/api_reality_1_12.png" alt="api_reality_1_12.png" />
+</p>
+</div>
+
+</section>
+<section >
+<p>
+[Developer PSA]
+<img src="./img/programmer_productivity_0.png" alt="programmer_productivity_0.png" />
+</p>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/programmer_productivity_1.png" alt="programmer_productivity_1.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/tab_competition_graph.png" alt="tab_competition_graph.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/tab_competition_proof.png" alt="tab_competition_proof.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org3526304">
+<h2 id="org3526304">Three metrics for dev happiness</h2>
+<p>
+Evaluate your API with the following criteria:
+</p>
+<ul>
+<li>Time to initial success (Success ASAP)</li>
+<li>Intensity of success (Biggest "wow" moments possible)</li>
+<li>Interval between subsequent success states (make success frequent)</li>
+
+</ul>
+
+</section>
+<section >
+<p>
+Criteria =&gt; Maxims:
+</p>
+<ul>
+<li>Deliver quickest initial success</li>
+<li>Maximize "wow" factor</li>
+<li>Make success frequent</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org29b2f28">
+<h2 id="org29b2f28">How does GraphQL help?</h2>
+<ul>
+<li>GraphQL is inherently machine-readable (at multiple levels!)</li>
+<li>The tooling possible is intensely powerful</li>
+<li>A positive feedback loop</li>
+
+</ul>
+
+</section>
+<section id="slide-orgc19b169">
+<h3 id="orgc19b169">GraphQL Help: Demoathon</h3>
+<p>
+GraphiQL - Auto-complete APIs!
+</p>
+</section>
+<section >
+<p>
+GraphiQL Explorer
+</p>
+</section>
+<section >
+<p>
+GraphiQL Smart Forms
+</p>
+</section>
+<section >
+<p>
+Next level: Auto-parameterize existing queries
+<img src="./img/explorer_parameterize_example_1.png" alt="explorer_parameterize_example_1.png" />
+</p>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_parameterize_example_2.png" alt="explorer_parameterize_example_2.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_parameterize_example_3.png" alt="explorer_parameterize_example_3.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_parameterize_example_4.png" alt="explorer_parameterize_example_4.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_parameterize_example_5.png" alt="explorer_parameterize_example_5.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_parameterize_example_6.png" alt="explorer_parameterize_example_6.png" />
+</p>
+</div>
+</section>
+<section >
+<p>
+GraphiQL Code Exporter
+</p>
+</section>
+<section >
+<p>
+Compare to existing fragmented experiences:
+</p>
+<ul>
+<li>Documentation is often "inert"</li>
+<li>Examples aren't generalizable</li>
+<li>Initial experimentation isn't reusable in code</li>
+
+</ul>
+</section>
+<section >
+<p>
+Who can traverse graphs?
+</p>
+<ul>
+<li class="fragment appear">Humans</li>
+<li class="fragment appear">Computers</li>
+
+</ul>
+<p class="fragment (appear)">
+Who's generally better?
+</p>
+</section>
+<section >
+<p>
+Computers.
+</p>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/explorer_breadth_first_search.png" alt="explorer_breadth_first_search.png" />
+</p>
+</div>
+
+</section>
+<section >
+<p>
+Multi-APIs
+</p>
+</section>
+<section >
+<p>
+<object type="image/svg+xml" data="./img/hasura.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+Hasura: Instant Realtime GraphQL on Postgres
+</p>
+
+<p>
+Like Firebase++, but:
+</p>
+<ul>
+<li class="fragment appear">On Postgres</li>
+<li class="fragment appear">Standard GraphQL</li>
+<li class="fragment appear">Open-source</li>
+
+</ul>
+
+</section>
+<section >
+<p>
+Automatically combining APIs
+</p>
+<ul>
+<li class="fragment appear">Remote schema integration</li>
+<li class="fragment appear">"Remote-service joins"</li>
+<li class="fragment appear">Compare:
+<ul>
+<li>Stripe-as-a-library</li>
+<li>Stripe-as-an-introspectable-graph</li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section >
+<p>
+Auto-complete inside IDE
+</p>
+
+</section>
+<section >
+<p>
+GraphQL goes <span class="underline">everywhere</span>
+</p>
+<ul>
+<li class="fragment appear">Sales VP, CFO, etc.</li>
+<li class="fragment appear">Managers: "I need a list of new users for the past 30 days"</li>
+
+</ul>
+
+</section>
+<section >
+<p>
+GraphQL as async server-to-server events: Webhook delivery
+</p>
+</section>
+<section >
+
+<p>
+GraphQL Cortex
+</p>
+</section>
+<section >
+<p>
+GraphQL Cortex: sean@onegraph.com
+</p>
+
+</section>
+<section id="slide-orgc7c2778">
+<h3 id="orgc7c2778">Conquering Auth</h3>
+<p>
+Auth is difficult, and deeply unpleasant.
+</p>
+</section>
+<section >
+<p>
+Build it into your API.
+</p>
+</section>
+<section >
+<p>
+<code>[Auto "Log in to &lt;X&gt;" example]</code>
+</p>
+</section>
+<section id="slide-org183ff4f">
+<h4 id="org183ff4f">Progressive Auth</h4>
+<p>
+Progressive auth is the right thing to do.
+</p>
+
+<p>
+It's also even more unpleasant!
+</p>
+</section>
+<section >
+<p>
+Build it into your API.
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="java" >type Company {
+  id: String!
+  name: String!
+  createdAt: DateTime!
+  accountBalance: Int @permissions(scopes: ["account:read"])
+}
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="json" >{
+  "errors": [
+    {
+      "message": "Missing scope for accountBalance. Please grant additional permissions.",
+      "path": [
+        "company"
+        "accountBalance"
+      ],
+      "extensions": {
+        "type": "auth/insufficient-auth",
+        "requiredScope": "account:read",
+      }
+    }
+  ],
+  "data": {
+    "company": {
+      "id": "hZd773dvb"
+      "name": "Globodex, Inc."
+    }
+  }
+}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgab7c3bf">
+<h2 id="orgab7c3bf">Virtuous-data cycle</h2>
+
+<div class="figure">
+<p><img src="./img/virtuous_cycle.png" alt="virtuous_cycle.png" />
+</p>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-org9bf761f">
+<h2 id="org9bf761f">Deep Analytics: What can we do?</h2>
+<div class="outline-text-2" id="text-org9bf761f">
+</div>
+</section>
+<section id="slide-orgc554494">
+<h4 id="orgc554494">Iterative API design</h4>
+<p>
+Solution to ivory-tower API design problem - inherent loop
+</p>
+</section>
+<section id="slide-orgd6850ea">
+<h3 id="orgd6850ea">Example of breaking schema</h3>
+<ul>
+<li class="fragment appear">Deprecate old fields</li>
+<li class="fragment appear">Identify <b>specific</b> clients who have accessed in the past</li>
+<li class="fragment appear">Reach out to work on migration
+<ul>
+<li>Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)</li>
+
+</ul></li>
+<li class="fragment appear">Write query transformers to update client queries automatically</li>
+<li class="fragment appear">Compare to REST: small tweaks indiscriminately affect all clients OR fork the world</li>
+
+</ul>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/no_breaking_changes.png" alt="no_breaking_changes.png" />
+</p>
+</div>
+</section>
+<section id="slide-org2e889ab">
+<h4 id="org2e889ab">Schema changelog automation</h4>
+<ul>
+<li><a href="https://developer.github.com/v4/changelog/">https://developer.github.com/v4/changelog/</a></li>
+
+</ul>
+</section>
+<section id="slide-org3135ca0">
+<h4 id="org3135ca0">Living, responding, <b>accurate</b> API Docs</h4>
+<ul>
+<li class="fragment appear">"Lies, damn lies, and API documentation"</li>
+<li class="fragment appear">Accurate docs and consistent APIs</li>
+<li class="fragment appear">"For the new users who signed up two weeks ago, what fields have they been accessing?"</li>
+<li class="fragment appear">Humans classify unrecognized new use-cases</li>
+<li class="fragment appear">Insert into documentation as annotated example</li>
+<li class="fragment appear">Sort ranking based on trends in new users
+<ul>
+<li>Potentially even per client-group via tagging clients</li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section id="slide-org2298dc8">
+<h4 id="org2298dc8">Auto-classify fields for mocking use for mocking to help users without accounts</h4>
+<p>
+What's better than auto-auth?
+</p>
+
+<p>
+No auth!
+</p>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/auto_classification.png" alt="auto_classification.png" />
+</p>
+</div>
+<ul>
+<li>First/Last/Full name
+<ul>
+<li>Language distribution</li>
+
+</ul></li>
+<li>Email</li>
+<li>Address, Zip Code, Country</li>
+<li>URI</li>
+
+</ul>
+</section>
+<section >
+<p>
+GraphQL Muse: sean@onegraph.com
+</p>
+
+</section>
+<section id="slide-org86c5d1a">
+<h4 id="org86c5d1a">Deep performance monitoring</h4>
+<ul>
+<li class="fragment appear">Performance/timing</li>
+<li class="fragment appear">Error rates</li>
+<li class="fragment appear">Audit-logs</li>
+<li class="fragment appear">Total requests, bytes</li>
+
+</ul>
+<p class="fragment (appear)">
+&#x2026; per <b>field</b>
+</p>
+
+</section>
+<section id="slide-orgb827a23">
+<h4 id="orgb827a23">GDPR, COPPA, HIPAA, PII</h4>
+<p>
+Combine client+field-level access with server-awareness of data sensitivity:
+</p>
+<div class="org-src-container">
+
+<pre><code class="java" >type User @ GDPR {
+  id: String!
+  name: String!
+  birthdate: DateTime! @PII
+  lastMedicalAppointment: DateTime @HIPAA
+  socialSecurityNumber: String @PII
+}
+</code></pre>
+</div>
+<ul>
+<li>Automate permissions + privilege</li>
+<li>Track data exposure</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org836f671">
+<h2 id="org836f671">Getting over the hurdle</h2>
+<ul>
+<li>Analyze current network traffic</li>
+<li>Track "novelty" over time</li>
+<li>Derive <b>actual</b> API contract
+<ul>
+<li>Authentication</li>
+<li>Pagination</li>
+<li>Relationships</li>
+<li>Types</li>
+
+</ul></li>
+<li>Generate GraphQL</li>
+
+</ul>
+</section>
+<section >
+<p>
+&#x2026;
+</p>
+</section>
+<section >
+<ul>
+<li>Self-contained binary</li>
+<li>Runs next to your webserver</li>
+<li>OSS</li>
+<li>On-premise</li>
+
+</ul>
+</section>
+<section >
+<p>
+Appiderv: sean@onegraph.com
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org3fd49d6">
+<h2 id="org3fd49d6">Summary</h2>
+<p>
+GraphQL itself offers substantial benefits out of the box.
+</p>
+
+<p>
+The tooling today and tomorrow take developer happiness to the next level:
+</p>
+<ul>
+<li>For API providers</li>
+<li>For data-infrastructure managers</li>
+<li>For client-side developers</li>
+<li>And even for non-traditional devs: CFOs, VP Sales, Managers, Data-scientists, etc.</li>
+
+</ul>
+
+</section>
+<section >
+<ul>
+<li>Ultimately the data and effects of your API are king - focus on <b>that</b> exclusively.</li>
+<li>But if you want your api to adopted in 2019, it must plug into next-level tooling:
+<ul>
+<li>Familiar</li>
+<li>Exploration</li>
+<li>Documentation</li>
+<li>Code generation</li>
+<li>Client migration</li>
+<li>Analytics-lifecycle</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Pick standards that can give you as much of the above in an evolve-able way out of the box</li>
+<li>Designing apis still involves humans, but checking for consistency can be automated</li>
+
+</ul>
+
+</section>
+<section >
+
+<ol>
+<li>Content is king</li>
+<li>Competition is fierce</li>
+
+</ol>
+
+<p class="fragment (appear)">
+A word of caution:
+</p>
+<ul>
+<li class="fragment appear">This is a 'wow' moment now.</li>
+<li class="fragment appear">&#x2026;.In a few years, it will simply be table-stakes.</li>
+<li class="fragment appear">OneGraph tooling has started to spread and become standard!</li>
+<li class="fragment appear">How is your API going to fit into that world?</li>
+
+</ul>
+
+<p class="fragment (appear)">
+Adopt GraphQL &amp; focus on #1
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgef66a25">
+<h2 id="orgef66a25">My offers</h2>
+<div class="outline-text-2" id="text-orgef66a25">
+</div>
+</section>
+<section id="slide-orgf4b92f7">
+<h3 id="orgf4b92f7"><span class="underline">The</span> GraphQL Book</h3>
+<p>
+5 copies of the new GraphQL book by our friends <a href="https://twitter.com/MoonHighway">@MoonHighway</a>, the premier GraphQL training group:
+</p>
+
+
+<div class="figure">
+<p><img src="./img/learning_graphql.jpg" alt="learning_graphql.jpg" />
+</p>
+</div>
+</section>
+<section >
+<p>
+Tweet your best GraphQL questions (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)
+</p>
+<ul>
+<li>GraphQL adoption</li>
+<li>Tooling possibilities</li>
+<li>Etc.</li>
+
+</ul>
+
+</section>
+<section id="slide-orga92918d">
+<h3 id="orga92918d">GraphQL, APIs, Dev-Tooling &amp; Coffee</h3>
+</section>
+<section id="slide-org81ea5ec">
+<h3 id="org81ea5ec">Developer happiness for your company</h3>
+<p>
+Want this tooling for your api and for your developers?
+</p>
+
+<p>
+We can make it happen for you, public or on-premise.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org7157677">
+<h2 id="org7157677">Thank you!</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org534c473">
+<h2 id="org534c473">Misc</h2>
+<div class="outline-text-2" id="text-org534c473">
+</div>
+</section>
+<section id="slide-org26cad86">
+<h3 id="org26cad86">Overview</h3>
+<div class="outline-text-3" id="text-org26cad86">
+</div>
+</section>
+<section id="slide-org8c58312">
+<h4 id="org8c58312">Client-side DX</h4>
+</section>
+<section id="slide-orgcb2e3de">
+<h4 id="orgcb2e3de">Meta-API</h4>
+</section>
+<section id="slide-orge0a00fa">
+<h4 id="orge0a00fa">Maintainers</h4>
+</section>
+<section id="slide-org2437321">
+<h3 id="org2437321">Demos</h3>
+<ul>
+<li>GraphiQL autocomplete</li>
+<li>Explorer</li>
+<li>Smart forms</li>
+<li>Exporter - figure out trello api?</li>
+<li>Excel
+<ul>
+<li>GraphQL goes everywhere - even into Excel!</li>
+
+</ul></li>
+<li>Multi-APIs</li>
+<li>Automatic progressive authorization</li>
+<li>Hasura DB-access
+<ul>
+<li>We've seen internal devs who - when they're so frustrated with an inscrutable api - stand up a hasura instance to build and prototype instead</li>
+
+</ul></li>
+<li>Hasura remote-joins</li>
+<li>Draftbit</li>
+<li>npm (salesforce) api redesign</li>
+<li>in-editor autocomplete</li>
+<li>Breaking schema changes</li>
+<li>GraphQL Pipelines</li>
+<li>Webhooks</li>
+<li>Generating JWT with GraphQL for authorization and authentication</li>
+
+</ul>
+</section>
+<section id="slide-org6ce69f1">
+<h3 id="org6ce69f1">Ideas</h3>
+<ul>
+<li>Inferring API design from traffic
+<ul>
+<li>Generate GraphQL Layer</li>
+
+</ul></li>
+<li>API analytics
+<ul>
+<li>"Living API Docs" - can even be generated per client-group ("Fintech devs want to see these cases first", "startups want these cases first") if you tag the clients and see what fields they query in common</li>
+<li>Migrating existing clients (affects api maintainers)</li>
+
+</ul></li>
+<li>Auto-classify fields and use for mocking to help users without accounts</li>
+
+</ul>
+</section>
+<section id="slide-org8c5f277">
+<h3 id="org8c5f277">CTAs</h3>
+<ul>
+<li>Ask me out for coffee</li>
+<li>Best 5 tweets get GraphQL book</li>
+<li>Waitlist for products
+<ul>
+<li>GraphQL Pipelines</li>
+<li>Analytics classifier/mocking</li>
+<li>API inferrer</li>
+
+</ul></li>
+<li>Want this tooling for your api, for your developers? We can make it happen for you, public or internal</li>
+
+</ul>
+
+<p>
+"This is a 'wow' moment now. It won't be in a few years - it'll be table-stakes. How is your API going to fit into that world?"
+"The developer has remained in a state of constant success"
+"If you give your developers super-powers, they'll love you"
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

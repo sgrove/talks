@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-orgb779fe1">
+<h2 id="orgb779fe1">JAMStack Meetup SF</h2>
+<p>
+JWT &amp; GraphQL: The Ouroboros of Authorization &amp; Authentication
+<img src="./img/ouroboros.png" alt="ouroboros.png" />
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org1f4e5f5">
+<h2 id="org1f4e5f5">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>VP Eng @ Payments company</li>
+<li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgc576cc6">
+<h2 id="orgc576cc6">What challenge are we trying to overcome?</h2>
+<p>
+JAMstack
+</p>
+<ul>
+<li class="fragment appear">JavaScript</li>
+<li class="fragment appear">APIs</li>
+<li class="fragment appear">Markup</li>
+
+</ul>
+</section>
+<section >
+<p>
+APIs: What is the JavaScript talking to?
+</p>
+<ul>
+<li class="fragment appear">Twilio</li>
+<li class="fragment appear">Trello</li>
+<li class="fragment appear">GitHub</li>
+<li class="fragment appear">Asana</li>
+<li class="fragment appear">Spotify</li>
+<li class="fragment appear">Google Calendar</li>
+
+</ul>
+</section>
+<section >
+<p>
+How do they know&#x2026;
+</p>
+<ul>
+<li class="fragment appear">Who you are?</li>
+<li class="fragment appear">What your allowed to do?</li>
+<li class="fragment appear">What to call you?</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org15e2789">
+<h2 id="org15e2789">What's a JWT?</h2>
+<p class="fragment (appear)">
+"JSON Web Token"
+</p>
+</section>
+<section id="slide-org125f5af">
+<h3 id="org125f5af">What's inside a JWT?</h3>
+<div class="outline-text-3" id="text-org125f5af">
+</div>
+</section>
+<section id="slide-orgfd52ea5">
+<h4 id="orgfd52ea5">Payload</h4>
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  "iss": "OneGraph",
+  "aud": "https://serve.onegraph.com/dashboard/app/0b33e830-7cde-4b90-ad7e-2a39c57c0e11",
+  "iat": 1563758630,
+  "exp": 1564968229,
+  "https://onegraph.com/jwt/claims": {
+    "access_token": "3z-kiiioUBTyMOZ_8Yet70xzOzC4"
+  }
+}
+</code></pre>
+</div>
+<p>
+Some common claims:
+</p>
+<ul>
+<li class="fragment appear">iss: "Issuer" (Who issued this token?)</li>
+<li class="fragment appear">sub: "Subject" (Who is this token about)</li>
+<li class="fragment appear">aud: "Audience" (Who is this token intended for?)</li>
+<li class="fragment appear">exp: "Expires in" (When does this token expire relative to when it was issued?)</li>
+<li class="fragment appear">iat: "Issued at" (When was this token issued?)</li>
+<li class="fragment appear">alg: "Algorithm" (What algorithm was used to generate this token?)</li>
+
+</ul>
+</section>
+<section >
+<p>
+Cool story.
+</p>
+
+
+<p class="fragment (appear)">
+&#x2026;who are you again?
+</p>
+</section>
+<section id="slide-orga5d4761">
+<h4 id="orga5d4761">Header</h4>
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  "alg": "RS256",
+  "typ": "JWT",
+  "kid": "gXv50C7Jg-xT0wPVAVQp-8C4zIM"
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-orgd3f2617">
+<h4 id="orgd3f2617">Signature</h4>
+<div class="org-src-container">
+
+<pre><code class="javascript" >"eL5tvRyGO1CFbw9Dv58xlX00jmpmsVid9q42-4iSj4PrBOVl1MZ_xWYVeHv22Xh8S1Cel-mL9lbu7RBhFDNujf4VKJKElkg3J7xd5XpvYFGRHgtT3jj1J0Nx2xM1_9qhn8E0kOOCUIkJqagdG2Mtex7cl_BJ5i5k1PoGbO5PPMzRkdj5QvZbwKbRLi0LzWMiYgWf8C6_IVNt1My3FDwbs-Lg2xvB0aWf2gYIpISp8gRTuZMwTA2B8ugAzDtg-23Xb8OlNH-0DoG2N6MgSoBvDpoRuAJTWUEs2mHbA5HJNvGZUCrggDObbyhPPIu8u"
+
+#+ATTR_REVEAL: :frag (appear)
+- Looks like gibberish, actually critical
+</code></pre>
+</div>
+</section>
+<section id="slide-org9ca9811">
+<h3 id="org9ca9811">How are they protected?</h3>
+<div class="outline-text-3" id="text-org9ca9811">
+</div>
+</section>
+<section id="slide-org2cf1fd9">
+<h4 id="org2cf1fd9">HMAC: Shared-secret</h4>
+<ul>
+<li class="fragment appear">Parties who know the secret can verify</li>
+<li class="fragment appear">Parties who know the secret can write</li>
+
+</ul>
+</section>
+<section id="slide-orgfc32f56">
+<h4 id="orgfc32f56">JWKs: Public/private</h4>
+<ul>
+<li class="fragment appear">Everyone can verify</li>
+<li class="fragment appear">Only one party can generate tokens</li>
+<li class="fragment appear">Generally safer than HMAC (also, better disaster story)</li>
+
+</ul>
+</section>
+<section id="slide-org9d7c7ec">
+<h3 id="org9d7c7ec">Where are JWTs stored?</h3>
+<p>
+When making an API request, JavaScript can store/read JWT from:
+</p>
+<ul>
+<li>LocalStorage</li>
+<li>Cookies</li>
+
+</ul>
+</section>
+<section id="slide-org6fca507">
+<h3 id="org6fca507">A note about size</h3>
+<ul>
+<li>JWT are used with stateless APIs</li>
+<li>JWT is sent with every request</li>
+<li>Previous example is ~740 bytes - nearly 1kb!</li>
+<li>Not amenable to gzipping</li>
+
+</ul>
+</section>
+<section id="slide-org8ce3b62">
+<h3 id="org8ce3b62">A note about safety</h3>
+<ul>
+<li class="fragment appear">JWTs are <b>not</b> encrypted</li>
+<li class="fragment appear">JWTs are <b>not</b> encrypted</li>
+<li class="fragment appear">JWTs are <b>not</b> encrypted</li>
+<li class="fragment appear">Let's take a look!</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orge5bb735">
+<h2 id="orge5bb735">Using a JWT in GraphQL</h2>
+<div class="outline-text-2" id="text-orge5bb735">
+</div>
+</section>
+<section id="slide-org2b531c3">
+<h3 id="org2b531c3">Annotating GraphQL Schemas</h3>
+<div class="org-src-container">
+
+<pre><code class="java" >// SDL (Schema Definition Language)
+directive @isAuthenticated on QUERY | FIELD
+directive @hasRole(role: [String]) on QUERY | FIELD
+
+type Query {
+  companies : [Company] @isAuthenticated
+}
+
+type Company {
+  id: String!
+  name: String!
+  createdAt: DateTime!
+  accountBalance: Int @hasRole(roles: ["admin", "finance"])
+}
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="javascript" >isAuthenticatedDirective: (next, source, args, context) => {
+  const token = context.headers.authorization;
+  if (!token) {
+    throw new AuthorizationError({
+      message: "You must supply a JWT for authentication!"
+    });
+  }
+  try {
+    const decoded = jwt.verify(
+      token.replace("Bearer ", ""),
+      process.env.JWT_SECRET
+    );
+    context.user = decoded;
+    return next();
+  } catch (err) {
+    throw new AuthorizationError({
+      message: "You are not authentication."
+    });
+  }
+};
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="javascript" >hasRoleDirective: (next, source, args, context) => {
+  const token = context.headers.authorization;
+  const expectedRoles = args.roles;
+  if (!token) {
+    throw new AuthorizationError({
+      message: 'You must supply a JWT for authorization!'
+    });
+  }
+  try {
+    const decoded = jwt.verify(
+      token.replace('Bearer ', ''),
+      process.env.JWT_SECRET
+    );
+    const roles = decoded.roles.split(' ');
+    if (expectedRole.some(role => roles.indexOf(role) !== -1)) {
+      return next();
+    }
+  } catch (err) {
+    return Promise.reject(
+      new AuthorizationError({
+        message: `To access ${source.name}, You must be assigned one of the following roles: ${expectedRoles.join(
+            ', '
+          )}`
+      })
+    );
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="javascript" >const schema = makeExecutableSchema({
+  typeDefs,
+  schemaDirectives: {
+    hasRole: hasRoleDirective,
+    isAuthenticated: isAuthenticatedDirective
+  }
+});
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org4e8d7e9">
+<h2 id="org4e8d7e9">Generating a JWT</h2>
+<p>
+Given we now trust the contents of a token, we need to figure out 2 things:
+</p>
+<ol>
+<li class="fragment appear">Who is this person who holds the token?</li>
+<li class="fragment appear">What are they authorized to do?</li>
+
+</ol>
+</section>
+<section id="slide-orgdd3415e">
+<h3 id="orgdd3415e">Authentication</h3>
+<ol>
+<li>What is the primary key we're tracking for this person?</li>
+
+</ol>
+<ul>
+<li class="fragment appear"><code>userId</code> from database (custom)</li>
+<li class="fragment appear"><code>sub</code> from OAuth provider (Google, etc.)</li>
+<li class="fragment appear"><code>userId</code> from API provider (Spotify, GitHub, etc.)</li>
+<li class="fragment appear"><code>email</code> from database/service</li>
+
+</ul>
+</section>
+<section id="slide-org623ac3f">
+<h3 id="org623ac3f">Authorization</h3>
+<ol>
+<li>What is this person allowed to do? Based on&#x2026;</li>
+
+</ol>
+<ul>
+<li class="fragment appear">Database columns</li>
+<li class="fragment appear">Membership in organizations</li>
+<li class="fragment appear">Age</li>
+<li class="fragment appear">Manual verification</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orgd443ac4">
+<h2 id="orgd443ac4">Generating a JWT with GraphQL</h2>
+<ol>
+<li class="fragment appear">Data =&gt; Authentication</li>
+<li class="fragment appear">Logic =&gt; Authorization</li>
+
+</ol>
+</section>
+<section id="slide-org57928a7">
+<h3 id="org57928a7">Step 1: Query</h3>
+<div class="org-src-container">
+
+<pre><code class="javascript" >query WhoAmI {
+  me {
+    github {
+      email
+      id
+      databaseId
+      organizations(first: 100) {
+        nodes {
+          id
+          email
+          login
+          name
+        }
+      }
+    }
+    spotify {
+      email
+      id
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+[Demo GraphiQL Explorer]
+</p>
+</section>
+<section id="slide-org70154cb">
+<h3 id="org70154cb">Step 2: Logic</h3>
+<div class="org-src-container">
+
+<pre><code class="javascript" >if (
+    gitHubEmail === "sean@onegraph.com" ||
+    gitHubEmail === "daniel@onegraph.com" ||
+    gitHubOrganizations.find(
+      organization => organization.name === "OneGraph"
+    )
+  ) {
+    finalJwt["role"] = "admin";
+  } else {
+    finalJwt["role"] = "user";
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgb6b7793">
+<h2 id="orgb6b7793">Examples</h2>
+<div class="outline-text-2" id="text-orgb6b7793">
+</div>
+</section>
+<section id="slide-orgbd3a807">
+<h3 id="orgbd3a807">Hasura</h3>
+<ul>
+<li class="fragment appear">Common claims are cool</li>
+<li class="fragment appear">Custom claims&#x2026; better?</li>
+
+</ul>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="javascript" >finalJwt["https://hasura.io/jwt/claims"]["x-hasura-default-role"] = "user";
+
+if (
+    (gitHubCollaboratorRepositories.find(
+      repository =>
+        repository.nameWithOwner === "yukims19/wasm-gameboy-emulator"
+    ) && spotifyEmail === "sean@gmail.com")
+  ) {
+    finalJwt["https://hasura.io/jwt/claims"]["x-hasura-allowed-roles"] = "admin";
+  }
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org906509d">
+<h3 id="org906509d">Netlify</h3>
+<div class="org-src-container">
+
+<pre><code class="javascript" >if (
+    (gitHubContributedRepositories.find(
+      repository.nameWithOwner === "sgrove/riseos-static"
+    )) &&
+    (twitterFollowers.find(
+      follower => follower.screenName === "@sgrove"
+    ))
+  ) {
+    finalJwt["app_metadata"]["authorization"]["roles"] = "moderator";
+  }
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgd3c1515">
+<h2 id="orgd3c1515">Next Level DX: Tooling!</h2>
+<ul>
+<li>Well-known rules/values</li>
+<li>Reflect for UI</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org8118d8e">
+<h2 id="org8118d8e">The Ouroboros of Authorization &amp; Authentication</h2>
+<ol>
+<li class="fragment appear">Use JWTs to authenticate and authorize with your GraphQL APIs</li>
+<li class="fragment appear">Use your GraphQL APIs to generate your JWTs</li>
+
+</ol>
+</section>
+</section>
+<section>
+<section id="slide-orgdb018ce">
+<h2 id="orgdb018ce">Thank you!</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgc751e5d">
+<h2 id="orgc751e5d">Misc</h2>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+
+<link rel="stylesheet" href="css/custom.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<section id="slide-org023ae19">
+<h2 id="org023ae19">Magically Migrating from REST to GraphQL</h2>
+<p>
+Or, the power of shutting up and listening.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org58fb717">
+<h2 id="org58fb717">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>), from SF</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>YC S11 / VP Eng / YC S18</li>
+<li>Background in Clojure(Script)/Reason/Rust</li>
+<li>Lots of specific GraphQL experience - server, client, tooling</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orgd3235c3">
+<h2 id="orgd3235c3">Motivations: Why move from REST to GraphQL?</h2>
+<p>
+[Omitted for this audience]
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org9f4c833">
+<h2 id="org9f4c833">The usual REST to GraphQL prologue</h2>
+<p>
+Dozens of people productionizing a REST→GraphQL migration with a common narrative:
+</p>
+</section>
+<section >
+<ul>
+<li>Excited about this GraphQL thing!</li>
+<li>Let’s try it with over a single REST endpoint first</li>
+<li>We’ll just list out all of the fields this endpoint returns&#x2026;</li>
+<li>&#x2026;and copy them verbatim into GraphQL resolvers</li>
+<li>Job done! Let’s share it with the frontend team, and await our shower of roses</li>
+<li><b>confused looks from the devs meant to actually use the API</b></li>
+<li><b>lots of follow-up meetings with engineering managers from now on</b></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org44bd981">
+<h2 id="org44bd981">Principles for designing GraphQL API</h2>
+<p>
+3 principles:
+</p>
+
+<ul>
+<li>Maximal power</li>
+<li>Minimal cost</li>
+<li>Constant success</li>
+
+</ul>
+</section>
+<section >
+
+<p>
+At each step along the way, it's best to ask yourself:
+</p>
+
+<p class="fragment appear">
+[Maximal power]: Will this provide the maximum power permissible to the consumer, so they can handle unforeseen demands as independently as possible?
+</p>
+</section>
+<section >
+<p>
+[Minimal cost]: Will this impose the minimal cost on the consumer in terms of graph structure, verbosity, tooling, and documentation?
+</p>
+</section>
+<section >
+<p>
+[Constant success]: Will this design decision maximize the chance the consumer is always in a successful state, in terms of correctness and performance?
+</p>
+</section>
+<section >
+
+<p>
+Example 1: GitHub's <code>first</code> / <code>last</code> pagination
+</p>
+
+</section>
+<section >
+
+<p>
+Example 2: npm's downloads design
+</p>
+<ul>
+<li>Date input field?</li>
+<li>Enums?</li>
+<li>Dedicated fields?</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgdf9bb62">
+<h2 id="orgdf9bb62">GraphQL is a chance to rethink your API design</h2>
+<p>
+&#x2026; porting it 1:1 will be a missed opportunity!
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org8de85f1">
+<h2 id="org8de85f1">Let's get started with a real migration!</h2>
+<p>
+A journey with npm "REST"-ish API to GraphQL
+</p>
+
+<ul>
+<li>Step 1: Survey The API endpoints and their return data</li>
+<li>Step 2: Decide on top level fields, based on the underlying concepts and data</li>
+<li>Step 3: Think through idiomatic design</li>
+<li>Step 4: Model the data relationships within your API</li>
+<li>Step 5: Model the data relationships to the outside of your API</li>
+
+</ul>
+
+</section>
+<section >
+
+
+<div class="figure">
+<p><img src="./img/migration_steps.png" alt="migration_steps.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-orgd9e1f20">
+<h3 id="orgd9e1f20">Step 1: Survey The API endpoints and their return data</h3>
+<p>
+npm has ~four endpoints on two hosts:
+</p>
+
+<ol>
+<li>Point downloads</li>
+<li>Cumulative downloads</li>
+<li>Metadata</li>
+<li>Search</li>
+
+</ol>
+
+</section>
+<section id="slide-org2d264ec">
+<h4 id="org2d264ec">Downloads</h4>
+<ul>
+<li><code>https://api.npmjs.org/downloads/point/{period}[/{package}]</code></li>
+
+</ul>
+<p>
+Cumulative downloads for a given period ("Point values")
+</p>
+
+<ul>
+<li><code>https://api.npmjs.org/downloads/range/{period}[/{package}]</code></li>
+
+</ul>
+<p>
+Downloads broken down per-day for a given period ("Ranges")
+</p>
+
+</section>
+<section >
+<p>
+<code>https://api.npmjs.org/downloads/range/{period}[/{package}]</code>
+</p>
+
+<ul>
+<li>Package is optional on both endpoints!</li>
+<li>Two potentially separate ideas conflated.</li>
+
+</ul>
+
+</section>
+<section >
+
+<p>
+Both endpoints return a similar structure:
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="javascript" >// Common structure returned from both endpoints
+{
+  "start": "date",
+  "end": "date",
+  "package": "string"
+}
+
+// `downloads` is an integer in the "point" (cumulative) downloads endpoint
+{
+  "downloads": "integer",
+}
+
+// `downloads` is an array of downloads by day in the "range" endpoint
+{
+  "downloads": [
+    {
+      "day": "date",
+      "downloads": "integer"
+    }
+  ]
+}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org710170e">
+<h3 id="org710170e">Step 2: Decide on top level fields, based on the underlying concepts and data</h3>
+<p>
+From these three endpoints so far, we can imagine there are two top level concepts consumers are ultimately looking for:
+</p>
+
+<ul>
+<li>Download data (<code>`downloads`</code>)</li>
+<li>Package metadata (<code>`package`</code>)</li>
+
+</ul>
+
+<p>
+&gt; Note: It’s normal for multiple endpoints in REST to boil down to fewer concepts in GraphQL
+</p>
+</section>
+<section id="slide-org68d1224">
+<h3 id="org68d1224">Step 3: Think through idiomatic design</h3>
+<p>
+A naive approach would be to mimic the concepts and endpoints exactly.
+</p>
+
+<p>
+Just like the original API endpoint, we could parameterize our downloads field with a required <code>dateIsh</code> argument, and an optional <code>packageName</code> argument.
+</p>
+
+<p>
+Similarly the package endpoint would be parameterized by a required <code>name</code> argument.
+</p>
+</section>
+<section >
+
+<p>
+But let's not do that.
+</p>
+
+</section>
+<section >
+
+<p>
+Let's judge it according to our three goals:
+</p>
+
+<p>
+How closely does this design achieve our three goals:
+</p>
+
+<ul>
+<li>Do we give our consumer the maximal power we can afford?
+<ul>
+<li>Despite being naive, the design is very powerful, as a user can put any `dateIsh` value recognized by the underlying api in, so we're not hiding any flexbility from consumers.</li>
+<li>Yes, very powerful.</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+
+<ul>
+<li>Do we impose the minimal costs possible on the consumer trying to access the data?
+<ul>
+<li>The cost isn't too bad either, just two arguments (one of which is optional).</li>
+<li>Medium, some syntax cost</li>
+
+</ul></li>
+
+</ul>
+
+</section>
+<section >
+<ul>
+<li>Did we design our graph for constant success so each step our consumer takes is a valid, useful query?
+<ul>
+<li>The design badly fails this test!</li>
+<li>We have to understand special-cased enums, the date format, and the range format</li>
+<li>It's possible to input effectively infinite malformed values.</li>
+<li>Also, it's unclear why `packageName` is optional - what happens when it's omitted?</li>
+
+</ul></li>
+
+</ul>
+
+<p>
+Let's improve on the third point, while trying to either maintain or improve on the first two!
+</p>
+
+
+</section>
+<section id="slide-orgd6396a8">
+<h4 id="orgd6396a8">Alternative approach</h4>
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  npm {
+    downloads {
+      lastMonth {
+        count
+        perDay {
+          day
+          count
+        }
+      }
+      lastDay { ... }
+      lastWeek { ... }
+      day { ... }
+      period(
+        endDate: "2019-01-01"
+        startDate: "2019-12-01"
+      ) { ... }
+    }
+  }
+}
+</code></pre>
+</div>
+
+</section>
+<section >
+<ul>
+<li>Conceptually though (and in terms of the `npm` api), the ranges endpoint takes the same arguments as the "point data." There's a relationship between the dates (whether enums, a point date, or a range), and the `point` and `range` download data.</li>
+<li>Notice how the arguments for both point and range downloads are captured in the graph structure.</li>
+
+</ul>
+
+<p>
+&gt; REST endpoints that share exactly the same arguments often share a deeper relationship that’s worth modeling explicitly in your GraphQL API structure
+</p>
+
+</section>
+<section id="slide-org96dc2f4">
+<h3 id="org96dc2f4">Step 4: Model the data relationships within your API</h3>
+<p>
+The package metadata host/endpoint returns package name, homepage, source repository, etc.
+</p>
+
+<ul>
+<li>No special enums, easily parameterized by a required <code>name</code> argument.</li>
+<li>Add in the fields: <code>author</code>, <code>description</code>, <code>homepage</code>, etc.</li>
+
+</ul>
+<ul class="fragment appear">
+<li>But user has <b>already</b> specified the package name, which is also an argument to the downloads field&#x2026;</li>
+
+</ul>
+<ul class="fragment appear">
+<li>So we can add a relation between package-&gt;downloads!</li>
+<li>Makes navigating between the APIs feel incredibly natural:</li>
+
+</ul>
+
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  npm {
+    package(name: "graphql") {
+      author {
+        name
+      }
+      description
+      homepage
+      downloads {
+        lastMonth {
+          downloads
+          perDay {
+            day
+            count
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-org24444af">
+<h3 id="org24444af">Step 5: Model the data relationships to the outside of your API</h3>
+<p>
+<code>npm</code>'s data is wonderful, but they’re not in a position to also add related external data.
+</p>
+
+<p>
+But this is GraphQL, and we can - in fact, we should!
+</p>
+
+</section>
+<section id="slide-orgd338dcb">
+<h4 id="orgd338dcb">Bundlephobia</h4>
+<p>
+Bundlephobia
+&gt; Bundlephobia is a wonderful service by @pastelsky to find the cost of adding an `npm` package to your bundle, because JavaScript bloat is more real today than ever before.
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  npm {
+    package(name: "graphql") {
+      name
+      bundlephobia {
+        dependencyCount
+        version
+        name
+        history {
+          dependencyCount
+          size
+          version
+        }
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-orge9ed7bd">
+<h4 id="orge9ed7bd">GitHub</h4>
+<p>
+&gt; GitHub is an up-and-coming little startup that's pretty nifty for hosting source code
+</p>
+</section>
+<section >
+<p>
+:P
+</p>
+</section>
+<section >
+<ul>
+<li>Bundlephobia is extremely straightforward</li>
+<li>We expect the connection between npm and bundlephobia to remain static</li>
+<li>No competing service we might merge into the bundlephobia field - it'd naturally fall under its own new field.</li>
+
+</ul>
+</section>
+<section >
+<p>
+<code>npm</code>'s package metadata has a repository field with e.g. "repository":
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  "type": "git",
+  "url": "http://github.com/facebook/graphql.git"
+}
+</code></pre>
+</div>
+
+<p>
+Can see that it's a repository hosted on GitHub, so let's add a connection called <code>sourceRepository</code> 
+</p>
+
+<p>
+What could be better than querying into npm and joining GitHub’s repository data to get the stargazer count, the open issues, and most recent commit data? So cool!
+</p>
+
+</section>
+<section >
+
+<p>
+But what if the repository is on Bitbucket or GitLab?
+</p>
+
+<p>
+We don't have those in our graph today, it's maybe someday!
+</p>
+
+<p>
+Let's make this field a more "open" type than the <code>bundlephobia</code> field.
+</p>
+
+</section>
+<section >
+
+<ul>
+<li>To make <code>sourceRepository</code> extensible for future use, we'll create a union type</li>
+<li>Union initially only has one possible type: <code>GitHubRepository</code></li>
+
+</ul>
+<ul class="fragment appear">
+<li>We’re imposing some syntactic and conceptual cost for the consumer (more typing and this whole “unions” thing)</li>
+<li>But extending new repository types will be natural in the future</li>
+
+</ul>
+
+</section>
+<section >
+
+<p>
+With that in place, our consumers can jump from a npm package right into GitHub to get the number of open issues with this simple query:
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="javascript" >{
+  npm {
+    package(name: "graphql") {
+      name
+      repository {
+        sourceRepository {
+          ... on GitHubRepository {
+            name
+            issues(states: CLOSED) {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org39c4670">
+<h2 id="org39c4670">REST to GraphQL - what do we have so far?</h2>
+<ul>
+<li>Introspectable, idiomatic GraphQL representation</li>
+<li>Lots of goodies across three great services</li>
+<li>Implemented in a way that should minimize ongoing maintenance and breaking changes for us, and</li>
+<li>Maximize our consumer's power, minimize their cost, and providing a very high level of constant success</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orge975072">
+<h2 id="orge975072">Other topics: Gotchas!</h2>
+<ul>
+<li>What to do with inconsistent field structures in your API</li>
+<li>How to represent objects with dynamic keys</li>
+
+</ul>
+<p>
+Happy to talk about examples of this
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org040d186">
+<h2 id="org040d186">Future topics: Going deeper</h2>
+<ul>
+<li>Normalizing pagination</li>
+<li>Optimizations, both at a high level and in nitty-gritty detail</li>
+<li>Migration strategies for your clients
+<ul>
+<li>How to support both APIs at once</li>
+<li>How to switch infrastructure pieces from the old REST to the new GraphQL API as necessary</li>
+
+</ul></li>
+<li>Avoiding N+1 and preventing your REST servers from catching on fire under load</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orgcf0524c">
+<h2 id="orgcf0524c">Future topics: A whole new world of opportunities</h2>
+<ul>
+<li>API analytics</li>
+<li>Developer on-boarding</li>
+<li>Computer-aided consistency</li>
+<li>Request batching wins</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org911ccf3">
+<h2 id="org911ccf3">Demo time: What's that order again?</h2>
+<ul>
+<li>Step 1: Survey The API endpoints and their return data</li>
+<li>Step 2: Decide on top level fields, based on the underlying concepts and data</li>
+<li>Step 3: Think through idiomatic design</li>
+<li>Step 4: Model the data relationships within your API</li>
+<li>Step 5: Model the data relationships to the outside of your API</li>
+
+</ul>
+
+</section>
+<section id="slide-org634b1de">
+<h3 id="org634b1de">How much could we automate?</h3>
+<p>
+[Demo]
+</p>
+
+
+</section>
+<section >
+<p>
+Thank you!
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>
