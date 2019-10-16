@@ -124,7 +124,9 @@ New plan:
 #+ATTR_REVEAL: :frag (appear)
 Put the case study on hold...
 #+REVEAL: split
-... and automate everything.
+... and build a public tool
+#+ATTR_REVEAL: :frag (appear)
+to automate everything.
 #+REVEAL: split
 Time to shave some yaks.
 #+REVEAL: split
@@ -455,7 +457,9 @@ We *can* overcome these issues with this, but...
 1. It's a lot of work.
 2. It doesn't help with the first problem of exploring.
 #+REVEAL: split
-Ok, let's solve those problems.
+Ok, new proposal: 
+
+let's solve these API problems, *too*.
 #+REVEAL: split
 For those keeping score...
 
@@ -463,10 +467,10 @@ For those keeping score...
 Here's our challenge stack we just pushed onto:
 
 #+ATTR_REVEAL: :frag (appear)
-- Fix API explorability, docs, and auth
-- Automate settings up startup infrastructure
-- Set up startup infrastructure
 - Matcha Scooters
+  - Set up startup infrastructure
+    - Automate settings up startup infrastructure
+      - Fix API explorability, docs, and auth
 #+REVEAL: split
 [[./img/rabbit_hole_2.png]]
 
@@ -610,6 +614,8 @@ mutation DeployNetlifySite($path: String!) {
 }
 #+END_SRC
 #+REVEAL: split
+https://startup-in-a-box.netlify.com/
+#+ATTR_REVEAL: :frag (appear)
 One
 #+ATTR_REVEAL: :frag (appear)
 Single
@@ -636,16 +642,38 @@ Pop that stack!
 But we're not *quite* ready yet, I think.
 #+ATTR_REVEAL: :frag (appear)
 Inspiration strikes even when I'm not at my computer.
+#+ATTR_REVEAL: :frag (appear)
+Competition is fierce.
 #+REVEAL: split
 But I always have my phone.
 #+REVEAL: split
 Final goal:
 #+ATTR_REVEAL: :frag (appear)
 Trigger the pipeline with an incoming SMS from Twilio.
-
+#+REVEAL: split
+#+BEGIN_SRC javascript
+subscription TwilioSub($authToken: String!, $accountSid: String!, $inspirationalPhoneNumber: String!) {
+  twilio(
+    auth: { twilio: { authToken: $authToken, accountSid: $accountSid } }
+    webhookUrl: "https://startup-in-a-box.netlify.com/jamstack-what-an-amazing-demo-fn"
+  ) {
+    incomingSMS(input: {
+      to: $inspirationalPhoneNumber
+    }) {
+      sms {
+        body
+        from
+        to        
+      }
+    }
+  }
+}
+#+END_SRC
 #+REVEAL: split
 - Set up startup infrastructure
 - Matcha Scooters
+#+REVEAL: split
+Win?
 #+REVEAL: split
 Win
 #+ATTR_REVEAL: :frag (appear)

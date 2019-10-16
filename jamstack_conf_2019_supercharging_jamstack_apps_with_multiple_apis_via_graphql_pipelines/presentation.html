@@ -29,8 +29,8 @@
 <div class="slides">
 
 <section>
-<section id="slide-org467675d">
-<h2 id="org467675d">Supercharging JAMstack apps with multiple APIs</h2>
+<section id="slide-org9afbf6e">
+<h2 id="org9afbf6e">Supercharging JAMstack apps with multiple APIs</h2>
 <p>
 And introducing "GraphQL Pipelines"
 </p>
@@ -38,8 +38,8 @@ And introducing "GraphQL Pipelines"
 </section>
 </section>
 <section>
-<section id="slide-org135295a">
-<h2 id="org135295a">Who am I?</h2>
+<section id="slide-org3561807">
+<h2 id="org3561807">Who am I?</h2>
 <ul>
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
@@ -88,8 +88,8 @@ And I have some <b>grat</b> ideas.
 </section>
 </section>
 <section>
-<section id="slide-orgc9b0937">
-<h2 id="orgc9b0937">How do the ideas come to me?</h2>
+<section id="slide-orge392741">
+<h2 id="orge392741">How do the ideas come to me?</h2>
 <p class="fragment (appear)">
 Indescribable process&#x2026;
 </p>
@@ -123,8 +123,8 @@ So many great ideas start as side-projects:
 </section>
 </section>
 <section>
-<section id="slide-orgd57d66c">
-<h2 id="orgd57d66c">Case study</h2>
+<section id="slide-org49ef82b">
+<h2 id="org49ef82b">Case study</h2>
 <p>
 Inspiration strikes:
 </p>
@@ -175,8 +175,8 @@ Before we can build our startup, we require&#x2026;:
 
 </ul>
 </section>
-<section id="slide-org056c3b3">
-<h3 id="org056c3b3">What does our project need?</h3>
+<section id="slide-org205b0b0">
+<h3 id="org205b0b0">What does our project need?</h3>
 <p>
 We live in a golden age of building real apps
 </p>
@@ -241,7 +241,10 @@ Put the case study on hold&#x2026;
 </section>
 <section >
 <p>
-&#x2026; and automate everything.
+&#x2026; and build a public tool
+</p>
+<p class="fragment (appear)">
+to automate everything.
 </p>
 </section>
 <section >
@@ -259,8 +262,8 @@ Time to shave some yaks.
 </section>
 </section>
 <section>
-<section id="slide-orgecee54e">
-<h2 id="orgecee54e">A startup pipeline</h2>
+<section id="slide-orgded7f88">
+<h2 id="orgded7f88">A startup pipeline</h2>
 <p>
 Let's focus on the first part post-idea:
 </p>
@@ -276,8 +279,8 @@ Let's focus on the first part post-idea:
 </ol>
 
 </section>
-<section id="slide-org32f132e">
-<h3 id="org32f132e">1. Source control: Create a GitHub Repository</h3>
+<section id="slide-orgb9a69a5">
+<h3 id="orgb9a69a5">1. Source control: Create a GitHub Repository</h3>
 <p>
 GitHub API:
 </p>
@@ -426,8 +429,8 @@ Et voilà! Our masterpiece:
 
 
 </section>
-<section id="slide-orgc049e1a">
-<h3 id="orgc049e1a">2. Create a new site</h3>
+<section id="slide-org2b21aa7">
+<h3 id="org2b21aa7">2. Create a new site</h3>
 <p>
 All our favorite provider*:
 </p>
@@ -599,8 +602,8 @@ Netlify!
 "Hello darkness, my old friend&#x2026;"
 </p>
 </section>
-<section id="slide-orgfc8833b">
-<h3 id="orgfc8833b">Why is this so difficult?</h3>
+<section id="slide-org9f1ca3d">
+<h3 id="org9f1ca3d">Why is this so difficult?</h3>
 <p>
 GitHub and Netlify have great APIs!
 </p>
@@ -684,7 +687,11 @@ We <b>can</b> overcome these issues with this, but&#x2026;
 </section>
 <section >
 <p>
-Ok, let's solve those problems.
+Ok, new proposal: 
+</p>
+
+<p>
+let's solve these API problems, <b>too</b>.
 </p>
 </section>
 <section >
@@ -697,10 +704,19 @@ Here's our challenge stack we just pushed onto:
 </p>
 
 <ul>
-<li class="fragment appear">Fix API explorability, docs, and auth</li>
-<li class="fragment appear">Automate settings up startup infrastructure</li>
-<li class="fragment appear">Set up startup infrastructure</li>
-<li class="fragment appear">Matcha Scooters</li>
+<li class="fragment appear">Matcha Scooters
+<ul>
+<li>Set up startup infrastructure
+<ul>
+<li>Automate settings up startup infrastructure
+<ul>
+<li>Fix API explorability, docs, and auth</li>
+
+</ul></li>
+
+</ul></li>
+
+</ul></li>
 
 </ul>
 </section>
@@ -727,8 +743,8 @@ We <b>will</b> get there.
 &#x2026; I think.
 </p>
 </section>
-<section id="slide-orgb3bf914">
-<h3 id="orgb3bf914">Fixing API explorability</h3>
+<section id="slide-org34c5c48">
+<h3 id="org34c5c48">Fixing API explorability</h3>
 <p>
 Here's the plan:
 </p>
@@ -766,8 +782,8 @@ Now, let's recreate our previous two functions with this new tooling!
 boom.
 </p>
 </section>
-<section id="slide-org055ee6b">
-<h3 id="org055ee6b">Fixing API Auth</h3>
+<section id="slide-orgc986c10">
+<h3 id="orgc986c10">Fixing API Auth</h3>
 <p>
 How do we solve the auth problem!?
 </p>
@@ -927,6 +943,9 @@ mutation DeployNetlifySite($path: String!) {
 </section>
 <section >
 <p>
+<a href="https://startup-in-a-box.netlify.com/">https://startup-in-a-box.netlify.com/</a>
+</p>
+<p class="fragment (appear)">
 One
 </p>
 <p class="fragment (appear)">
@@ -971,6 +990,9 @@ But we're not <b>quite</b> ready yet, I think.
 <p class="fragment (appear)">
 Inspiration strikes even when I'm not at my computer.
 </p>
+<p class="fragment (appear)">
+Competition is fierce.
+</p>
 </section>
 <section >
 <p>
@@ -984,7 +1006,28 @@ Final goal:
 <p class="fragment (appear)">
 Trigger the pipeline with an incoming SMS from Twilio.
 </p>
+</section>
+<section >
+<div class="org-src-container">
 
+<pre><code class="javascript" >subscription TwilioSub($authToken: String!, $accountSid: String!, $inspirationalPhoneNumber: String!) {
+  twilio(
+    auth: { twilio: { authToken: $authToken, accountSid: $accountSid } }
+    webhookUrl: "https://startup-in-a-box.netlify.com/jamstack-what-an-amazing-demo-fn"
+  ) {
+    incomingSMS(input: {
+      to: $inspirationalPhoneNumber
+    }) {
+      sms {
+        body
+        from
+        to        
+      }
+    }
+  }
+}
+</code></pre>
+</div>
 </section>
 <section >
 <ul>
@@ -992,6 +1035,11 @@ Trigger the pipeline with an incoming SMS from Twilio.
 <li>Matcha Scooters</li>
 
 </ul>
+</section>
+<section >
+<p>
+Win?
+</p>
 </section>
 <section >
 <p>
@@ -1013,8 +1061,8 @@ Win
 </section>
 </section>
 <section>
-<section id="slide-orgcf989a6">
-<h2 id="orgcf989a6">What did we do?</h2>
+<section id="slide-org43746bc">
+<h2 id="org43746bc">What did we do?</h2>
 <ul>
 <li>We made APIs easy (and fun!) to explore, experiment with</li>
 <li>We automated an ad-hoc GraphQL pipeline from start to finish
@@ -1033,8 +1081,8 @@ Win
 </section>
 </section>
 <section>
-<section id="slide-org1c19255">
-<h2 id="org1c19255">So what?</h2>
+<section id="slide-org52c8f21">
+<h2 id="org52c8f21">So what?</h2>
 <ul>
 <li>This is a fun side project, but the principle is the same for our jobs</li>
 <li>Building time-efficient pipeline on:
@@ -1057,8 +1105,8 @@ We need to make productionizing ideas <b>fast</b> [Pipelines]
 </section>
 </section>
 <section>
-<section id="slide-orga4a59f5">
-<h2 id="orga4a59f5">Thank you!</h2>
+<section id="slide-org5cac5c5">
+<h2 id="org5cac5c5">Thank you!</h2>
 <ul>
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
@@ -1073,8 +1121,8 @@ We need to make productionizing ideas <b>fast</b> [Pipelines]
 </section>
 </section>
 <section>
-<section id="slide-org38e5516">
-<h2 id="org38e5516">Misc</h2>
+<section id="slide-org7a0c330">
+<h2 id="org7a0c330">Misc</h2>
 <p>
 "All of us have ideas that come to us from time to time that we'd like to work on, but even though we live in a golden age, putting the pieces together is still super cumbersome."
 "I get dozens of good ideas per week! There's no way I can spend a bunch of time on each one. So either I have to start jettisoning my great ideas&#x2026;. or, make each idea faster"
