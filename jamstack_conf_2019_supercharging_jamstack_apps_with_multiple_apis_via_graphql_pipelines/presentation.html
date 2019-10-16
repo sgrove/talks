@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<meta name="author" content="(Sean Grove)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+
+<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org467675d">
+<h2 id="org467675d">Supercharging JAMstack apps with multiple APIs</h2>
+<p>
+And introducing "GraphQL Pipelines"
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org135295a">
+<h2 id="org135295a">Who am I?</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+<li>VP Eng @ Payments company</li>
+<li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
+
+</ul>
+</section>
+<section >
+<p>
+More importantly&#x2026;
+</p>
+<p class="fragment (appear)">
+I'm a smart guy.
+</p>
+<p class="fragment (appear)">
+Like, really, <b>raelly</b> smart.
+</p>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/testimonial_face_1.png" alt="testimonial_face_1.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/testimonial_face_2.png" alt="testimonial_face_2.png" />
+</p>
+</div>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/testimonial_face_3.png" alt="testimonial_face_3.png" />
+</p>
+</div>
+</section>
+<section >
+<p>
+And I have some <b>grat</b> ideas.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgc9b0937">
+<h2 id="orgc9b0937">How do the ideas come to me?</h2>
+<p class="fragment (appear)">
+Indescribable process&#x2026;
+</p>
+
+<div class="figure">
+<p><img src="./img/inspirational_process.jpg" alt="inspirational_process.jpg" class="fragment (appear)" />
+</p>
+</div>
+</section>
+<section >
+<p>
+And I'm not alone!
+</p>
+
+<p class="fragment (appear)">
+All of us have great ideas!
+</p>
+
+<p class="fragment (appear)">
+So many great ideas start as side-projects:
+</p>
+<ul>
+<li class="fragment appear">Twitter</li>
+<li class="fragment appear">ProductHunt</li>
+<li class="fragment appear">Groupon</li>
+<li class="fragment appear">Oculus</li>
+<li class="fragment appear">literally <b>some</b> others&#x2026;</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgd57d66c">
+<h2 id="orgd57d66c">Case study</h2>
+<p>
+Inspiration strikes:
+</p>
+
+<p class="fragment (appear)">
+Matcha is hot. It's everywhere.
+</p>
+
+<p class="fragment (appear)">
+Scooters are hot. They're everywhere.
+</p>
+
+<p class="fragment (appear)">
+Hot thing + other hot thing = hottest thing?
+</p>
+</section>
+<section >
+<p>
+Matcha. Scooters.
+</p>
+<p class="fragment (appear)">
+Matcha flavored scooters?
+</p>
+<p class="fragment (appear)">
+Matcha with your scooter?
+</p>
+<p class="fragment (appear)">
+No time for that!
+</p>
+<p class="fragment (appear)">
+Figure out the details later!
+</p>
+</section>
+<section >
+<p>
+Before we can build our startup, we require&#x2026;:
+</p>
+<ul>
+<li class="fragment appear">Domain</li>
+<li class="fragment appear">Decentralized, hosted source control</li>
+<li class="fragment appear">Infinitely scalable site hosting</li>
+<li class="fragment appear">Launch page</li>
+<li class="fragment appear">Mailing list</li>
+<li class="fragment appear">Payment processor</li>
+<li class="fragment appear">Authentication / Authorization</li>
+<li class="fragment appear">Continuous integration / deployment</li>
+<li class="fragment appear">Institutional investors</li>
+
+</ul>
+</section>
+<section id="slide-org056c3b3">
+<h3 id="org056c3b3">What does our project need?</h3>
+<p>
+We live in a golden age of building real apps
+</p>
+
+<p class="fragment (appear)">
+There are services that do everything for us!
+</p>
+
+</section>
+<section >
+<ul>
+<li>Domain</li>
+<li>Decentralized, hosted source control</li>
+<li>Infinitely scalable site hosting</li>
+<li>Launch page</li>
+<li>Mailing list</li>
+<li>Payment processor</li>
+<li>Authentication / Authorization</li>
+<li>Continuous integration / deployment</li>
+<li>Institutional investors</li>
+
+</ul>
+</section>
+<section >
+<p>
+But still, it's <b>a lot</b>
+</p>
+
+<p class="fragment (appear)">
+Setting up all these great tool&#x2026;
+</p>
+<p class="fragment (appear)">
+Gluing everything together&#x2026;
+</p>
+
+<p class="fragment (appear)">
+It still takes too much friction!
+</p>
+
+<p class="fragment (appear)">
+The world moves fast now,
+</p>
+<p class="fragment (appear)">
+we can't afford to take that much time!
+</p>
+
+</section>
+<section >
+<p>
+But if you notice&#x2026;.
+</p>
+<p class="fragment (appear)">
+All these services have APIs.
+</p>
+
+<p class="fragment (appear)">
+New plan:
+</p>
+<p class="fragment (appear)">
+Put the case study on hold&#x2026;
+</p>
+</section>
+<section >
+<p>
+&#x2026; and automate everything.
+</p>
+</section>
+<section >
+<p>
+Time to shave some yaks.
+</p>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/rabbit_hole_1.jpg" alt="rabbit_hole_1.jpg" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgecee54e">
+<h2 id="orgecee54e">A startup pipeline</h2>
+<p>
+Let's focus on the first part post-idea:
+</p>
+
+<ol>
+<li class="fragment appear">Create a GitHub repository</li>
+<li class="fragment appear">Create a new Netlify site</li>
+<li class="fragment appear">Buy a domain</li>
+<li class="fragment appear">Deploy a placeholder page</li>
+<li class="fragment appear">Start a viral social media campaign (i.e. tweet a link)</li>
+<li class="fragment appear">Get PUMPED!</li>
+
+</ol>
+
+</section>
+<section id="slide-org32f132e">
+<h3 id="org32f132e">1. Source control: Create a GitHub Repository</h3>
+<p>
+GitHub API:
+</p>
+<ul>
+<li class="fragment appear">Step 0: Google.</li>
+
+</ul>
+</section>
+<section >
+<ul>
+<li>Step 1:</li>
+
+</ul>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="bash" >POST https://api.github.com/users/{username}/repos -d
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="json" >{
+  "name": "matchascoots",
+  "description": "Matcha Scooters is your one stop...",
+  "homepage": "https://matchascoots.com",
+  "private": false,
+  "has_issues": true,
+  "has_projects": true,
+  "has_wiki": true
+}
+</code></pre>
+</div>
+
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >curl -X POST https://api.github.com/users/sgrove/repos -d '{"name": "matchascoots"}'
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="json" >{
+  "message": "Not Found",
+  "documentation_url": "https://developer.github.com/v3"
+}
+</code></pre>
+</div>
+
+
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >curl -X POST https://api.github.com/users/repos -d '{"name": "matchascoots"}'
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="json" >{
+  "message": "Not Found",
+  "documentation_url": "https://developer.github.com/v3"
+}
+</code></pre>
+</div>
+
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}'
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="json" >{
+  "message": "Requires authentication",
+  "documentation_url": "https://developer.github.com/v3/repos/#create"
+}
+</code></pre>
+</div>
+
+</section>
+<section >
+<ul>
+<li class="fragment appear">&#x2026; ?</li>
+<li class="fragment appear">Step 1: Create a personal access token and use it in place of password</li>
+
+</ul>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}' \
+     -u sgrove:<.... yeah right! ...>
+</code></pre>
+</div>
+<div class="org-src-container">
+
+<pre><code class="json" >{
+  "name": "matchascoots",
+  "url": "https://github.com/sgrove/matchascoots"
+  "id": "....",
+  ...
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+Et voilà! Our masterpiece:
+</p>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="javascript" >const createRepo = (name, token) =>
+  fetch("https://api.github.com/user/repos", {
+    method: "POST",
+    body: JSON.stringify({ name: name }),
+    headers: {
+      authorization: `Bearer ${token}`
+    }
+  });
+</code></pre>
+</div>
+</section>
+<section >
+<ol>
+<li><b>Create a GitHub repository</b></li>
+<li>Create a new Netlify site</li>
+<li>Buy a domain</li>
+<li>Deploy a placeholder page</li>
+<li>Start a viral social media campaign (i.e. tweet a link)</li>
+<li>Get PUMPED!</li>
+
+</ol>
+</section>
+<section >
+<ol>
+<li><del>Create a GitHub repository</del></li>
+<li><b>Create a new Netlify site</b></li>
+<li>Buy a domain</li>
+<li>Deploy a placeholder page</li>
+<li>Start a viral social media campaign (i.e. tweet a link)</li>
+<li>Get PUMPED!</li>
+
+</ol>
+
+
+</section>
+<section id="slide-orgc049e1a">
+<h3 id="orgc049e1a">2. Create a new site</h3>
+<p>
+All our favorite provider*:
+</p>
+
+<p class="fragment (appear)">
+Netlify!
+</p>
+
+<ul>
+<li class="fragment appear">totally not contractually obligated to say that</li>
+
+</ul>
+<p class="fragment (appear)">
+<a href="https://open-api.netlify.com/" class="fragment (appear)">https://open-api.netlify.com/</a>
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >curl -X POST https://api.netlify.com/api/v1/sites -H 'Content-Type: application/json' -d '{
+  "id": "...",
+  "state": "...",
+  "plan": "...",
+  "name": "...",
+  "custom_domain": "...",
+  "domain_aliases": [
+    "..."
+  ],
+  "password": "...",
+  "notification_email": "...",
+  "url": "...",
+  "ssl_url": "...",
+  "admin_url": "...",
+  "screenshot_url": "...",
+  "created_at": "...",
+  "updated_at": "...",
+  "user_id": "...",
+  "session_id": "...",
+  "ssl": true,
+  "force_ssl": true,
+  "managed_dns": true,
+  "deploy_url": "...",
+  "published_deploy": {
+    "id": "...",
+    "site_id": "...",
+    "user_id": "...",
+    "build_id": "...",
+    "state": "...",
+    "name": "...",
+    "url": "...",
+    "ssl_url": "...",
+    "admin_url": "...",
+    "deploy_url": "...",
+    "deploy_ssl_url": "...",
+    "screenshot_url": "...",
+    "review_id": 0,
+    "draft": true,
+    "required": [
+      "..."
+    ],
+    "required_functions": [
+      "..."
+    ],
+    "error_message": "...",
+    "branch": "...",
+    "commit_ref": "...",
+    "commit_url": "...",
+    "skipped": true,
+    "created_at": "...",
+    "updated_at": "...",
+    "published_at": "...",
+    "title": "...",
+    "context": "...",
+    "locked": true,
+    "review_url": "...",
+    "site_capabilities": {
+      "large_media_enabled": true
+    }
+  },
+  "account_name": "...",
+  "account_slug": "...",
+  "git_provider": "...",
+  "deploy_hook": "...",
+  "capabilities": {
+    "property1": {},
+    "property2": {}
+  },
+  "processing_settings": {
+    "skip": true,
+    "css": {
+      "bundle": true,
+      "minify": true
+    },
+    "js": {
+      "bundle": true,
+      "minify": true
+    },
+    "images": {
+      "optimize": true
+    },
+    "html": {
+      "pretty_urls": true
+    }
+  },
+  "build_settings": {
+    "id": 0,
+    "provider": "...",
+    "deploy_key_id": "...",
+    "repo_path": "...",
+    "repo_branch": "...",
+    "dir": "...",
+    "cmd": "...",
+    "allowed_branches": [
+      "..."
+    ],
+    "public_repo": true,
+    "private_logs": true,
+    "repo_url": "...",
+    "env": {
+      "property1": "...",
+      "property2": "..."
+    },
+    "installation_id": 0
+  },
+  "id_domain": "...",
+  "default_hooks_data": {
+    "access_token": "..."
+  },
+  "build_image": "...",
+  "repo": {
+    "id": 0,
+    "provider": "...",
+    "deploy_key_id": "...",
+    "repo_path": "...",
+    "repo_branch": "...",
+    "dir": "...",
+    "cmd": "...",
+    "allowed_branches": [
+      "..."
+    ],
+    "public_repo": true,
+    "private_logs": true,
+    "repo_url": "...",
+    "env": {
+      "property1": "...",
+      "property2": "..."
+    },
+    "installation_id": 0
+  }
+}'
+</code></pre>
+</div>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="bash" >* Connection state changed (MAX_CONCURRENT_STREAMS updated)!
+* We are completely uploaded and fine # <--- I love this!
+</code></pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="bash" >< HTTP/2 401
+</code></pre>
+</div>
+
+<p class="fragment (appear)">
+"Hello darkness, my old friend&#x2026;"
+</p>
+</section>
+<section id="slide-orgfc8833b">
+<h3 id="orgfc8833b">Why is this so difficult?</h3>
+<p>
+GitHub and Netlify have great APIs!
+</p>
+<p class="fragment (appear)">
+In fact, they both have <b>great</b> APIs.
+</p>
+<p class="fragment (appear)">
+Like, furreal:
+</p>
+<div class="org-src-container">
+
+<pre class="fragment (appear)"><code class="json" >{
+  "message": "Requires authentication",
+  "documentation_url": "https://developer.github.com/v3/repos/#create"
+}
+</code></pre>
+</div>
+<p class="fragment (appear)">
+<code>"documentation_url"</code>??
+</p>
+
+<ul>
+<li class="fragment appear">Good design</li>
+<li class="fragment appear">Good documentation</li>
+
+</ul>
+<p class="fragment (appear)">
+&#x2026; Not every API will be so nice.
+</p>
+</section>
+<section >
+<p>
+Fundamental problems:
+</p>
+<ol>
+<li>API design is very open, tools can't help</li>
+<li>Auth is <b>hard</b></li>
+
+</ol>
+</section>
+<section >
+<p>
+Remember, we want to expose our startup-generating pipeline somewhere for us to hit later, publicly!
+</p>
+
+<p class="fragment (appear)">
+We don't want to expose our GitHub token
+</p>
+<p class="fragment (appear)">
+and our Netlify token
+</p>
+<p class="fragment (appear)">
+and our other tokens&#x2026;
+</p>
+<p class="fragment (appear)">
+So what can we do?
+</p>
+</section>
+<section >
+<ol>
+<li class="fragment appear">Let's write some server-side functions</li>
+<li class="fragment appear">That will call out to GitHub/Netlify</li>
+<li class="fragment appear">And will know our auth tokens via ENV variables</li>
+
+</ol>
+</section>
+<section >
+<p>
+Except, let's not.
+</p>
+
+<p class="fragment (appear)">
+We <b>can</b> overcome these issues with this, but&#x2026;
+</p>
+
+<ol>
+<li class="fragment appear">It's a lot of work.</li>
+<li class="fragment appear">It doesn't help with the first problem of exploring.</li>
+
+</ol>
+</section>
+<section >
+<p>
+Ok, let's solve those problems.
+</p>
+</section>
+<section >
+<p>
+For those keeping score&#x2026;
+</p>
+
+<p class="fragment (appear)">
+Here's our challenge stack we just pushed onto:
+</p>
+
+<ul>
+<li class="fragment appear">Fix API explorability, docs, and auth</li>
+<li class="fragment appear">Automate settings up startup infrastructure</li>
+<li class="fragment appear">Set up startup infrastructure</li>
+<li class="fragment appear">Matcha Scooters</li>
+
+</ul>
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/rabbit_hole_2.png" alt="rabbit_hole_2.png" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/trust_me.png" alt="trust_me.png" />
+</p>
+</div>
+</section>
+<section >
+<p>
+We <b>will</b> get there.
+</p>
+<p class="fragment (appear)">
+&#x2026; I think.
+</p>
+</section>
+<section id="slide-orgb3bf914">
+<h3 id="orgb3bf914">Fixing API explorability</h3>
+<p>
+Here's the plan:
+</p>
+<ol>
+<li>API must have a computer-readable spec from the beginning</li>
+<li>The spec must be complete and infallible</li>
+
+</ol>
+</section>
+<section >
+<p>
+GraphQL!
+</p>
+</section>
+<section >
+<ol>
+<li>API must have a computer-readable spec from the beginning</li>
+<li>The spec must be complete and infallible</li>
+<li>Build lots of great open tools on top of that spec</li>
+
+</ol>
+</section>
+<section >
+<p>
+[Spotify Demo]
+</p>
+</section>
+<section >
+<p>
+Now, let's recreate our previous two functions with this new tooling!
+</p>
+</section>
+<section >
+<p>
+boom.
+</p>
+</section>
+<section id="slide-org055ee6b">
+<h3 id="org055ee6b">Fixing API Auth</h3>
+<p>
+How do we solve the auth problem!?
+</p>
+
+
+<div class="figure">
+<p><img src="./img/simple_auth.png" alt="simple_auth.png" class="fragment (appear)" />
+</p>
+</div>
+
+</section>
+<section >
+
+<div class="figure">
+<p><img src="./img/enterprise_grade_auth.png" alt="enterprise_grade_auth.png" />
+</p>
+</div>
+</section>
+<section >
+<p>
+Two benefits from this approach:
+</p>
+<ol>
+<li>Auth is captured securely in proxy</li>
+<li>API can be customized/molded to be a bit friendlier</li>
+
+</ol>
+</section>
+<section >
+<p>
+Can we do the same thing for GraphQL?
+</p>
+</section>
+<section >
+<p>
+Persisted queries.
+</p>
+</section>
+<section >
+<p>
+[Persisted queries demo]
+</p>
+</section>
+<section >
+<p>
+Let's pop the stack!
+</p>
+<ul>
+<li><del>Fix API explorability, docs, and auth</del></li>
+<li>Automate settings up startup infrastructure
+<ul>
+<li>1. <del>Create a GitHub repository</del></li>
+<li>1. <del>Create a new Netlify site</del></li>
+<li>1. Buy a domain</li>
+<li>1. Deploy a placeholder page</li>
+<li>1. Start a viral social media campaign (i.e. tweet a link)</li>
+<li>1. Get PUMPED!</li>
+
+</ul></li>
+<li>Set up startup infrastructure</li>
+<li>Matcha Scooters</li>
+
+</ul>
+</section>
+<section >
+<p>
+Let's do this!
+</p>
+</section>
+<section >
+<div class="org-src-container">
+
+<pre><code class="json" >mutation CopyTemplateRepo($name: String!, $ownerId: String!) {
+  gitHub {
+    cloneTemplateRepository(
+      input: {
+        repositoryId: "MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="
+        visibility: PUBLIC
+        ownerId: $ownerId
+        name: $name
+      }
+    ) {
+      repository {
+        databaseId
+        id
+        nameWithLogin
+      }
+    }
+  }
+}
+
+mutation CreateNetlifyDeployKey {
+  netlify {
+    makeRestCall {
+      post(path: "/api/v1/deploy_keys") {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation AddDeployKeyToRepo($path: String!, $key: String!, $repoId: Int!) {
+  gitHub {
+    makeRestCall {
+      post(
+        path: $path # "/repos/dwwoelfel/netlify-test/keys"
+        jsonBody: {
+          id: $repoId
+          key: $key
+          title: "Netlify"
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation CreateNetlifySite($siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: "/api/v1/sites"
+        jsonBody: {
+          name: $siteName
+          repo: {
+            provider: "github"
+            id: 215425232
+            repo: $repo
+            private: false
+            branch: "master"
+            cmd: $cmd # "sed -i 's/{site-name}/Macha Scoot/g' index.html"
+            dir: "/"
+            deploy_key_id: $deployKeyId
+          }
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation DeployNetlifySite($path: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: $path #"/api/v1/sites/8c47014f-7074-4afb-820c-758e1d105e76/deploys"
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section >
+<p>
+One
+</p>
+<p class="fragment (appear)">
+Single
+</p>
+<p class="fragment (appear)">
+Endpoint
+</p>
+<p class="fragment (appear)">
+with all our auth, and operations.
+</p>
+<p class="fragment (appear)">
+Success?
+</p>
+</section>
+<section >
+<p>
+Pop that stack!
+</p>
+
+<ul>
+<li><del>Fix API explorability, docs, and auth</del></li>
+<li><del>Automate settings up startup infrastructure</del>
+<ul>
+<li>1. <del>Create a GitHub repository</del></li>
+<li>1. <del>Create a new Netlify site</del></li>
+<li>1. <del>Buy a domain</del></li>
+<li>1. <del>Deploy a placeholder page</del></li>
+<li>1. <del>Start a viral social media campaign (i.e. tweet a link)</del></li>
+<li>1. <del>Get PUMPED!</del></li>
+
+</ul></li>
+<li>Set up startup infrastructure</li>
+<li>Matcha Scooters</li>
+
+</ul>
+</section>
+<section >
+<p>
+But we're not <b>quite</b> ready yet, I think.
+</p>
+<p class="fragment (appear)">
+Inspiration strikes even when I'm not at my computer.
+</p>
+</section>
+<section >
+<p>
+But I always have my phone.
+</p>
+</section>
+<section >
+<p>
+Final goal:
+</p>
+<p class="fragment (appear)">
+Trigger the pipeline with an incoming SMS from Twilio.
+</p>
+
+</section>
+<section >
+<ul>
+<li>Set up startup infrastructure</li>
+<li>Matcha Scooters</li>
+
+</ul>
+</section>
+<section >
+<p>
+Win
+</p>
+<p class="fragment (appear)">
+Win
+</p>
+<p class="fragment (appear)">
+Win
+</p>
+</section>
+<section >
+<ul>
+<li><del>Set up startup infrastructure</del></li>
+<li>Matcha Scooters</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-orgcf989a6">
+<h2 id="orgcf989a6">What did we do?</h2>
+<ul>
+<li>We made APIs easy (and fun!) to explore, experiment with</li>
+<li>We automated an ad-hoc GraphQL pipeline from start to finish
+<ul>
+<li>Buys a domain</li>
+<li>Creates a GitHub repository</li>
+<li>Creates a Netlify site for the repository and domain</li>
+<li>Tweets out the new site</li>
+<li>Gets us stoked for the project with our JAM</li>
+
+</ul></li>
+<li>Extended the pipeline to be triggered by incoming SMS</li>
+<li>Actually purchased and deployed - live! - <a href="http://matchascoots.com">matchascoots.com</a></li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org1c19255">
+<h2 id="org1c19255">So what?</h2>
+<ul>
+<li>This is a fun side project, but the principle is the same for our jobs</li>
+<li>Building time-efficient pipeline on:
+<ul>
+<li>Salesforce</li>
+<li>Stripe</li>
+<li>Quickbooks</li>
+<li>Brex</li>
+<li>Slack</li>
+
+</ul></li>
+
+</ul>
+</section>
+<section >
+<p>
+But we need to make exploring APIs <b>fun</b> [GraphQL]
+We need to make productionizing ideas <b>fast</b> [Pipelines]
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orga4a59f5">
+<h2 id="orga4a59f5">Thank you!</h2>
+<ul>
+<li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
+<li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
+
+</ul>
+
+<div class="figure">
+<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org38e5516">
+<h2 id="org38e5516">Misc</h2>
+<p>
+"All of us have ideas that come to us from time to time that we'd like to work on, but even though we live in a golden age, putting the pieces together is still super cumbersome."
+"I get dozens of good ideas per week! There's no way I can spend a bunch of time on each one. So either I have to start jettisoning my great ideas&#x2026;. or, make each idea faster"
+"The secret to a good idea is to ride a wave. And I've seen matcha just about <b>everywhere</b> - Matcha is great, it's hot - so what can we do with that?"
+"Matcha scooters, obviously"
+</p>
+
+<ul>
+<li>End the talk by also playing some rap song at the end of the pipeline, "all I do is win win win"</li>
+
+</ul>
+<p>
+"Yeah, moving bits around is cool, but changing the physical world is cooler. Like, sound waves."
+"It's functioning, but it lacks some&#x2026; class. Some pizazz. "
+</p>
+
+
+<p>
+Every JAMstack app at its core does 2 things for users:
+</p>
+<ul>
+<li>reads data from sources (DB, Stripe, Salesforce, Shopify, etc.)</li>
+<li>effects the world on their behalf (sending emails, submitting purchases, etc.)</li>
+
+</ul>
+
+<p>
+Yet combining APIs into a coherent unit is intensely manual &amp; fiddly.
+Instead, let's combine multiple persisted queries in GraphQL to succinctly encompass all of the chaining work.
+We'll build one such sequence to expose as a single call for our JAMstack app that:
+</p>
+<ul>
+<li>takes a domain-name input from a user</li>
+<li>purchases the domain</li>
+<li>creates a GitHub project</li>
+<li>deploys a placeholder on Netlify</li>
+
+</ul>
+<div class="org-src-container">
+
+<pre><code class="graphql" >mutation WinWinWin {
+  spotify {
+    playTrack(
+      input: {
+        trackIds: ["0RIHDrcRAXtUlnkvTYPW1a"]
+        positionMs: 69500
+      }
+    ) {
+      player {
+        isPlaying
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+
+
+<div class="org-src-container">
+
+<pre><code class="graphql" >query MyQuery {
+  spotify {
+    search(data: { query: "all I do is win" }) {
+      tracks {
+        id
+        name
+        artists {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation WinWinWin {
+  spotify {
+    playTrack(
+      input: {
+        # Sean's desktop Spotify player
+        deviceId: "c7bdc7f723380d0da320927d5e681156599f6f84"
+        # win win win
+        trackIds: ["0RIHDrcRAXtUlnkvTYPW1a"]
+        positionMs: 69500
+      }
+    ) {
+      player {
+        isPlaying
+      }
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: true,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>

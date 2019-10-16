@@ -1,0 +1,758 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
+#+REVEAL_THEME: league
+#+REVEAL_TRANS: none
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_DEFAULT_FRAG_STYLE: (appear)
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+
+* Supercharging JAMstack apps with multiple APIs
+And introducing "GraphQL Pipelines"
+
+* Who am I?
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+- VP Eng @ Payments company
+- Background in Clojure(Script)/Reason/Rust, dev-tooling
+#+REVEAL: split
+More importantly...
+#+ATTR_REVEAL: :frag (appear)
+I'm a smart guy.
+#+ATTR_REVEAL: :frag (appear)
+Like, really, *raelly* smart.
+#+REVEAL: split
+[[./img/testimonial_face_1.png]]
+#+REVEAL: split
+[[./img/testimonial_face_2.png]]
+#+REVEAL: split
+[[./img/testimonial_face_3.png]]
+#+REVEAL: split
+And I have some *grat* ideas.
+
+* How do the ideas come to me?
+#+ATTR_REVEAL: :frag (appear)
+Indescribable process...
+#+ATTR_REVEAL: :frag (appear)
+[[./img/inspirational_process.jpg]]
+#+REVEAL: split
+And I'm not alone!
+
+#+ATTR_REVEAL: :frag (appear)
+All of us have great ideas!
+
+#+ATTR_REVEAL: :frag (appear)
+So many great ideas start as side-projects:
+#+ATTR_REVEAL: :frag (appear)
+- Twitter
+- ProductHunt
+- Groupon
+- Oculus
+- literally *some* others...
+
+* Case study
+Inspiration strikes:
+
+#+ATTR_REVEAL: :frag (appear)
+Matcha is hot. It's everywhere.
+
+#+ATTR_REVEAL: :frag (appear)
+Scooters are hot. They're everywhere.
+
+#+ATTR_REVEAL: :frag (appear)
+Hot thing + other hot thing = hottest thing?
+#+REVEAL: split
+Matcha. Scooters.
+#+ATTR_REVEAL: :frag (appear)
+Matcha flavored scooters?
+#+ATTR_REVEAL: :frag (appear)
+Matcha with your scooter?
+#+ATTR_REVEAL: :frag (appear)
+No time for that!
+#+ATTR_REVEAL: :frag (appear)
+Figure out the details later!
+#+REVEAL: split
+Before we can build our startup, we require...:
+#+ATTR_REVEAL: :frag (appear)
+- Domain
+- Decentralized, hosted source control
+- Infinitely scalable site hosting
+- Launch page
+- Mailing list
+- Payment processor
+- Authentication / Authorization
+- Continuous integration / deployment
+- Institutional investors
+** What does our project need?
+We live in a golden age of building real apps
+
+#+ATTR_REVEAL: :frag (appear)
+There are services that do everything for us!
+
+#+REVEAL: split
+- Domain
+- Decentralized, hosted source control
+- Infinitely scalable site hosting
+- Launch page
+- Mailing list
+- Payment processor
+- Authentication / Authorization
+- Continuous integration / deployment
+- Institutional investors
+#+REVEAL: split
+But still, it's *a lot*
+
+#+ATTR_REVEAL: :frag (appear)
+Setting up all these great tool...
+#+ATTR_REVEAL: :frag (appear)
+Gluing everything together...
+
+#+ATTR_REVEAL: :frag (appear)
+It still takes too much friction!
+
+#+ATTR_REVEAL: :frag (appear)
+The world moves fast now,
+#+ATTR_REVEAL: :frag (appear)
+we can't afford to take that much time!
+
+#+REVEAL: split
+But if you notice....
+#+ATTR_REVEAL: :frag (appear)
+All these services have APIs.
+
+#+ATTR_REVEAL: :frag (appear)
+New plan:
+#+ATTR_REVEAL: :frag (appear)
+Put the case study on hold...
+#+REVEAL: split
+... and automate everything.
+#+REVEAL: split
+Time to shave some yaks.
+#+REVEAL: split
+[[./img/rabbit_hole_1.jpg]]
+
+* A startup pipeline
+Let's focus on the first part post-idea:
+
+#+ATTR_REVEAL: :frag (appear)
+1. Create a GitHub repository
+1. Create a new Netlify site
+1. Buy a domain
+1. Deploy a placeholder page
+1. Start a viral social media campaign (i.e. tweet a link)
+1. Get PUMPED!
+
+** 1. Source control: Create a GitHub Repository
+GitHub API:
+#+ATTR_REVEAL: :frag (appear)
+- Step 0: Google.
+#+REVEAL: split
+- Step 1:
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC bash
+POST https://api.github.com/users/{username}/repos -d
+#+END_SRC
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC json
+{
+  "name": "matchascoots",
+  "description": "Matcha Scooters is your one stop...",
+  "homepage": "https://matchascoots.com",
+  "private": false,
+  "has_issues": true,
+  "has_projects": true,
+  "has_wiki": true
+}
+#+END_SRC
+
+#+REVEAL: split
+#+BEGIN_SRC bash
+curl -X POST https://api.github.com/users/sgrove/repos -d '{"name": "matchascoots"}'
+#+END_SRC
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC json
+{
+  "message": "Not Found",
+  "documentation_url": "https://developer.github.com/v3"
+}
+#+END_SRC
+
+
+#+REVEAL: split
+#+BEGIN_SRC bash
+curl -X POST https://api.github.com/users/repos -d '{"name": "matchascoots"}'
+#+END_SRC
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC json
+{
+  "message": "Not Found",
+  "documentation_url": "https://developer.github.com/v3"
+}
+#+END_SRC
+
+#+REVEAL: split
+#+BEGIN_SRC bash
+curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}'
+#+END_SRC
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC json
+{
+  "message": "Requires authentication",
+  "documentation_url": "https://developer.github.com/v3/repos/#create"
+}
+#+END_SRC
+
+#+REVEAL: split
+#+ATTR_REVEAL: :frag (appear)
+- ... ?
+- Step 1: Create a personal access token and use it in place of password
+#+REVEAL: split
+#+BEGIN_SRC bash
+curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}' \
+     -u sgrove:<.... yeah right! ...>
+#+END_SRC
+#+BEGIN_SRC json
+{
+  "name": "matchascoots",
+  "url": "https://github.com/sgrove/matchascoots"
+  "id": "....",
+  ...
+}
+#+END_SRC
+#+REVEAL: split
+Et voilà! Our masterpiece:
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC javascript
+const createRepo = (name, token) =>
+  fetch("https://api.github.com/user/repos", {
+    method: "POST",
+    body: JSON.stringify({ name: name }),
+    headers: {
+      authorization: `Bearer ${token}`
+    }
+  });
+#+END_SRC
+#+REVEAL: split
+1. *Create a GitHub repository*
+1. Create a new Netlify site
+1. Buy a domain
+1. Deploy a placeholder page
+1. Start a viral social media campaign (i.e. tweet a link)
+1. Get PUMPED!
+#+REVEAL: split
+1. +Create a GitHub repository+
+1. *Create a new Netlify site*
+1. Buy a domain
+1. Deploy a placeholder page
+1. Start a viral social media campaign (i.e. tweet a link)
+1. Get PUMPED!
+
+
+** 2. Create a new site
+All our favorite provider*:
+
+#+ATTR_REVEAL: :frag (appear)
+Netlify!
+
+#+ATTR_REVEAL: :frag (appear)
+ * totally not contractually obligated to say that
+#+ATTR_REVEAL: :frag (appear)
+https://open-api.netlify.com/
+#+REVEAL: split
+#+BEGIN_SRC bash
+curl -X POST https://api.netlify.com/api/v1/sites -H 'Content-Type: application/json' -d '{
+  "id": "...",
+  "state": "...",
+  "plan": "...",
+  "name": "...",
+  "custom_domain": "...",
+  "domain_aliases": [
+    "..."
+  ],
+  "password": "...",
+  "notification_email": "...",
+  "url": "...",
+  "ssl_url": "...",
+  "admin_url": "...",
+  "screenshot_url": "...",
+  "created_at": "...",
+  "updated_at": "...",
+  "user_id": "...",
+  "session_id": "...",
+  "ssl": true,
+  "force_ssl": true,
+  "managed_dns": true,
+  "deploy_url": "...",
+  "published_deploy": {
+    "id": "...",
+    "site_id": "...",
+    "user_id": "...",
+    "build_id": "...",
+    "state": "...",
+    "name": "...",
+    "url": "...",
+    "ssl_url": "...",
+    "admin_url": "...",
+    "deploy_url": "...",
+    "deploy_ssl_url": "...",
+    "screenshot_url": "...",
+    "review_id": 0,
+    "draft": true,
+    "required": [
+      "..."
+    ],
+    "required_functions": [
+      "..."
+    ],
+    "error_message": "...",
+    "branch": "...",
+    "commit_ref": "...",
+    "commit_url": "...",
+    "skipped": true,
+    "created_at": "...",
+    "updated_at": "...",
+    "published_at": "...",
+    "title": "...",
+    "context": "...",
+    "locked": true,
+    "review_url": "...",
+    "site_capabilities": {
+      "large_media_enabled": true
+    }
+  },
+  "account_name": "...",
+  "account_slug": "...",
+  "git_provider": "...",
+  "deploy_hook": "...",
+  "capabilities": {
+    "property1": {},
+    "property2": {}
+  },
+  "processing_settings": {
+    "skip": true,
+    "css": {
+      "bundle": true,
+      "minify": true
+    },
+    "js": {
+      "bundle": true,
+      "minify": true
+    },
+    "images": {
+      "optimize": true
+    },
+    "html": {
+      "pretty_urls": true
+    }
+  },
+  "build_settings": {
+    "id": 0,
+    "provider": "...",
+    "deploy_key_id": "...",
+    "repo_path": "...",
+    "repo_branch": "...",
+    "dir": "...",
+    "cmd": "...",
+    "allowed_branches": [
+      "..."
+    ],
+    "public_repo": true,
+    "private_logs": true,
+    "repo_url": "...",
+    "env": {
+      "property1": "...",
+      "property2": "..."
+    },
+    "installation_id": 0
+  },
+  "id_domain": "...",
+  "default_hooks_data": {
+    "access_token": "..."
+  },
+  "build_image": "...",
+  "repo": {
+    "id": 0,
+    "provider": "...",
+    "deploy_key_id": "...",
+    "repo_path": "...",
+    "repo_branch": "...",
+    "dir": "...",
+    "cmd": "...",
+    "allowed_branches": [
+      "..."
+    ],
+    "public_repo": true,
+    "private_logs": true,
+    "repo_url": "...",
+    "env": {
+      "property1": "...",
+      "property2": "..."
+    },
+    "installation_id": 0
+  }
+}'
+#+END_SRC
+#+REVEAL: split
+#+BEGIN_SRC bash
+ * Connection state changed (MAX_CONCURRENT_STREAMS updated)!
+ * We are completely uploaded and fine # <--- I love this!
+#+END_SRC
+
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC bash
+< HTTP/2 401
+#+END_SRC
+
+#+ATTR_REVEAL: :frag (appear)
+"Hello darkness, my old friend..."
+** Why is this so difficult?
+GitHub and Netlify have great APIs!
+#+ATTR_REVEAL: :frag (appear)
+In fact, they both have *great* APIs.
+#+ATTR_REVEAL: :frag (appear)
+Like, furreal:
+#+ATTR_REVEAL: :frag (appear)
+#+BEGIN_SRC json
+{
+  "message": "Requires authentication",
+  "documentation_url": "https://developer.github.com/v3/repos/#create"
+}
+#+END_SRC
+#+ATTR_REVEAL: :frag (appear)
+~"documentation_url"~??
+
+#+ATTR_REVEAL: :frag (appear)
+- Good design
+- Good documentation
+#+ATTR_REVEAL: :frag (appear)
+... Not every API will be so nice.
+#+REVEAL: split
+Fundamental problems:
+1. API design is very open, tools can't help
+2. Auth is *hard*
+#+REVEAL: split
+Remember, we want to expose our startup-generating pipeline somewhere for us to hit later, publicly!
+
+#+ATTR_REVEAL: :frag (appear)
+We don't want to expose our GitHub token
+#+ATTR_REVEAL: :frag (appear)
+and our Netlify token
+#+ATTR_REVEAL: :frag (appear)
+and our other tokens...
+#+ATTR_REVEAL: :frag (appear)
+So what can we do?
+#+REVEAL: split
+#+ATTR_REVEAL: :frag (appear)
+1. Let's write some server-side functions
+2. That will call out to GitHub/Netlify
+3. And will know our auth tokens via ENV variables
+#+REVEAL: split
+Except, let's not.
+
+#+ATTR_REVEAL: :frag (appear)
+We *can* overcome these issues with this, but...
+
+#+ATTR_REVEAL: :frag (appear)
+1. It's a lot of work.
+2. It doesn't help with the first problem of exploring.
+#+REVEAL: split
+Ok, let's solve those problems.
+#+REVEAL: split
+For those keeping score...
+
+#+ATTR_REVEAL: :frag (appear)
+Here's our challenge stack we just pushed onto:
+
+#+ATTR_REVEAL: :frag (appear)
+- Fix API explorability, docs, and auth
+- Automate settings up startup infrastructure
+- Set up startup infrastructure
+- Matcha Scooters
+#+REVEAL: split
+[[./img/rabbit_hole_2.png]]
+
+#+REVEAL: split
+[[./img/trust_me.png]]
+#+REVEAL: split
+We *will* get there.
+#+ATTR_REVEAL: :frag (appear)
+... I think.
+** Fixing API explorability
+Here's the plan:
+1. API must have a computer-readable spec from the beginning
+2. The spec must be complete and infallible
+#+REVEAL: split
+GraphQL!
+#+REVEAL: split
+1. API must have a computer-readable spec from the beginning
+2. The spec must be complete and infallible
+3. Build lots of great open tools on top of that spec
+#+REVEAL: split
+[Spotify Demo]
+#+REVEAL: split
+Now, let's recreate our previous two functions with this new tooling!
+#+REVEAL: split
+boom.
+** Fixing API Auth
+How do we solve the auth problem!?
+
+#+ATTR_REVEAL: :frag (appear)
+[[./img/simple_auth.png]]
+
+#+REVEAL: split
+[[./img/enterprise_grade_auth.png]]
+#+REVEAL: split
+Two benefits from this approach:
+1. Auth is captured securely in proxy
+2. API can be customized/molded to be a bit friendlier
+#+REVEAL: split
+Can we do the same thing for GraphQL?
+#+REVEAL: split
+Persisted queries.
+#+REVEAL: split
+[Persisted queries demo]
+#+REVEAL: split
+Let's pop the stack!
+- +Fix API explorability, docs, and auth+
+- Automate settings up startup infrastructure
+  - 1. +Create a GitHub repository+
+  - 1. +Create a new Netlify site+
+  - 1. Buy a domain
+  - 1. Deploy a placeholder page
+  - 1. Start a viral social media campaign (i.e. tweet a link)
+  - 1. Get PUMPED!
+- Set up startup infrastructure
+- Matcha Scooters
+#+REVEAL: split
+Let's do this!
+#+REVEAL: split
+#+BEGIN_SRC json
+mutation CopyTemplateRepo($name: String!, $ownerId: String!) {
+  gitHub {
+    cloneTemplateRepository(
+      input: {
+        repositoryId: "MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="
+        visibility: PUBLIC
+        ownerId: $ownerId
+        name: $name
+      }
+    ) {
+      repository {
+        databaseId
+        id
+        nameWithLogin
+      }
+    }
+  }
+}
+
+mutation CreateNetlifyDeployKey {
+  netlify {
+    makeRestCall {
+      post(path: "/api/v1/deploy_keys") {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation AddDeployKeyToRepo($path: String!, $key: String!, $repoId: Int!) {
+  gitHub {
+    makeRestCall {
+      post(
+        path: $path # "/repos/dwwoelfel/netlify-test/keys"
+        jsonBody: {
+          id: $repoId
+          key: $key
+          title: "Netlify"
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation CreateNetlifySite($siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: "/api/v1/sites"
+        jsonBody: {
+          name: $siteName
+          repo: {
+            provider: "github"
+            id: 215425232
+            repo: $repo
+            private: false
+            branch: "master"
+            cmd: $cmd # "sed -i 's/{site-name}/Macha Scoot/g' index.html"
+            dir: "/"
+            deploy_key_id: $deployKeyId
+          }
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation DeployNetlifySite($path: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: $path #"/api/v1/sites/8c47014f-7074-4afb-820c-758e1d105e76/deploys"
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+#+END_SRC
+#+REVEAL: split
+One
+#+ATTR_REVEAL: :frag (appear)
+Single
+#+ATTR_REVEAL: :frag (appear)
+Endpoint
+#+ATTR_REVEAL: :frag (appear)
+with all our auth, and operations.
+#+ATTR_REVEAL: :frag (appear)
+Success?
+#+REVEAL: split
+Pop that stack!
+
+- +Fix API explorability, docs, and auth+
+- +Automate settings up startup infrastructure+
+  - 1. +Create a GitHub repository+
+  - 1. +Create a new Netlify site+
+  - 1. +Buy a domain+
+  - 1. +Deploy a placeholder page+
+  - 1. +Start a viral social media campaign (i.e. tweet a link)+
+  - 1. +Get PUMPED!+
+- Set up startup infrastructure
+- Matcha Scooters
+#+REVEAL: split
+But we're not *quite* ready yet, I think.
+#+ATTR_REVEAL: :frag (appear)
+Inspiration strikes even when I'm not at my computer.
+#+REVEAL: split
+But I always have my phone.
+#+REVEAL: split
+Final goal:
+#+ATTR_REVEAL: :frag (appear)
+Trigger the pipeline with an incoming SMS from Twilio.
+
+#+REVEAL: split
+- Set up startup infrastructure
+- Matcha Scooters
+#+REVEAL: split
+Win
+#+ATTR_REVEAL: :frag (appear)
+Win
+#+ATTR_REVEAL: :frag (appear)
+Win
+#+ATTR_REVEAL: :frag (appear)
+#+REVEAL: split
+- +Set up startup infrastructure+
+- Matcha Scooters
+* What did we do?
+- We made APIs easy (and fun!) to explore, experiment with
+- We automated an ad-hoc GraphQL pipeline from start to finish
+  - Buys a domain
+  - Creates a GitHub repository
+  - Creates a Netlify site for the repository and domain
+  - Tweets out the new site
+  - Gets us stoked for the project with our JAM
+- Extended the pipeline to be triggered by incoming SMS
+- Actually purchased and deployed - live! - [[http://matchascoots.com][matchascoots.com]]
+* So what?
+- This is a fun side project, but the principle is the same for our jobs
+- Building time-efficient pipeline on:
+  - Salesforce
+  - Stripe
+  - Quickbooks
+  - Brex
+  - Slack
+#+REVEAL: split
+But we need to make exploring APIs *fun* [GraphQL]
+We need to make productionizing ideas *fast* [Pipelines]
+* Thank you!
+- Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
+- Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
+[[file:./img/onegraph_website.png]]
+
+* Misc
+"All of us have ideas that come to us from time to time that we'd like to work on, but even though we live in a golden age, putting the pieces together is still super cumbersome."
+"I get dozens of good ideas per week! There's no way I can spend a bunch of time on each one. So either I have to start jettisoning my great ideas.... or, make each idea faster"
+"The secret to a good idea is to ride a wave. And I've seen matcha just about *everywhere* - Matcha is great, it's hot - so what can we do with that?"
+"Matcha scooters, obviously"
+
+- End the talk by also playing some rap song at the end of the pipeline, "all I do is win win win"
+"Yeah, moving bits around is cool, but changing the physical world is cooler. Like, sound waves."
+"It's functioning, but it lacks some... class. Some pizazz. "
+
+
+Every JAMstack app at its core does 2 things for users:
+- reads data from sources (DB, Stripe, Salesforce, Shopify, etc.)
+- effects the world on their behalf (sending emails, submitting purchases, etc.)
+
+Yet combining APIs into a coherent unit is intensely manual & fiddly.
+Instead, let's combine multiple persisted queries in GraphQL to succinctly encompass all of the chaining work.
+We'll build one such sequence to expose as a single call for our JAMstack app that:
+- takes a domain-name input from a user
+- purchases the domain
+- creates a GitHub project
+- deploys a placeholder on Netlify
+#+BEGIN_SRC graphql
+mutation WinWinWin {
+  spotify {
+    playTrack(
+      input: {
+        trackIds: ["0RIHDrcRAXtUlnkvTYPW1a"]
+        positionMs: 69500
+      }
+    ) {
+      player {
+        isPlaying
+      }
+    }
+  }
+}
+#+END_SRC
+
+
+#+BEGIN_SRC graphql
+query MyQuery {
+  spotify {
+    search(data: { query: "all I do is win" }) {
+      tracks {
+        id
+        name
+        artists {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation WinWinWin {
+  spotify {
+    playTrack(
+      input: {
+        # Sean's desktop Spotify player
+        deviceId: "c7bdc7f723380d0da320927d5e681156599f6f84"
+        # win win win
+        trackIds: ["0RIHDrcRAXtUlnkvTYPW1a"]
+        positionMs: 69500
+      }
+    ) {
+      player {
+        isPlaying
+      }
+    }
+  }
+}
+#+END_SRC
