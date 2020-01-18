@@ -1,25 +1,34 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
 #+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
 #+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
 #+REVEAL_THEME: league
 #+REVEAL_TRANS: none
 #+REVEAL_PLUGINS: (highlight)
 #+REVEAL_DEFAULT_FRAG_STYLE: appear
-#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true
+#+TITLE:     Accelerating API Adoption through developer happiness with GraphQL 
+#+AUTHOR:    Sean Grove
+#+EMAIL:     sean@onegraph.com
 
-* Accelerating API adoption through developer happiness with GraphQL
 
-* Quick Graph
-
-[[file:./img/tech_comparison_graph.png]]
-
+* GraphQL Tooling, today and tomorrow
+* Or, "Accelerating API adoption through developer happiness with GraphQL"
 * Who am I?
 - Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
 - Cofounder of ([[https://twitter.com/onegraphio][@OneGraphIO]])
 - VP Eng @ Payments company
 - Background in Clojure(Script)/Reason/Rust, dev-tooling
-[[file:./img/onegraph_website.png]]
+* Today
+1. Why do we care?
+2. Demoathon
+3. Pontificating about the future
 
-* Accelerating API adoption through developer happiness with GraphQL
+* Let's start!
+- *1. Why do we care?*
+- 2. Demoathon
+- 3. Pontificating about the future
+
+* Why do we care?
 Two Points to keep in mind when talking about api adoption:
 - Content is king
 - Competition is fierce (not always from other APIs)
@@ -40,9 +49,6 @@ At any given time, 20+% of an API-based company's deal-flow is delayed for 6-8 m
 
 "The business lead was about to buy, but realized they don't have engineering resources."
 
-- Competition isn't always with other APIs
-"Consumer" APIs like Spotify are competing for my attention against other interests I have
-
 ** Two components 
 
 - _Engineering resource constraint_
@@ -57,6 +63,7 @@ Reflects amount of intrinsic energy *available* to complete a task
 #+REVEAL: split
 Setting the scene...
 * Perception of our API's adoption
+
 [[file:./img/api_perception.png]]
 ** Reality of our API's adoption curve
 
@@ -135,11 +142,54 @@ Criteria => Maxims:
 - A positive feedback loop
 
 ** GraphQL Help: Demoathon
+- +1. Why do we care?+
+- *2. Demoathon*
+- 3. Pontificating about the future
+#+REVEAL: split
 GraphiQL - Auto-complete APIs!
 #+REVEAL: split
 GraphiQL Explorer
 #+REVEAL: split
-GraphiQL Smart Forms
+GraphiQL Code Exporter
+#+BEGIN_SRC json
+query npm($package: String!) {
+  npm {
+    package(name: $package) {
+      name
+      downloads {
+        lastMonth {
+          count
+        }
+      }
+    }
+  }
+}
+
+query rss($url: String!) {
+  rss {
+    rss2Feed(url: $url) {
+      title
+      items {
+        title
+        pubDate
+        guid {
+          data
+          permalink
+        }
+        enclosure {
+          url
+          length
+          mime
+        }
+        content
+        comments
+        author
+      }
+    }
+  }
+}
+#+END_SRC
+
 #+REVEAL: split
 Next level: Auto-parameterize existing queries
 [[file:./img/explorer_parameterize_example_1.png]]
@@ -154,7 +204,7 @@ Next level: Auto-parameterize existing queries
 #+REVEAL: split
 [[file:./img/explorer_parameterize_example_6.png]]
 #+REVEAL: split
-GraphiQL Code Exporter
+GraphiQL Smart Forms
 #+REVEAL: split
 Compare to existing fragmented experiences:
 - Documentation is often "inert"
@@ -170,7 +220,7 @@ Who's generally better?
 #+REVEAL: split
 Computers.
 #+REVEAL: split
-[[file:./img/explorer_breadth_first_search.png]]
+[GraphiQL Explorer Search Demo]
 
 #+REVEAL: split
 Multi-APIs
@@ -185,31 +235,37 @@ Like Firebase++, but:
 - Open-source
 
 #+REVEAL: split
-Automatically combining APIs
+[Automatically combining APIs Demo]
+
 #+ATTR_REVEAL: :frag (appear)
 - Remote schema integration
 - "Remote-service joins"
 - Compare:
   - Stripe-as-a-library
   - Stripe-as-an-introspectable-graph
-
 #+REVEAL: split
-Auto-complete inside IDE
+Auto-complete in editor
+
+[vscode example]
 
 #+REVEAL: split
 GraphQL goes _everywhere_
+
+Developers are not the only ones building things.
 #+ATTR_REVEAL: :frag (appear)
+- Largest programming platform in the world?
+- Excel.
+
+#+REVEAL: split
+[Excel demo]
+
+#+REVEAL: split
 - Sales VP, CFO, etc.
+  - "I need the projected revenue for Q4 from Salesforce"
 - Managers: "I need a list of new users for the past 30 days"
 
 #+REVEAL: split
 GraphQL as async server-to-server events: Webhook delivery
-#+REVEAL: split
-
-GraphQL Cortex
-#+REVEAL: split
-GraphQL Cortex: sean@onegraph.com
-
 ** Conquering Auth
 Auth is difficult, and deeply unpleasant.
 #+REVEAL: split
@@ -255,36 +311,125 @@ type Company {
   }
 }
 #+END_SRC
+** Implementing auth in GraphQL?
+"How do I secure my GraphQL server?"
 
-* Virtuous-data cycle
-[[file:./img/virtuous_cycle.png]]
+*** AuthGuardian
+Auth[n/z]
 
+Authentication: Who are you?
 
-* Deep Analytics: What can we do?
-*** Iterative API design
-Solution to ivory-tower API design problem - inherent loop
-** Example of breaking schema
-#+ATTR_REVEAL: :frag (appear)
-- Deprecate old fields
-- Identify *specific* clients who have accessed in the past
-- Reach out to work on migration
-  - Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)
-- Write query transformers to update client queries automatically
-- Compare to REST: small tweaks indiscriminately affect all clients OR fork the world
+Authorization: What are you allowed to do?
+
+Authorization often is based on facts about your:
+- What GitHub organization do you belong to?
+- Do you have a (verified) email that belongs to the company?
+- Are you the owner of playlist ~X~?
+- Have you ever committed to GitHub repo ~Y~?
+
 #+REVEAL: split
-   [[./img/no_breaking_changes.png]]
-*** Schema changelog automation
-  - https://developer.github.com/v4/changelog/
-*** Living, responding, *accurate* API Docs
-#+ATTR_REVEAL: :frag (appear)
+What if we know how to find those facts, and process the predicates?
+
+[AuthGuardian demo]
+
+** Living, responding, *accurate* API Docs
+**** Problem 1: Docs lie
 - "Lies, damn lies, and API documentation"
-- Accurate docs and consistent APIs
+[[file:./img/broken_example.png]]
+#+REVEAL: split
+- Connect a GitHub repo
+- Scan all ~.md~ files
+- Verify all _~graphql~_ codeblocks against new schema
+#+REVEAL: split
+[[file:./img/broken_example_error.png]]
+#+REVEAL: split
+**** Problem 2: Docs live over there
+[[file:./img/docs_with_examples.png]]
+#+REVEAL: split
+[[file:./img/graphiql_submit_example.png]]
+#+REVEAL: split
+**** Problem 3: Docs are dead
+Analytics!
+#+ATTR_REVEAL: :frag (appear)
 - "For the new users who signed up two weeks ago, what fields have they been accessing?"
 - Humans classify unrecognized new use-cases
 - Insert into documentation as annotated example
 - Sort ranking based on trends in new users
   - Potentially even per client-group via tagging clients
+#+REVEAL: split
+[GraphQL Codex Demo]
+- Generate fast, SEO-able site
+- Embed examples
+- Check examples against schema on any change
+- Provide automated changelog [like https://developer.github.com/v4/changelog/]
 
+https://www.onegraph.com/schema/
+** Persisted queries
+Persisted queries register a query/mutation/subscription *outside* of normal app
+flow, usually a as build or manual step.
+
+Persisted queries store the query as-is, and return a ~doc_id~ to be used inside of the app.
+#+REVEAL: split
+Allows the developer to explore and code freely, while locking down the production version.
+
+- Prevent DoS attacks
+- Enforce privacy and permissions
+- Caching becomes trivial! ~doc_id~+~auth_token_hash~
+*** Persisted queries + metadata...?
+
+And, you can attach metadata.
+
+Like auth.
+
+Securely.
+
+*** Persisted query demo 1
+
+[Persisted query auth demo]
+#+BEGIN_SRC json
+mutation SayHiToJesse($body: String!) {
+  __typename
+  google {
+    gmail {
+      sendMessage(
+        data: {
+          subject: "Sorry about this..."
+          to: "jesse+graphcms+is+amazing@graphcms.com"
+          body: $body
+        }
+      ) {
+        message {
+          id
+          snippet
+        }
+      }
+    }
+  }
+}
+#+END_SRC
+
+*** Persisted query example app
+
+OneGraph Changelog, lightweight GitHub-issue based blogging
+- Includes posts
+- Authenticated comments (with GitHub)
+- Reactions
+- Secure
+- Incredibly optimized (SEO bonus points!) 
+
+[Persisted query real-world OSS example]
+
+* Pontificating about the future
+- +1. Why do we care?+
+- +2. Demoathon+
+- *3. Pontificating about the future*
+
+* Virtuous-data cycle
+[[file:./img/virtuous_cycle.png]]
+
+* Deep Analytics: What can we do?
+*** Iterative API design
+Drive API adoption and innovation through inherent loop
 *** Auto-classify fields for mocking use for mocking to help users without accounts
 What's better than auto-auth?
 
@@ -298,7 +443,97 @@ No auth!
 - URI
 #+REVEAL: split
 GraphQL Muse: sean@onegraph.com
+#+REVEAL: split
+GraphQL Cortex: sean@onegraph.com
+[Process orchestration demo with Google Voice]
+#+BEGIN_SRC json
+mutation CopyTemplateRepo($name: String!, $ownerId: String!) {
+  gitHub {
+    cloneTemplateRepository(
+      input: {
+        repositoryId: "MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="
+        visibility: PUBLIC
+        ownerId: $ownerId
+        name: $name
+      }
+    ) {
+      repository {
+        databaseId
+        id
+        nameWithLogin
+      }
+    }
+  }
+}
 
+mutation CreateNetlifyDeployKey {
+  netlify {
+    makeRestCall {
+      post(path: "/api/v1/deploy_keys") {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation AddDeployKeyToRepo($path: String!, $key: String!, $repoId: Int!) {
+  gitHub {
+    makeRestCall {
+      post(
+        path: $path # "/repos/dwwoelfel/netlify-test/keys"
+        jsonBody: {
+          id: $repoId
+          key: $key
+          title: "Netlify"
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation CreateNetlifySite($siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: "/api/v1/sites"
+        jsonBody: {
+          name: $siteName
+          repo: {
+            provider: "github"
+            id: 215425232
+            repo: $repo
+            private: false
+            branch: "master"
+            cmd: $cmd # "sed -i 's/{site-name}/Macha Scoot/g' index.html"
+            dir: "/"
+            deploy_key_id: $deployKeyId
+          }
+        }
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+
+mutation DeployNetlifySite($path: String!) {
+  netlify {
+    makeRestCall {
+      post(
+        path: $path #"/api/v1/sites/8c47014f-7074-4afb-820c-758e1d105e76/deploys"
+      ) {
+        jsonBody
+      }
+    }
+  }
+}
+#+END_SRC
+#+REVEAL: split
+GraphQL Cortex - orchestrate processes with GraphQL
+
+sean@onegraph.com
 *** Deep performance monitoring
 #+ATTR_REVEAL: :frag (appear)
 - Performance/timing
@@ -307,6 +542,33 @@ GraphQL Muse: sean@onegraph.com
 - Total requests, bytes
 #+ATTR_REVEAL: :frag (appear)
 ... per *field*
+
+*** Prevent breaking schema
+#+ATTR_REVEAL: :frag (appear)
+- Deprecate old fields
+- Identify *specific* clients who have accessed in the past
+- Reach out to work on migration
+  - Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)
+- Write query transformers to update client queries automatically
+- Compare to REST: small tweaks indiscriminately affect all clients OR fork the world
+#+REVEAL: split
+   [[./img/no_breaking_changes.png]]
+*** Only one schema? :(
+- Never break your API
+  - developers are sad.
+
+#+ATTR_REVEAL: :frag (appear)
+- Beautiful, iterative API
+  - clients are sad.
+
+#+ATTR_REVEAL: :frag (appear)
+Solution?
+
+#+ATTR_REVEAL: :frag (appear)
+Look to Stripe!
+
+#+REVEAL: split
+Migration strategy! 
 
 *** GDPR, COPPA, HIPAA, PII
 Combine client+field-level access with server-awareness of data sensitivity:
@@ -321,25 +583,26 @@ type User @ GDPR {
 #+END_SRC
 - Automate permissions + privilege
 - Track data exposure
-
-* Getting over the hurdle
-- Analyze current network traffic
-- Track "novelty" over time
-- Derive *actual* API contract
-  - Authentication
-  - Pagination
-  - Relationships
-  - Types
-- Generate GraphQL
-#+REVEAL: split
-...
-#+REVEAL: split
-- Self-contained binary
-- Runs next to your webserver
-- OSS
-- On-premise
-#+REVEAL: split
-Appiderv: sean@onegraph.com
+** Getting over the hurdle: Providers
+ - Analyze current network traffic
+ - Track "novelty" over time
+ - Derive *actual* API contract
+   - Authentication
+   - Pagination
+   - Relationships
+   - Types
+ - Generate GraphQL
+ #+REVEAL: split
+ ...
+ #+REVEAL: split
+ - Self-contained binary
+ - Runs next to your webserver
+ - OSS
+ - On-premise
+ #+REVEAL: split
+ Appiderv: sean@onegraph.com
+** Getting over the hurdle: Users
+ [GraphQL Doctor sketch]
 
 * Summary
 GraphQL itself offers substantial benefits out of the box.
@@ -351,6 +614,7 @@ The tooling today and tomorrow take developer happiness to the next level:
 - And even for non-traditional devs: CFOs, VP Sales, Managers, Data-scientists, etc.
 
 #+REVEAL: split
+*** Why do we care?
 - Ultimately the data and effects of your API are king - focus on *that* exclusively.
 - But if you want your api to adopted in 2019, it must plug into next-level tooling:
  - Familiar
@@ -374,6 +638,11 @@ A word of caution:
 - This is a 'wow' moment now.
 - ....In a few years, it will simply be table-stakes.
 - OneGraph tooling has started to spread and become standard!
+  - GitHub
+  - Gatsby
+  - Shopify
+  - Wordpress
+  - and on and on and on....
 - How is your API going to fit into that world?
 
 #+ATTR_REVEAL: :frag (appear)

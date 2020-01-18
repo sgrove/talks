@@ -1,104 +1,416 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<meta charset="utf-8"/>
-<title></title>
-<meta name="author" content="(Sean Grove)"/>
+<!-- 2019-12-13 Fri 11:58 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Accelerating API Adoption through developer happiness with GraphQL</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Sean Grove" />
 <style type="text/css">
-.underline { text-decoration: underline; }
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
 </style>
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
 
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
-<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
-<!-- If the query includes 'print-pdf', include the PDF print sheet -->
-<script>
-    if( window.location.search.match( /print-pdf/gi ) ) {
-        var link = document.createElement( 'link' );
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
-        document.getElementsByTagName( 'head' )[0].appendChild( link );
-    }
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
 </script>
 </head>
 <body>
-<div class="reveal">
-<div class="slides">
-
-<section>
-<section id="slide-org6dc10aa">
-<h2 id="org6dc10aa">Accelerating API adoption through developer happiness with GraphQL</h2>
-
-</section>
-</section>
-<section>
-<section id="slide-orgaa64958">
-<h2 id="orgaa64958">Quick Graph</h2>
-
-<div class="figure">
-<p><img src="./img/tech_comparison_graph.png" alt="tech_comparison_graph.png" />
-</p>
+<div id="content">
+<h1 class="title">Accelerating API Adoption through developer happiness with GraphQL</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf976105">GraphQL Tooling, today and tomorrow</a></li>
+<li><a href="#org093ef0f">Or, "Accelerating API adoption through developer happiness with GraphQL"</a></li>
+<li><a href="#orgcecac0c">Who am I?</a></li>
+<li><a href="#orgcb33cbb">Today</a></li>
+<li><a href="#org0d33190">Let's start!</a></li>
+<li><a href="#org25092bd">Why do we care?</a>
+<ul>
+<li><a href="#orga74a705">Content is king</a></li>
+<li><a href="#orgbbb3d3f">Competition is fierce</a></li>
+<li><a href="#org5ac2d33">Two components</a></li>
+</ul>
+</li>
+<li><a href="#org5fc704c">APIs are <span class="underline">rarely</span> known for sparking joy</a></li>
+<li><a href="#org82659a9">Perception of our API's adoption</a>
+<ul>
+<li><a href="#org04fa018">Reality of our API's adoption curve</a></li>
+</ul>
+</li>
+<li><a href="#org5dbe709">Three metrics for dev happiness</a></li>
+<li><a href="#orgbd8663a">How does GraphQL help?</a>
+<ul>
+<li><a href="#org7065d1d">GraphQL Help: Demoathon</a></li>
+<li><a href="#org7848aab">Conquering Auth</a>
+<ul>
+<li><a href="#org9e6282a">Progressive Auth</a></li>
+</ul>
+</li>
+<li><a href="#org27c7a68">Implementing auth in GraphQL?</a>
+<ul>
+<li><a href="#orgbe71149">AuthGuardian</a></li>
+</ul>
+</li>
+<li><a href="#org0b780a9">Living, responding, <b>accurate</b> API Docs</a></li>
+<li><a href="#orgce5501e">Persisted queries</a>
+<ul>
+<li><a href="#org86efafb">Persisted queries + metadata&#x2026;?</a></li>
+<li><a href="#org53bc33d">Persisted query demo 1</a></li>
+<li><a href="#org912b689">Persisted query example app</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org63d4158">Pontificating about the future</a></li>
+<li><a href="#org5571f10">Virtuous-data cycle</a></li>
+<li><a href="#orgba0a21e">Deep Analytics: What can we do?</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org550e182">Iterative API design</a></li>
+<li><a href="#org3dfa5a7">Auto-classify fields for mocking use for mocking to help users without accounts</a></li>
+<li><a href="#org4eec47d">Deep performance monitoring</a></li>
+<li><a href="#orgaa60f7a">Prevent breaking schema</a></li>
+<li><a href="#orgce40a8b">Only one schema? :(</a></li>
+<li><a href="#orgc997cc0">GDPR, COPPA, HIPAA, PII</a></li>
+</ul>
+</li>
+<li><a href="#org117c878">Getting over the hurdle: Providers</a></li>
+<li><a href="#orgea2808d">Getting over the hurdle: Users</a></li>
+</ul>
+</li>
+<li><a href="#org6148492">Summary</a>
+<ul>
+<li>
+<ul>
+<li><a href="#orge6afa6e">Why do we care?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgcc6e236">My offers</a>
+<ul>
+<li><a href="#orgf82762d"><span class="underline">The</span> GraphQL Book</a></li>
+<li><a href="#org222b36a">GraphQL, APIs, Dev-Tooling &amp; Coffee</a></li>
+<li><a href="#org45bb3a8">Developer happiness for your company</a></li>
+</ul>
+</li>
+<li><a href="#org5953ef3">Thank you!</a></li>
+<li><a href="#orgf049ac5">Misc</a>
+<ul>
+<li><a href="#org9141aa9">Overview</a>
+<ul>
+<li><a href="#org3f358bd">Client-side DX</a></li>
+<li><a href="#orgfa9abcb">Meta-API</a></li>
+<li><a href="#org61261c7">Maintainers</a></li>
+</ul>
+</li>
+<li><a href="#org4f49b76">Demos</a></li>
+<li><a href="#org8e16e08">Ideas</a></li>
+<li><a href="#org14b7cd5">CTAs</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 
-</section>
-</section>
-<section>
-<section id="slide-orgf8ae460">
-<h2 id="orgf8ae460">Who am I?</h2>
-<ul>
+
+<div id="outline-container-orgf976105" class="outline-2">
+<h2 id="orgf976105">GraphQL Tooling, today and tomorrow</h2>
+</div>
+<div id="outline-container-org093ef0f" class="outline-2">
+<h2 id="org093ef0f">Or, "Accelerating API adoption through developer happiness with GraphQL"</h2>
+</div>
+<div id="outline-container-orgcecac0c" class="outline-2">
+<h2 id="orgcecac0c">Who am I?</h2>
+<div class="outline-text-2" id="text-orgcecac0c">
+<ul class="org-ul">
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
 <li>VP Eng @ Payments company</li>
 <li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
-
 </ul>
-
-<div class="figure">
-<p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
-</p>
+</div>
+</div>
+<div id="outline-container-orgcb33cbb" class="outline-2">
+<h2 id="orgcb33cbb">Today</h2>
+<div class="outline-text-2" id="text-orgcb33cbb">
+<ol class="org-ol">
+<li>Why do we care?</li>
+<li>Demoathon</li>
+<li>Pontificating about the future</li>
+</ol>
+</div>
 </div>
 
-</section>
-</section>
-<section>
-<section id="slide-orgd99ea27">
-<h2 id="orgd99ea27">Accelerating API adoption through developer happiness with GraphQL</h2>
+<div id="outline-container-org0d33190" class="outline-2">
+<h2 id="org0d33190">Let's start!</h2>
+<div class="outline-text-2" id="text-org0d33190">
+<ul class="org-ul">
+<li><b>1. Why do we care?</b></li>
+<li>2. Demoathon</li>
+<li>3. Pontificating about the future</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org25092bd" class="outline-2">
+<h2 id="org25092bd">Why do we care?</h2>
+<div class="outline-text-2" id="text-org25092bd">
 <p>
 Two Points to keep in mind when talking about api adoption:
 </p>
-<ul>
+<ul class="org-ul">
 <li>Content is king</li>
 <li>Competition is fierce (not always from other APIs)</li>
-
 </ul>
+</div>
 
-</section>
-<section id="slide-org8dbe5c3">
-<h3 id="org8dbe5c3">Content is king</h3>
+<div id="outline-container-orga74a705" class="outline-3">
+<h3 id="orga74a705">Content is king</h3>
+<div class="outline-text-3" id="text-orga74a705">
 <p>
 First and foremost, the <span class="underline">primary</span> attraction of your API:
 </p>
-<ul>
+<ul class="org-ul">
 <li>Its <span class="underline">data</span></li>
 <li>Its <span class="underline">effects</span></li>
-
 </ul>
 
-<blockquote nil>
+<blockquote>
 <p>
 "How do you help me achieve my business goal?"
 </p>
 </blockquote>
+</div>
+</div>
 
-</section>
-<section id="slide-org4311eff">
-<h3 id="org4311eff">Competition is fierce</h3>
-<ul>
+<div id="outline-container-orgbbb3d3f" class="outline-3">
+<h3 id="orgbbb3d3f">Competition is fierce</h3>
+<div class="outline-text-3" id="text-orgbbb3d3f">
+<ul class="org-ul">
 <li>Engineering resources are always stretched</li>
-
 </ul>
 
 <p>
@@ -108,349 +420,312 @@ At any given time, 20+% of an API-based company's deal-flow is delayed for 6-8 m
 <p>
 "The business lead was about to buy, but realized they don't have engineering resources."
 </p>
+</div>
+</div>
 
-<ul>
-<li>Competition isn't always with other APIs</li>
-
-</ul>
-<p>
-"Consumer" APIs like Spotify are competing for my attention against other interests I have
-</p>
-
-</section>
-<section id="slide-org407c6f9">
-<h3 id="org407c6f9">Two components</h3>
-<ul>
+<div id="outline-container-org5ac2d33" class="outline-3">
+<h3 id="org5ac2d33">Two components</h3>
+<div class="outline-text-3" id="text-org5ac2d33">
+<ul class="org-ul">
 <li><span class="underline">Engineering resource constraint</span></li>
-
 </ul>
 <p>
 Reflects amount of energy <b>required</b> to complete a task
 </p>
 
-<ul>
+<ul class="org-ul">
 <li><span class="underline">Developer happiness</span></li>
-
 </ul>
 <p>
 Reflects amount of intrinsic energy <b>available</b> to complete a task
 </p>
+</div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org0a6a155">
-<h2 id="org0a6a155">APIs are <span class="underline">rarely</span> known for sparking joy</h2>
-<ul>
+<div id="outline-container-org5fc704c" class="outline-2">
+<h2 id="org5fc704c">APIs are <span class="underline">rarely</span> known for sparking joy</h2>
+<div class="outline-text-2" id="text-org5fc704c">
+<ul class="org-ul">
 <li>Lack of empathy (broken feedback loop)</li>
 <li>Limited resources for design/documentation/testing/tooling, etc.</li>
-
 </ul>
-</section>
-<section >
 <p>
 Setting the scene&#x2026;
 </p>
-</section>
-</section>
-<section>
-<section id="slide-orgb356aaa">
-<h2 id="orgb356aaa">Perception of our API's adoption</h2>
+</div>
+</div>
+<div id="outline-container-org82659a9" class="outline-2">
+<h2 id="org82659a9">Perception of our API's adoption</h2>
+<div class="outline-text-2" id="text-org82659a9">
 
 <div class="figure">
 <p><img src="./img/api_perception.png" alt="api_perception.png" />
 </p>
 </div>
-</section>
-<section id="slide-org9deed71">
-<h3 id="org9deed71">Reality of our API's adoption curve</h3>
-</section>
-<section >
+</div>
+<div id="outline-container-org04fa018" class="outline-3">
+<h3 id="org04fa018">Reality of our API's adoption curve</h3>
+<div class="outline-text-3" id="text-org04fa018">
 
 <div class="figure">
 <p><img src="./img/api_reality_1_0.png" alt="api_reality_1_0.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_1.png" alt="api_reality_1_1.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_2.png" alt="api_reality_1_2.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_3.png" alt="api_reality_1_3.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_4.png" alt="api_reality_1_4.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_5.png" alt="api_reality_1_5.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_6.png" alt="api_reality_1_6.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_7.png" alt="api_reality_1_7.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_8.png" alt="api_reality_1_8.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_9.png" alt="api_reality_1_9.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_10.png" alt="api_reality_1_10.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_11.png" alt="api_reality_1_11.png" />
 </p>
 </div>
 
-</section>
-<section >
 <p>
 "Though I walk through the valley of the shadow of auth&#x2026;"
 <img src="./img/api_reality_1_13.png" alt="api_reality_1_13.png" />
 </p>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/api_reality_1_12.png" alt="api_reality_1_12.png" />
 </p>
 </div>
 
-</section>
-<section >
 <p>
 [Developer PSA]
 <img src="./img/programmer_productivity_0.png" alt="programmer_productivity_0.png" />
 </p>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/programmer_productivity_1.png" alt="programmer_productivity_1.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/tab_competition_graph.png" alt="tab_competition_graph.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/tab_competition_proof.png" alt="tab_competition_proof.png" />
 </p>
 </div>
+</div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org3526304">
-<h2 id="org3526304">Three metrics for dev happiness</h2>
+<div id="outline-container-org5dbe709" class="outline-2">
+<h2 id="org5dbe709">Three metrics for dev happiness</h2>
+<div class="outline-text-2" id="text-org5dbe709">
 <p>
 Evaluate your API with the following criteria:
 </p>
-<ul>
+<ul class="org-ul">
 <li>Time to initial success (Success ASAP)</li>
 <li>Intensity of success (Biggest "wow" moments possible)</li>
 <li>Interval between subsequent success states (make success frequent)</li>
-
 </ul>
 
-</section>
-<section >
 <p>
 Criteria =&gt; Maxims:
 </p>
-<ul>
+<ul class="org-ul">
 <li>Deliver quickest initial success</li>
 <li>Maximize "wow" factor</li>
 <li>Make success frequent</li>
-
 </ul>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org29b2f28">
-<h2 id="org29b2f28">How does GraphQL help?</h2>
-<ul>
+<div id="outline-container-orgbd8663a" class="outline-2">
+<h2 id="orgbd8663a">How does GraphQL help?</h2>
+<div class="outline-text-2" id="text-orgbd8663a">
+<ul class="org-ul">
 <li>GraphQL is inherently machine-readable (at multiple levels!)</li>
 <li>The tooling possible is intensely powerful</li>
 <li>A positive feedback loop</li>
-
 </ul>
+</div>
 
-</section>
-<section id="slide-orgc19b169">
-<h3 id="orgc19b169">GraphQL Help: Demoathon</h3>
+<div id="outline-container-org7065d1d" class="outline-3">
+<h3 id="org7065d1d">GraphQL Help: Demoathon</h3>
+<div class="outline-text-3" id="text-org7065d1d">
+<ul class="org-ul">
+<li><del>1. Why do we care?</del></li>
+<li><b>2. Demoathon</b></li>
+<li>3. Pontificating about the future</li>
+</ul>
 <p>
 GraphiQL - Auto-complete APIs!
 </p>
-</section>
-<section >
 <p>
 GraphiQL Explorer
 </p>
-</section>
-<section >
 <p>
-GraphiQL Smart Forms
+GraphiQL Code Exporter
 </p>
-</section>
-<section >
+<div class="org-src-container">
+<pre class="src src-json">query npm<span style="color: #4f97d7;">(</span>$package: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  npm <span style="color: #bc6ec5;">{</span>
+    package<span style="color: #2d9574;">(</span>name: $package<span style="color: #2d9574;">)</span> <span style="color: #2d9574;">{</span>
+      name
+      downloads <span style="color: #67b11d;">{</span>
+        lastMonth <span style="color: #b1951d;">{</span>
+          count
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+
+query rss<span style="color: #4f97d7;">(</span>$url: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  rss <span style="color: #bc6ec5;">{</span>
+    rss<span style="color: #a45bad;">2</span>Feed<span style="color: #2d9574;">(</span>url: $url<span style="color: #2d9574;">)</span> <span style="color: #2d9574;">{</span>
+      title
+      items <span style="color: #67b11d;">{</span>
+        title
+        pubDate
+        guid <span style="color: #b1951d;">{</span>
+          data
+          permalink
+        <span style="color: #b1951d;">}</span>
+        enclosure <span style="color: #b1951d;">{</span>
+          url
+          length
+          mime
+        <span style="color: #b1951d;">}</span>
+        content
+        comments
+        author
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
+</div>
+
 <p>
 Next level: Auto-parameterize existing queries
 <img src="./img/explorer_parameterize_example_1.png" alt="explorer_parameterize_example_1.png" />
 </p>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/explorer_parameterize_example_2.png" alt="explorer_parameterize_example_2.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/explorer_parameterize_example_3.png" alt="explorer_parameterize_example_3.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/explorer_parameterize_example_4.png" alt="explorer_parameterize_example_4.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/explorer_parameterize_example_5.png" alt="explorer_parameterize_example_5.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/explorer_parameterize_example_6.png" alt="explorer_parameterize_example_6.png" />
 </p>
 </div>
-</section>
-<section >
 <p>
-GraphiQL Code Exporter
+GraphiQL Smart Forms
 </p>
-</section>
-<section >
 <p>
 Compare to existing fragmented experiences:
 </p>
-<ul>
+<ul class="org-ul">
 <li>Documentation is often "inert"</li>
 <li>Examples aren't generalizable</li>
 <li>Initial experimentation isn't reusable in code</li>
-
 </ul>
-</section>
-<section >
 <p>
 Who can traverse graphs?
 </p>
-<ul>
-<li class="fragment appear">Humans</li>
-<li class="fragment appear">Computers</li>
-
+<ul class="org-ul">
+<li>Humans</li>
+<li>Computers</li>
 </ul>
-<p class="fragment (appear)">
+<p>
 Who's generally better?
 </p>
-</section>
-<section >
 <p>
 Computers.
 </p>
-</section>
-<section >
-
-<div class="figure">
-<p><img src="./img/explorer_breadth_first_search.png" alt="explorer_breadth_first_search.png" />
+<p>
+[GraphiQL Explorer Search Demo]
 </p>
-</div>
 
-</section>
-<section >
 <p>
 Multi-APIs
 </p>
-</section>
-<section >
 <p>
 <object type="image/svg+xml" data="./img/hasura.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
@@ -460,83 +735,78 @@ Hasura: Instant Realtime GraphQL on Postgres
 <p>
 Like Firebase++, but:
 </p>
-<ul>
-<li class="fragment appear">On Postgres</li>
-<li class="fragment appear">Standard GraphQL</li>
-<li class="fragment appear">Open-source</li>
-
+<ul class="org-ul">
+<li>On Postgres</li>
+<li>Standard GraphQL</li>
+<li>Open-source</li>
 </ul>
 
-</section>
-<section >
 <p>
-Automatically combining APIs
+[Automatically combining APIs Demo]
 </p>
-<ul>
-<li class="fragment appear">Remote schema integration</li>
-<li class="fragment appear">"Remote-service joins"</li>
-<li class="fragment appear">Compare:
-<ul>
+
+<ul class="org-ul">
+<li>Remote schema integration</li>
+<li>"Remote-service joins"</li>
+<li>Compare:
+<ul class="org-ul">
 <li>Stripe-as-a-library</li>
 <li>Stripe-as-an-introspectable-graph</li>
-
 </ul></li>
-
 </ul>
-
-</section>
-<section >
 <p>
-Auto-complete inside IDE
+Auto-complete in editor
 </p>
 
-</section>
-<section >
+<p>
+[vscode example]
+</p>
+
 <p>
 GraphQL goes <span class="underline">everywhere</span>
 </p>
-<ul>
-<li class="fragment appear">Sales VP, CFO, etc.</li>
-<li class="fragment appear">Managers: "I need a list of new users for the past 30 days"</li>
 
+<p>
+Developers are not the only ones building things.
+</p>
+<ul class="org-ul">
+<li>Largest programming platform in the world?</li>
+<li>Excel.</li>
 </ul>
 
-</section>
-<section >
+<p>
+[Excel demo]
+</p>
+
+<ul class="org-ul">
+<li>Sales VP, CFO, etc.
+<ul class="org-ul">
+<li>"I need the projected revenue for Q4 from Salesforce"</li>
+</ul></li>
+<li>Managers: "I need a list of new users for the past 30 days"</li>
+</ul>
+
 <p>
 GraphQL as async server-to-server events: Webhook delivery
 </p>
-</section>
-<section >
-
-<p>
-GraphQL Cortex
-</p>
-</section>
-<section >
-<p>
-GraphQL Cortex: sean@onegraph.com
-</p>
-
-</section>
-<section id="slide-orgc7c2778">
-<h3 id="orgc7c2778">Conquering Auth</h3>
+</div>
+</div>
+<div id="outline-container-org7848aab" class="outline-3">
+<h3 id="org7848aab">Conquering Auth</h3>
+<div class="outline-text-3" id="text-org7848aab">
 <p>
 Auth is difficult, and deeply unpleasant.
 </p>
-</section>
-<section >
 <p>
 Build it into your API.
 </p>
-</section>
-<section >
 <p>
 <code>[Auto "Log in to &lt;X&gt;" example]</code>
 </p>
-</section>
-<section id="slide-org183ff4f">
-<h4 id="org183ff4f">Progressive Auth</h4>
+</div>
+<div id="outline-container-org9e6282a" class="outline-4">
+<h4 id="org9e6282a">Progressive Auth</h4>
+<div class="outline-text-4" id="text-org9e6282a">
 <p>
 Progressive auth is the right thing to do.
 </p>
@@ -544,125 +814,289 @@ Progressive auth is the right thing to do.
 <p>
 It's also even more unpleasant!
 </p>
-</section>
-<section >
 <p>
 Build it into your API.
 </p>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="java" >type Company {
-  id: String!
-  name: String!
-  createdAt: DateTime!
-  accountBalance: Int @permissions(scopes: ["account:read"])
-}
-</code></pre>
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">type</span> <span style="color: #7590db;">Company</span> <span style="color: #4f97d7;">{</span>
+  <span style="color: #a45bad;">id</span>: String<span style="color: #a45bad;">!</span>
+  name: String<span style="color: #a45bad;">!</span>
+  createdAt: DateTime<span style="color: #a45bad;">!</span>
+  accountBalance: Int <span style="color: #a45bad;">@permissions</span><span style="color: #bc6ec5;">(</span>scopes: <span style="color: #2d9574;">[</span><span style="color: #2d9574;">"account:read"</span><span style="color: #2d9574;">]</span><span style="color: #bc6ec5;">)</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="json" >{
-  "errors": [
-    {
-      "message": "Missing scope for accountBalance. Please grant additional permissions.",
-      "path": [
-        "company"
-        "accountBalance"
-      ],
-      "extensions": {
-        "type": "auth/insufficient-auth",
-        "requiredScope": "account:read",
-      }
-    }
-  ],
-  "data": {
-    "company": {
-      "id": "hZd773dvb"
-      "name": "Globodex, Inc."
-    }
-  }
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"errors"</span>: <span style="color: #bc6ec5;">[</span>
+    <span style="color: #2d9574;">{</span>
+      <span style="color: #4f97d7; font-weight: bold;">"message"</span>: <span style="color: #2d9574;">"Missing scope for accountBalance. Please grant additional permissions."</span>,
+      <span style="color: #4f97d7; font-weight: bold;">"path"</span>: <span style="color: #67b11d;">[</span>
+        <span style="color: #2d9574;">"company"</span>
+        <span style="color: #2d9574;">"accountBalance"</span>
+      <span style="color: #67b11d;">]</span>,
+      <span style="color: #4f97d7; font-weight: bold;">"extensions"</span>: <span style="color: #67b11d;">{</span>
+        <span style="color: #4f97d7; font-weight: bold;">"type"</span>: <span style="color: #2d9574;">"auth/insufficient-auth"</span>,
+        <span style="color: #4f97d7; font-weight: bold;">"requiredScope"</span>: <span style="color: #2d9574;">"account:read"</span>,
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">]</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"data"</span>: <span style="color: #bc6ec5;">{</span>
+    <span style="color: #4f97d7; font-weight: bold;">"company"</span>: <span style="color: #2d9574;">{</span>
+      <span style="color: #4f97d7; font-weight: bold;">"id"</span>: <span style="color: #2d9574;">"hZd773dvb"</span>
+      <span style="color: #4f97d7; font-weight: bold;">"name"</span>: <span style="color: #2d9574;">"Globodex, Inc."</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org27c7a68" class="outline-3">
+<h3 id="org27c7a68">Implementing auth in GraphQL?</h3>
+<div class="outline-text-3" id="text-org27c7a68">
+<p>
+"How do I secure my GraphQL server?"
+</p>
 </div>
 
-</section>
-</section>
-<section>
-<section id="slide-orgab7c3bf">
-<h2 id="orgab7c3bf">Virtuous-data cycle</h2>
+<div id="outline-container-orgbe71149" class="outline-4">
+<h4 id="orgbe71149">AuthGuardian</h4>
+<div class="outline-text-4" id="text-orgbe71149">
+<p>
+Auth[n/z]
+</p>
+
+<p>
+Authentication: Who are you?
+</p>
+
+<p>
+Authorization: What are you allowed to do?
+</p>
+
+<p>
+Authorization often is based on facts about your:
+</p>
+<ul class="org-ul">
+<li>What GitHub organization do you belong to?</li>
+<li>Do you have a (verified) email that belongs to the company?</li>
+<li>Are you the owner of playlist <code>X</code>?</li>
+<li>Have you ever committed to GitHub repo <code>Y</code>?</li>
+</ul>
+
+<p>
+What if we know how to find those facts, and process the predicates?
+</p>
+
+<p>
+[AuthGuardian demo]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0b780a9" class="outline-3">
+<h3 id="org0b780a9">Living, responding, <b>accurate</b> API Docs</h3>
+<div class="outline-text-3" id="text-org0b780a9">
+</div>
+<ul class="org-ul">
+<li><a id="org6bd16ec"></a>Problem 1: Docs lie<br />
+<div class="outline-text-5" id="text-org6bd16ec">
+<ul class="org-ul">
+<li>"Lies, damn lies, and API documentation"</li>
+</ul>
+
+<div class="figure">
+<p><img src="./img/broken_example.png" alt="broken_example.png" />
+</p>
+</div>
+<ul class="org-ul">
+<li>Connect a GitHub repo</li>
+<li>Scan all <code>.md</code> files</li>
+<li>Verify all <span class="underline"><code>graphql</code></span> codeblocks against new schema</li>
+</ul>
+
+<div class="figure">
+<p><img src="./img/broken_example_error.png" alt="broken_example_error.png" />
+</p>
+</div>
+</div>
+</li>
+<li><a id="org5c5c5ad"></a>Problem 2: Docs live over there<br />
+<div class="outline-text-5" id="text-org5c5c5ad">
+
+<div class="figure">
+<p><img src="./img/docs_with_examples.png" alt="docs_with_examples.png" />
+</p>
+</div>
+
+<div class="figure">
+<p><img src="./img/graphiql_submit_example.png" alt="graphiql_submit_example.png" />
+</p>
+</div>
+</div>
+</li>
+<li><a id="org3df90a5"></a>Problem 3: Docs are dead<br />
+<div class="outline-text-5" id="text-org3df90a5">
+<p>
+Analytics!
+</p>
+<ul class="org-ul">
+<li>"For the new users who signed up two weeks ago, what fields have they been accessing?"</li>
+<li>Humans classify unrecognized new use-cases</li>
+<li>Insert into documentation as annotated example</li>
+<li>Sort ranking based on trends in new users
+<ul class="org-ul">
+<li>Potentially even per client-group via tagging clients</li>
+</ul></li>
+</ul>
+<p>
+[GraphQL Codex Demo]
+</p>
+<ul class="org-ul">
+<li>Generate fast, SEO-able site</li>
+<li>Embed examples</li>
+<li>Check examples against schema on any change</li>
+<li>Provide automated changelog [like <a href="https://developer.github.com/v4/changelog/">https://developer.github.com/v4/changelog/</a>]</li>
+</ul>
+
+<p>
+<a href="https://www.onegraph.com/schema/">https://www.onegraph.com/schema/</a>
+</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-orgce5501e" class="outline-3">
+<h3 id="orgce5501e">Persisted queries</h3>
+<div class="outline-text-3" id="text-orgce5501e">
+<p>
+Persisted queries register a query/mutation/subscription <b>outside</b> of normal app
+flow, usually a as build or manual step.
+</p>
+
+<p>
+Persisted queries store the query as-is, and return a <code>doc_id</code> to be used inside of the app.
+</p>
+<p>
+Allows the developer to explore and code freely, while locking down the production version.
+</p>
+
+<ul class="org-ul">
+<li>Prevent DoS attacks</li>
+<li>Enforce privacy and permissions</li>
+<li>Caching becomes trivial! <code>doc_id~+~auth_token_hash</code></li>
+</ul>
+</div>
+<div id="outline-container-org86efafb" class="outline-4">
+<h4 id="org86efafb">Persisted queries + metadata&#x2026;?</h4>
+<div class="outline-text-4" id="text-org86efafb">
+<p>
+And, you can attach metadata.
+</p>
+
+<p>
+Like auth.
+</p>
+
+<p>
+Securely.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org53bc33d" class="outline-4">
+<h4 id="org53bc33d">Persisted query demo 1</h4>
+<div class="outline-text-4" id="text-org53bc33d">
+<p>
+[Persisted query auth demo]
+</p>
+<div class="org-src-container">
+<pre class="src src-json">mutation SayHiToJesse<span style="color: #4f97d7;">(</span>$body: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  __typename
+  google <span style="color: #bc6ec5;">{</span>
+    gmail <span style="color: #2d9574;">{</span>
+      sendMessage<span style="color: #67b11d;">(</span>
+        data: <span style="color: #b1951d;">{</span>
+          subject: <span style="color: #2d9574;">"Sorry about this..."</span>
+          to: <span style="color: #2d9574;">"jesse+graphcms+is+amazing@graphcms.com"</span>
+          body: $body
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
+        message <span style="color: #b1951d;">{</span>
+          id
+          snippet
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org912b689" class="outline-4">
+<h4 id="org912b689">Persisted query example app</h4>
+<div class="outline-text-4" id="text-org912b689">
+<p>
+OneGraph Changelog, lightweight GitHub-issue based blogging
+</p>
+<ul class="org-ul">
+<li>Includes posts</li>
+<li>Authenticated comments (with GitHub)</li>
+<li>Reactions</li>
+<li>Secure</li>
+<li>Incredibly optimized (SEO bonus points!)</li>
+</ul>
+
+<p>
+[Persisted query real-world OSS example]
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org63d4158" class="outline-2">
+<h2 id="org63d4158">Pontificating about the future</h2>
+<div class="outline-text-2" id="text-org63d4158">
+<ul class="org-ul">
+<li><del>1. Why do we care?</del></li>
+<li><del>2. Demoathon</del></li>
+<li><b>3. Pontificating about the future</b></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5571f10" class="outline-2">
+<h2 id="org5571f10">Virtuous-data cycle</h2>
+<div class="outline-text-2" id="text-org5571f10">
 
 <div class="figure">
 <p><img src="./img/virtuous_cycle.png" alt="virtuous_cycle.png" />
 </p>
 </div>
-
-
-</section>
-</section>
-<section>
-<section id="slide-org9bf761f">
-<h2 id="org9bf761f">Deep Analytics: What can we do?</h2>
-<div class="outline-text-2" id="text-org9bf761f">
 </div>
-</section>
-<section id="slide-orgc554494">
-<h4 id="orgc554494">Iterative API design</h4>
+</div>
+
+<div id="outline-container-orgba0a21e" class="outline-2">
+<h2 id="orgba0a21e">Deep Analytics: What can we do?</h2>
+<div class="outline-text-2" id="text-orgba0a21e">
+</div>
+<div id="outline-container-org550e182" class="outline-4">
+<h4 id="org550e182">Iterative API design</h4>
+<div class="outline-text-4" id="text-org550e182">
 <p>
-Solution to ivory-tower API design problem - inherent loop
-</p>
-</section>
-<section id="slide-orgd6850ea">
-<h3 id="orgd6850ea">Example of breaking schema</h3>
-<ul>
-<li class="fragment appear">Deprecate old fields</li>
-<li class="fragment appear">Identify <b>specific</b> clients who have accessed in the past</li>
-<li class="fragment appear">Reach out to work on migration
-<ul>
-<li>Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)</li>
-
-</ul></li>
-<li class="fragment appear">Write query transformers to update client queries automatically</li>
-<li class="fragment appear">Compare to REST: small tweaks indiscriminately affect all clients OR fork the world</li>
-
-</ul>
-</section>
-<section >
-
-<div class="figure">
-<p><img src="./img/no_breaking_changes.png" alt="no_breaking_changes.png" />
+Drive API adoption and innovation through inherent loop
 </p>
 </div>
-</section>
-<section id="slide-org2e889ab">
-<h4 id="org2e889ab">Schema changelog automation</h4>
-<ul>
-<li><a href="https://developer.github.com/v4/changelog/">https://developer.github.com/v4/changelog/</a></li>
-
-</ul>
-</section>
-<section id="slide-org3135ca0">
-<h4 id="org3135ca0">Living, responding, <b>accurate</b> API Docs</h4>
-<ul>
-<li class="fragment appear">"Lies, damn lies, and API documentation"</li>
-<li class="fragment appear">Accurate docs and consistent APIs</li>
-<li class="fragment appear">"For the new users who signed up two weeks ago, what fields have they been accessing?"</li>
-<li class="fragment appear">Humans classify unrecognized new use-cases</li>
-<li class="fragment appear">Insert into documentation as annotated example</li>
-<li class="fragment appear">Sort ranking based on trends in new users
-<ul>
-<li>Potentially even per client-group via tagging clients</li>
-
-</ul></li>
-
-</ul>
-
-</section>
-<section id="slide-org2298dc8">
-<h4 id="org2298dc8">Auto-classify fields for mocking use for mocking to help users without accounts</h4>
+</div>
+<div id="outline-container-org3dfa5a7" class="outline-4">
+<h4 id="org3dfa5a7">Auto-classify fields for mocking use for mocking to help users without accounts</h4>
+<div class="outline-text-4" id="text-org3dfa5a7">
 <p>
 What's better than auto-auth?
 </p>
@@ -670,111 +1104,251 @@ What's better than auto-auth?
 <p>
 No auth!
 </p>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/auto_classification.png" alt="auto_classification.png" />
 </p>
 </div>
-<ul>
+<ul class="org-ul">
 <li>First/Last/Full name
-<ul>
+<ul class="org-ul">
 <li>Language distribution</li>
-
 </ul></li>
 <li>Email</li>
 <li>Address, Zip Code, Country</li>
 <li>URI</li>
-
 </ul>
-</section>
-<section >
 <p>
 GraphQL Muse: sean@onegraph.com
 </p>
+<p>
+GraphQL Cortex: sean@onegraph.com
+[Process orchestration demo with Google Voice]
+</p>
+<div class="org-src-container">
+<pre class="src src-json">mutation CopyTemplateRepo<span style="color: #4f97d7;">(</span>$name: String!, $ownerId: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  gitHub <span style="color: #bc6ec5;">{</span>
+    cloneTemplateRepository<span style="color: #2d9574;">(</span>
+      input: <span style="color: #67b11d;">{</span>
+        repositoryId: <span style="color: #2d9574;">"MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="</span>
+        visibility: PUBLIC
+        ownerId: $ownerId
+        name: $name
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">)</span> <span style="color: #2d9574;">{</span>
+      repository <span style="color: #67b11d;">{</span>
+        databaseId
+        id
+        nameWithLogin
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-</section>
-<section id="slide-org86c5d1a">
-<h4 id="org86c5d1a">Deep performance monitoring</h4>
-<ul>
-<li class="fragment appear">Performance/timing</li>
-<li class="fragment appear">Error rates</li>
-<li class="fragment appear">Audit-logs</li>
-<li class="fragment appear">Total requests, bytes</li>
+mutation CreateNetlifyDeployKey <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>path: <span style="color: #2d9574;">"/api/v1/deploy_keys"</span><span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
+        jsonBody
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-</ul>
-<p class="fragment (appear)">
-&#x2026; per <b>field</b>
+mutation AddDeployKeyToRepo<span style="color: #4f97d7;">(</span>$path: String!, $key: String!, $repoId: Int!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  gitHub <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: $path # <span style="color: #2d9574;">"/repos/dwwoelfel/netlify-test/keys"</span>
+        jsonBody: <span style="color: #b1951d;">{</span>
+          id: $repoId
+          key: $key
+          title: <span style="color: #2d9574;">"Netlify"</span>
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
+        jsonBody
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+
+mutation CreateNetlifySite<span style="color: #4f97d7;">(</span>$siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: <span style="color: #2d9574;">"/api/v1/sites"</span>
+        jsonBody: <span style="color: #b1951d;">{</span>
+          name: $siteName
+          repo: <span style="color: #4f97d7;">{</span>
+            provider: <span style="color: #2d9574;">"github"</span>
+            id: <span style="color: #a45bad;">215425232</span>
+            repo: $repo
+            private: <span style="color: #a45bad;">false</span>
+            branch: <span style="color: #2d9574;">"master"</span>
+            cmd: $cmd # <span style="color: #2d9574;">"sed -i 's/{site-name}/Macha Scoot/g' index.html"</span>
+            dir: <span style="color: #2d9574;">"/"</span>
+            deploy_key_id: $deployKeyId
+          <span style="color: #4f97d7;">}</span>
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
+        jsonBody
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+
+mutation DeployNetlifySite<span style="color: #4f97d7;">(</span>$path: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: $path #"/api/v<span style="color: #a45bad;">1</span>/sites/<span style="color: #a45bad;">8c47014f</span>-<span style="color: #a45bad;">7074</span>-<span style="color: #a45bad;">4afb</span>-<span style="color: #a45bad;">820c</span>-<span style="color: #a45bad;">758e1d105e76</span>/deploys"
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
+        jsonBody
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
+</div>
+<p>
+GraphQL Cortex - orchestrate processes with GraphQL
 </p>
 
-</section>
-<section id="slide-orgb827a23">
-<h4 id="orgb827a23">GDPR, COPPA, HIPAA, PII</h4>
+<p>
+sean@onegraph.com
+</p>
+</div>
+</div>
+<div id="outline-container-org4eec47d" class="outline-4">
+<h4 id="org4eec47d">Deep performance monitoring</h4>
+<div class="outline-text-4" id="text-org4eec47d">
+<ul class="org-ul">
+<li>Performance/timing</li>
+<li>Error rates</li>
+<li>Audit-logs</li>
+<li>Total requests, bytes</li>
+</ul>
+<p>
+&#x2026; per <b>field</b>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaa60f7a" class="outline-4">
+<h4 id="orgaa60f7a">Prevent breaking schema</h4>
+<div class="outline-text-4" id="text-orgaa60f7a">
+<ul class="org-ul">
+<li>Deprecate old fields</li>
+<li>Identify <b>specific</b> clients who have accessed in the past</li>
+<li>Reach out to work on migration
+<ul class="org-ul">
+<li>Show potential impact for failed migration (you've accessed these fields 10,000 in the past 30 days)</li>
+</ul></li>
+<li>Write query transformers to update client queries automatically</li>
+<li>Compare to REST: small tweaks indiscriminately affect all clients OR fork the world</li>
+</ul>
+
+<div class="figure">
+<p><img src="./img/no_breaking_changes.png" alt="no_breaking_changes.png" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgce40a8b" class="outline-4">
+<h4 id="orgce40a8b">Only one schema? :(</h4>
+<div class="outline-text-4" id="text-orgce40a8b">
+<ul class="org-ul">
+<li>Never break your API
+<ul class="org-ul">
+<li>developers are sad.</li>
+</ul></li>
+</ul>
+
+<ul class="org-ul">
+<li>Beautiful, iterative API
+<ul class="org-ul">
+<li>clients are sad.</li>
+</ul></li>
+</ul>
+
+<p>
+Solution?
+</p>
+
+<p>
+Look to Stripe!
+</p>
+
+<p>
+Migration strategy! 
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc997cc0" class="outline-4">
+<h4 id="orgc997cc0">GDPR, COPPA, HIPAA, PII</h4>
+<div class="outline-text-4" id="text-orgc997cc0">
 <p>
 Combine client+field-level access with server-awareness of data sensitivity:
 </p>
 <div class="org-src-container">
-
-<pre><code class="java" >type User @ GDPR {
-  id: String!
-  name: String!
-  birthdate: DateTime! @PII
-  lastMedicalAppointment: DateTime @HIPAA
-  socialSecurityNumber: String @PII
-}
-</code></pre>
+<pre class="src src-java">type User <span style="color: #ce537a; font-weight: bold;">@</span> <span style="color: #7590db;">GDPR</span> <span style="color: #4f97d7;">{</span>
+  <span style="color: #a45bad;">id</span>: String<span style="color: #a45bad;">!</span>
+  name: String<span style="color: #a45bad;">!</span>
+  birthdate: DateTime<span style="color: #a45bad;">!</span> <span style="color: #a45bad;">@PII</span>
+  lastMedicalAppointment: DateTime <span style="color: #a45bad;">@HIPAA</span>
+  socialSecurityNumber: String <span style="color: #a45bad;">@PII</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-<ul>
+<ul class="org-ul">
 <li>Automate permissions + privilege</li>
 <li>Track data exposure</li>
-
 </ul>
-
-</section>
-</section>
-<section>
-<section id="slide-org836f671">
-<h2 id="org836f671">Getting over the hurdle</h2>
-<ul>
+</div>
+</div>
+<div id="outline-container-org117c878" class="outline-3">
+<h3 id="org117c878">Getting over the hurdle: Providers</h3>
+<div class="outline-text-3" id="text-org117c878">
+<ul class="org-ul">
 <li>Analyze current network traffic</li>
 <li>Track "novelty" over time</li>
 <li>Derive <b>actual</b> API contract
-<ul>
+<ul class="org-ul">
 <li>Authentication</li>
 <li>Pagination</li>
 <li>Relationships</li>
 <li>Types</li>
-
 </ul></li>
 <li>Generate GraphQL</li>
-
 </ul>
-</section>
-<section >
 <p>
 &#x2026;
 </p>
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li>Self-contained binary</li>
 <li>Runs next to your webserver</li>
 <li>OSS</li>
 <li>On-premise</li>
-
 </ul>
-</section>
-<section >
 <p>
 Appiderv: sean@onegraph.com
 </p>
+</div>
+</div>
+<div id="outline-container-orgea2808d" class="outline-3">
+<h3 id="orgea2808d">Getting over the hurdle: Users</h3>
+<div class="outline-text-3" id="text-orgea2808d">
+<p>
+[GraphQL Doctor sketch]
+</p>
+</div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org3fd49d6">
-<h2 id="org3fd49d6">Summary</h2>
+<div id="outline-container-org6148492" class="outline-2">
+<h2 id="org6148492">Summary</h2>
+<div class="outline-text-2" id="text-org6148492">
 <p>
 GraphQL itself offers substantial benefits out of the box.
 </p>
@@ -782,72 +1356,69 @@ GraphQL itself offers substantial benefits out of the box.
 <p>
 The tooling today and tomorrow take developer happiness to the next level:
 </p>
-<ul>
+<ul class="org-ul">
 <li>For API providers</li>
 <li>For data-infrastructure managers</li>
 <li>For client-side developers</li>
 <li>And even for non-traditional devs: CFOs, VP Sales, Managers, Data-scientists, etc.</li>
-
 </ul>
-
-</section>
-<section >
-<ul>
+</div>
+<div id="outline-container-orge6afa6e" class="outline-4">
+<h4 id="orge6afa6e">Why do we care?</h4>
+<div class="outline-text-4" id="text-orge6afa6e">
+<ul class="org-ul">
 <li>Ultimately the data and effects of your API are king - focus on <b>that</b> exclusively.</li>
 <li>But if you want your api to adopted in 2019, it must plug into next-level tooling:
-<ul>
+<ul class="org-ul">
 <li>Familiar</li>
 <li>Exploration</li>
 <li>Documentation</li>
 <li>Code generation</li>
 <li>Client migration</li>
 <li>Analytics-lifecycle</li>
-
 </ul></li>
-
 </ul>
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li>Pick standards that can give you as much of the above in an evolve-able way out of the box</li>
 <li>Designing apis still involves humans, but checking for consistency can be automated</li>
-
 </ul>
 
-</section>
-<section >
-
-<ol>
+<ol class="org-ol">
 <li>Content is king</li>
 <li>Competition is fierce</li>
-
 </ol>
 
-<p class="fragment (appear)">
+<p>
 A word of caution:
 </p>
-<ul>
-<li class="fragment appear">This is a 'wow' moment now.</li>
-<li class="fragment appear">&#x2026;.In a few years, it will simply be table-stakes.</li>
-<li class="fragment appear">OneGraph tooling has started to spread and become standard!</li>
-<li class="fragment appear">How is your API going to fit into that world?</li>
-
+<ul class="org-ul">
+<li>This is a 'wow' moment now.</li>
+<li>&#x2026;.In a few years, it will simply be table-stakes.</li>
+<li>OneGraph tooling has started to spread and become standard!
+<ul class="org-ul">
+<li>GitHub</li>
+<li>Gatsby</li>
+<li>Shopify</li>
+<li>Wordpress</li>
+<li>and on and on and on&#x2026;.</li>
+</ul></li>
+<li>How is your API going to fit into that world?</li>
 </ul>
 
-<p class="fragment (appear)">
+<p>
 Adopt GraphQL &amp; focus on #1
 </p>
-
-</section>
-</section>
-<section>
-<section id="slide-orgef66a25">
-<h2 id="orgef66a25">My offers</h2>
-<div class="outline-text-2" id="text-orgef66a25">
 </div>
-</section>
-<section id="slide-orgf4b92f7">
-<h3 id="orgf4b92f7"><span class="underline">The</span> GraphQL Book</h3>
+</div>
+</div>
+
+<div id="outline-container-orgcc6e236" class="outline-2">
+<h2 id="orgcc6e236">My offers</h2>
+<div class="outline-text-2" id="text-orgcc6e236">
+</div>
+<div id="outline-container-orgf82762d" class="outline-3">
+<h3 id="orgf82762d"><span class="underline">The</span> GraphQL Book</h3>
+<div class="outline-text-3" id="text-orgf82762d">
 <p>
 5 copies of the new GraphQL book by our friends <a href="https://twitter.com/MoonHighway">@MoonHighway</a>, the premier GraphQL training group:
 </p>
@@ -857,24 +1428,23 @@ Adopt GraphQL &amp; focus on #1
 <p><img src="./img/learning_graphql.jpg" alt="learning_graphql.jpg" />
 </p>
 </div>
-</section>
-<section >
 <p>
 Tweet your best GraphQL questions (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)
 </p>
-<ul>
+<ul class="org-ul">
 <li>GraphQL adoption</li>
 <li>Tooling possibilities</li>
 <li>Etc.</li>
-
 </ul>
+</div>
+</div>
 
-</section>
-<section id="slide-orga92918d">
-<h3 id="orga92918d">GraphQL, APIs, Dev-Tooling &amp; Coffee</h3>
-</section>
-<section id="slide-org81ea5ec">
-<h3 id="org81ea5ec">Developer happiness for your company</h3>
+<div id="outline-container-org222b36a" class="outline-3">
+<h3 id="org222b36a">GraphQL, APIs, Dev-Tooling &amp; Coffee</h3>
+</div>
+<div id="outline-container-org45bb3a8" class="outline-3">
+<h3 id="org45bb3a8">Developer happiness for your company</h3>
+<div class="outline-text-3" id="text-org45bb3a8">
 <p>
 Want this tooling for your api and for your developers?
 </p>
@@ -882,63 +1452,60 @@ Want this tooling for your api and for your developers?
 <p>
 We can make it happen for you, public or on-premise.
 </p>
+</div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org7157677">
-<h2 id="org7157677">Thank you!</h2>
-<ul>
+<div id="outline-container-org5953ef3" class="outline-2">
+<h2 id="org5953ef3">Thank you!</h2>
+<div class="outline-text-2" id="text-org5953ef3">
+<ul class="org-ul">
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
-
 </ul>
 
 <div class="figure">
 <p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
 </p>
 </div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org534c473">
-<h2 id="org534c473">Misc</h2>
-<div class="outline-text-2" id="text-org534c473">
+<div id="outline-container-orgf049ac5" class="outline-2">
+<h2 id="orgf049ac5">Misc</h2>
+<div class="outline-text-2" id="text-orgf049ac5">
 </div>
-</section>
-<section id="slide-org26cad86">
-<h3 id="org26cad86">Overview</h3>
-<div class="outline-text-3" id="text-org26cad86">
+<div id="outline-container-org9141aa9" class="outline-3">
+<h3 id="org9141aa9">Overview</h3>
+<div class="outline-text-3" id="text-org9141aa9">
 </div>
-</section>
-<section id="slide-org8c58312">
-<h4 id="org8c58312">Client-side DX</h4>
-</section>
-<section id="slide-orgcb2e3de">
-<h4 id="orgcb2e3de">Meta-API</h4>
-</section>
-<section id="slide-orge0a00fa">
-<h4 id="orge0a00fa">Maintainers</h4>
-</section>
-<section id="slide-org2437321">
-<h3 id="org2437321">Demos</h3>
-<ul>
+<div id="outline-container-org3f358bd" class="outline-4">
+<h4 id="org3f358bd">Client-side DX</h4>
+</div>
+<div id="outline-container-orgfa9abcb" class="outline-4">
+<h4 id="orgfa9abcb">Meta-API</h4>
+</div>
+<div id="outline-container-org61261c7" class="outline-4">
+<h4 id="org61261c7">Maintainers</h4>
+</div>
+</div>
+<div id="outline-container-org4f49b76" class="outline-3">
+<h3 id="org4f49b76">Demos</h3>
+<div class="outline-text-3" id="text-org4f49b76">
+<ul class="org-ul">
 <li>GraphiQL autocomplete</li>
 <li>Explorer</li>
 <li>Smart forms</li>
 <li>Exporter - figure out trello api?</li>
 <li>Excel
-<ul>
+<ul class="org-ul">
 <li>GraphQL goes everywhere - even into Excel!</li>
-
 </ul></li>
 <li>Multi-APIs</li>
 <li>Automatic progressive authorization</li>
 <li>Hasura DB-access
-<ul>
+<ul class="org-ul">
 <li>We've seen internal devs who - when they're so frustrated with an inscrutable api - stand up a hasura instance to build and prototype instead</li>
-
 </ul></li>
 <li>Hasura remote-joins</li>
 <li>Draftbit</li>
@@ -948,41 +1515,39 @@ We can make it happen for you, public or on-premise.
 <li>GraphQL Pipelines</li>
 <li>Webhooks</li>
 <li>Generating JWT with GraphQL for authorization and authentication</li>
-
 </ul>
-</section>
-<section id="slide-org6ce69f1">
-<h3 id="org6ce69f1">Ideas</h3>
-<ul>
+</div>
+</div>
+<div id="outline-container-org8e16e08" class="outline-3">
+<h3 id="org8e16e08">Ideas</h3>
+<div class="outline-text-3" id="text-org8e16e08">
+<ul class="org-ul">
 <li>Inferring API design from traffic
-<ul>
+<ul class="org-ul">
 <li>Generate GraphQL Layer</li>
-
 </ul></li>
 <li>API analytics
-<ul>
+<ul class="org-ul">
 <li>"Living API Docs" - can even be generated per client-group ("Fintech devs want to see these cases first", "startups want these cases first") if you tag the clients and see what fields they query in common</li>
 <li>Migrating existing clients (affects api maintainers)</li>
-
 </ul></li>
 <li>Auto-classify fields and use for mocking to help users without accounts</li>
-
 </ul>
-</section>
-<section id="slide-org8c5f277">
-<h3 id="org8c5f277">CTAs</h3>
-<ul>
+</div>
+</div>
+<div id="outline-container-org14b7cd5" class="outline-3">
+<h3 id="org14b7cd5">CTAs</h3>
+<div class="outline-text-3" id="text-org14b7cd5">
+<ul class="org-ul">
 <li>Ask me out for coffee</li>
 <li>Best 5 tweets get GraphQL book</li>
 <li>Waitlist for products
-<ul>
+<ul class="org-ul">
 <li>GraphQL Pipelines</li>
 <li>Analytics classifier/mocking</li>
 <li>API inferrer</li>
-
 </ul></li>
 <li>Want this tooling for your api, for your developers? We can make it happen for you, public or internal</li>
-
 </ul>
 
 <p>
@@ -990,40 +1555,14 @@ We can make it happen for you, public or on-premise.
 "The developer has remained in a state of constant success"
 "If you give your developers super-powers, they'll love you"
 </p>
-</section>
-</section>
 </div>
 </div>
-<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
-<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
-
-<script>
-// Full list of configuration options available here:
-// https://github.com/hakimel/reveal.js#configuration
-Reveal.initialize({
-
-controls: true,
-progress: true,
-history: true,
-center: true,
-slideNumber: 'c',
-rollingLinks: false,
-keyboard: true,
-overview: true,
-
-theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
-transitionSpeed: 'default',
-multiplex: {
-    secret: '', // null if client
-    id: '', // id, obtained from socket.io server
-    url: '' // Location of socket.io server
-},
-
-// Optional libraries used to extend on reveal.js
-dependencies: [
- { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
-});
-</script>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Sean Grove</p>
+<p class="date">Created: 2019-12-13 Fri 11:58</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
 </body>
 </html>

@@ -1,13 +1,17 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
 #+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
 #+REVEAL_EXTRA_CSS: /Users/s/Desktop/reactiveconf/talk.css
 #+REVEAL_THEME: league
 #+REVEAL_TRANS: none
 #+REVEAL_PLUGINS: (highlight)
 #+REVEAL_DEFAULT_FRAG_STYLE: (appear)
-#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true toc:nil
+#+OPTIONS: reveal_title_slide:nil num:nil reveal_history:true
+#+TITLE:     Supercharging JAMstack apps with Multiple APIs via GraphQL Pipelines
+#+AUTHOR:    Sean Grove
+#+EMAIL:     sean@onegraph.com
 
 * Supercharging JAMstack apps with multiple APIs
-And introducing "GraphQL Pipelines"
+(and ~GraphQL Pipelines~)
 
 * Who am I?
 - Sean Grove ([[https://twitter.com/sgrove][@sgrove]])
@@ -132,7 +136,7 @@ Time to shave some yaks.
 #+REVEAL: split
 [[./img/rabbit_hole_1.jpg]]
 
-* A startup pipeline
+* A startup-generating pipeline
 Let's focus on the first part post-idea:
 
 #+ATTR_REVEAL: :frag (appear)
@@ -529,6 +533,7 @@ Let's pop the stack!
 #+REVEAL: split
 Let's do this!
 #+REVEAL: split
+[GraphiQL tab!]
 #+BEGIN_SRC json
 mutation CopyTemplateRepo($name: String!, $ownerId: String!) {
   gitHub {
@@ -704,6 +709,7 @@ Win
   - Slack
 #+REVEAL: split
 But we need to make exploring APIs *fun* [GraphQL]
+
 We need to make productionizing ideas *fast* [Pipelines]
 * Thank you!
 - Sean Grove ([[https://twitter.com/sgrove][@sgrove]])

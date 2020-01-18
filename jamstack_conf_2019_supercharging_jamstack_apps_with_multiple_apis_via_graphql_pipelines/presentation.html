@@ -1,193 +1,387 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<meta charset="utf-8"/>
-<title></title>
-<meta name="author" content="(Sean Grove)"/>
+<!-- 2019-12-13 Fri 11:56 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supercharging JAMstack apps with Multiple APIs via GraphQL Pipelines</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Sean Grove" />
 <style type="text/css">
-.underline { text-decoration: underline; }
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
 </style>
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
 
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/league.css" id="theme"/>
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
 
-<link rel="stylesheet" href="/Users/s/Desktop/reactiveconf/talk.css"/>
-<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/css/zenburn.css"/>
-<!-- If the query includes 'print-pdf', include the PDF print sheet -->
-<script>
-    if( window.location.search.match( /print-pdf/gi ) ) {
-        var link = document.createElement( 'link' );
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
-        document.getElementsByTagName( 'head' )[0].appendChild( link );
-    }
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
 </script>
 </head>
 <body>
-<div class="reveal">
-<div class="slides">
-
-<section>
-<section id="slide-org9afbf6e">
-<h2 id="org9afbf6e">Supercharging JAMstack apps with multiple APIs</h2>
-<p>
-And introducing "GraphQL Pipelines"
-</p>
-
-</section>
-</section>
-<section>
-<section id="slide-org3561807">
-<h2 id="org3561807">Who am I?</h2>
+<div id="content">
+<h1 class="title">Supercharging JAMstack apps with Multiple APIs via GraphQL Pipelines</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
 <ul>
+<li><a href="#org7959ede">Supercharging JAMstack apps with multiple APIs</a></li>
+<li><a href="#org6189d21">Who am I?</a></li>
+<li><a href="#orge9161d8">How do the ideas come to me?</a></li>
+<li><a href="#orga41a2b1">Case study</a>
+<ul>
+<li><a href="#orgf15741d">What does our project need?</a></li>
+</ul>
+</li>
+<li><a href="#org2389509">A startup-generating pipeline</a>
+<ul>
+<li><a href="#orgb7a9c11">1. Source control: Create a GitHub Repository</a></li>
+<li><a href="#org9a7e9fb">2. Create a new site</a></li>
+<li><a href="#org318bf9f">Why is this so difficult?</a></li>
+<li><a href="#org848d181">Fixing API explorability</a></li>
+<li><a href="#org5763ab4">Fixing API Auth</a></li>
+</ul>
+</li>
+<li><a href="#orgdddd38e">What did we do?</a></li>
+<li><a href="#orgc158135">So what?</a></li>
+<li><a href="#org67a18f6">Thank you!</a></li>
+<li><a href="#org76d9c9d">Misc</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7959ede" class="outline-2">
+<h2 id="org7959ede">Supercharging JAMstack apps with multiple APIs</h2>
+<div class="outline-text-2" id="text-org7959ede">
+<p>
+(and <code>GraphQL Pipelines</code>)
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6189d21" class="outline-2">
+<h2 id="org6189d21">Who am I?</h2>
+<div class="outline-text-2" id="text-org6189d21">
+<ul class="org-ul">
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
 <li>VP Eng @ Payments company</li>
 <li>Background in Clojure(Script)/Reason/Rust, dev-tooling</li>
-
 </ul>
-</section>
-<section >
 <p>
 More importantly&#x2026;
 </p>
-<p class="fragment (appear)">
+<p>
 I'm a smart guy.
 </p>
-<p class="fragment (appear)">
+<p>
 Like, really, <b>raelly</b> smart.
 </p>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/testimonial_face_1.png" alt="testimonial_face_1.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/testimonial_face_2.png" alt="testimonial_face_2.png" />
 </p>
 </div>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/testimonial_face_3.png" alt="testimonial_face_3.png" />
 </p>
 </div>
-</section>
-<section >
 <p>
 And I have some <b>grat</b> ideas.
 </p>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-orge392741">
-<h2 id="orge392741">How do the ideas come to me?</h2>
-<p class="fragment (appear)">
+<div id="outline-container-orge9161d8" class="outline-2">
+<h2 id="orge9161d8">How do the ideas come to me?</h2>
+<div class="outline-text-2" id="text-orge9161d8">
+<p>
 Indescribable process&#x2026;
 </p>
 
 <div class="figure">
-<p><img src="./img/inspirational_process.jpg" alt="inspirational_process.jpg" class="fragment (appear)" />
+<p><img src="./img/inspirational_process.jpg" alt="inspirational_process.jpg" />
 </p>
 </div>
-</section>
-<section >
 <p>
 And I'm not alone!
 </p>
 
-<p class="fragment (appear)">
+<p>
 All of us have great ideas!
 </p>
 
-<p class="fragment (appear)">
+<p>
 So many great ideas start as side-projects:
 </p>
-<ul>
-<li class="fragment appear">Twitter</li>
-<li class="fragment appear">ProductHunt</li>
-<li class="fragment appear">Groupon</li>
-<li class="fragment appear">Oculus</li>
-<li class="fragment appear">literally <b>some</b> others&#x2026;</li>
-
+<ul class="org-ul">
+<li>Twitter</li>
+<li>ProductHunt</li>
+<li>Groupon</li>
+<li>Oculus</li>
+<li>literally <b>some</b> others&#x2026;</li>
 </ul>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org49ef82b">
-<h2 id="org49ef82b">Case study</h2>
+<div id="outline-container-orga41a2b1" class="outline-2">
+<h2 id="orga41a2b1">Case study</h2>
+<div class="outline-text-2" id="text-orga41a2b1">
 <p>
 Inspiration strikes:
 </p>
 
-<p class="fragment (appear)">
+<p>
 Matcha is hot. It's everywhere.
 </p>
 
-<p class="fragment (appear)">
+<p>
 Scooters are hot. They're everywhere.
 </p>
 
-<p class="fragment (appear)">
+<p>
 Hot thing + other hot thing = hottest thing?
 </p>
-</section>
-<section >
 <p>
 Matcha. Scooters.
 </p>
-<p class="fragment (appear)">
+<p>
 Matcha flavored scooters?
 </p>
-<p class="fragment (appear)">
+<p>
 Matcha with your scooter?
 </p>
-<p class="fragment (appear)">
+<p>
 No time for that!
 </p>
-<p class="fragment (appear)">
+<p>
 Figure out the details later!
 </p>
-</section>
-<section >
 <p>
 Before we can build our startup, we require&#x2026;:
 </p>
-<ul>
-<li class="fragment appear">Domain</li>
-<li class="fragment appear">Decentralized, hosted source control</li>
-<li class="fragment appear">Infinitely scalable site hosting</li>
-<li class="fragment appear">Launch page</li>
-<li class="fragment appear">Mailing list</li>
-<li class="fragment appear">Payment processor</li>
-<li class="fragment appear">Authentication / Authorization</li>
-<li class="fragment appear">Continuous integration / deployment</li>
-<li class="fragment appear">Institutional investors</li>
-
-</ul>
-</section>
-<section id="slide-org205b0b0">
-<h3 id="org205b0b0">What does our project need?</h3>
-<p>
-We live in a golden age of building real apps
-</p>
-
-<p class="fragment (appear)">
-There are services that do everything for us!
-</p>
-
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li>Domain</li>
 <li>Decentralized, hosted source control</li>
 <li>Infinitely scalable site hosting</li>
@@ -197,495 +391,455 @@ There are services that do everything for us!
 <li>Authentication / Authorization</li>
 <li>Continuous integration / deployment</li>
 <li>Institutional investors</li>
-
 </ul>
-</section>
-<section >
+</div>
+<div id="outline-container-orgf15741d" class="outline-3">
+<h3 id="orgf15741d">What does our project need?</h3>
+<div class="outline-text-3" id="text-orgf15741d">
+<p>
+We live in a golden age of building real apps
+</p>
+
+<p>
+There are services that do everything for us!
+</p>
+
+<ul class="org-ul">
+<li>Domain</li>
+<li>Decentralized, hosted source control</li>
+<li>Infinitely scalable site hosting</li>
+<li>Launch page</li>
+<li>Mailing list</li>
+<li>Payment processor</li>
+<li>Authentication / Authorization</li>
+<li>Continuous integration / deployment</li>
+<li>Institutional investors</li>
+</ul>
 <p>
 But still, it's <b>a lot</b>
 </p>
 
-<p class="fragment (appear)">
+<p>
 Setting up all these great tool&#x2026;
 </p>
-<p class="fragment (appear)">
+<p>
 Gluing everything together&#x2026;
 </p>
 
-<p class="fragment (appear)">
+<p>
 It still takes too much friction!
 </p>
 
-<p class="fragment (appear)">
+<p>
 The world moves fast now,
 </p>
-<p class="fragment (appear)">
+<p>
 we can't afford to take that much time!
 </p>
 
-</section>
-<section >
 <p>
 But if you notice&#x2026;.
 </p>
-<p class="fragment (appear)">
+<p>
 All these services have APIs.
 </p>
 
-<p class="fragment (appear)">
+<p>
 New plan:
 </p>
-<p class="fragment (appear)">
+<p>
 Put the case study on hold&#x2026;
 </p>
-</section>
-<section >
 <p>
 &#x2026; and build a public tool
 </p>
-<p class="fragment (appear)">
+<p>
 to automate everything.
 </p>
-</section>
-<section >
 <p>
 Time to shave some yaks.
 </p>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/rabbit_hole_1.jpg" alt="rabbit_hole_1.jpg" />
 </p>
 </div>
+</div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-orgded7f88">
-<h2 id="orgded7f88">A startup pipeline</h2>
+<div id="outline-container-org2389509" class="outline-2">
+<h2 id="org2389509">A startup-generating pipeline</h2>
+<div class="outline-text-2" id="text-org2389509">
 <p>
 Let's focus on the first part post-idea:
 </p>
 
-<ol>
-<li class="fragment appear">Create a GitHub repository</li>
-<li class="fragment appear">Create a new Netlify site</li>
-<li class="fragment appear">Buy a domain</li>
-<li class="fragment appear">Deploy a placeholder page</li>
-<li class="fragment appear">Start a viral social media campaign (i.e. tweet a link)</li>
-<li class="fragment appear">Get PUMPED!</li>
-
+<ol class="org-ol">
+<li>Create a GitHub repository</li>
+<li>Create a new Netlify site</li>
+<li>Buy a domain</li>
+<li>Deploy a placeholder page</li>
+<li>Start a viral social media campaign (i.e. tweet a link)</li>
+<li>Get PUMPED!</li>
 </ol>
+</div>
 
-</section>
-<section id="slide-orgb9a69a5">
-<h3 id="orgb9a69a5">1. Source control: Create a GitHub Repository</h3>
+<div id="outline-container-orgb7a9c11" class="outline-3">
+<h3 id="orgb7a9c11">1. Source control: Create a GitHub Repository</h3>
+<div class="outline-text-3" id="text-orgb7a9c11">
 <p>
 GitHub API:
 </p>
-<ul>
-<li class="fragment appear">Step 0: Google.</li>
-
+<ul class="org-ul">
+<li>Step 0: Google.</li>
 </ul>
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li>Step 1:</li>
-
 </ul>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="bash" >POST https://api.github.com/users/{username}/repos -d
-</code></pre>
+<pre class="src src-bash">POST https://api.github.com/users/<span style="color: #4f97d7;">{</span>username<span style="color: #4f97d7;">}</span>/repos -d
+</pre>
 </div>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="json" >{
-  "name": "matchascoots",
-  "description": "Matcha Scooters is your one stop...",
-  "homepage": "https://matchascoots.com",
-  "private": false,
-  "has_issues": true,
-  "has_projects": true,
-  "has_wiki": true
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"name"</span>: <span style="color: #2d9574;">"matchascoots"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"description"</span>: <span style="color: #2d9574;">"Matcha Scooters is your one stop..."</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"homepage"</span>: <span style="color: #2d9574;">"https://matchascoots.com"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"private"</span>: <span style="color: #a45bad;">false</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"has_issues"</span>: <span style="color: #a45bad;">true</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"has_projects"</span>: <span style="color: #a45bad;">true</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"has_wiki"</span>: <span style="color: #a45bad;">true</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
 
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >curl -X POST https://api.github.com/users/sgrove/repos -d '{"name": "matchascoots"}'
-</code></pre>
+<pre class="src src-bash">curl -X POST https://api.github.com/users/sgrove/repos -d <span style="color: #2d9574;">'{"name": "matchascoots"}'</span>
+</pre>
 </div>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="json" >{
-  "message": "Not Found",
-  "documentation_url": "https://developer.github.com/v3"
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"message"</span>: <span style="color: #2d9574;">"Not Found"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"documentation_url"</span>: <span style="color: #2d9574;">"https://developer.github.com/v3"</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
 
 
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >curl -X POST https://api.github.com/users/repos -d '{"name": "matchascoots"}'
-</code></pre>
+<pre class="src src-bash">curl -X POST https://api.github.com/users/repos -d <span style="color: #2d9574;">'{"name": "matchascoots"}'</span>
+</pre>
 </div>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="json" >{
-  "message": "Not Found",
-  "documentation_url": "https://developer.github.com/v3"
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"message"</span>: <span style="color: #2d9574;">"Not Found"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"documentation_url"</span>: <span style="color: #2d9574;">"https://developer.github.com/v3"</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
 
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}'
-</code></pre>
+<pre class="src src-bash">curl -X POST https://api.github.com/user/repos -d <span style="color: #2d9574;">'{"name": "matchascoots"}'</span>
+</pre>
 </div>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="json" >{
-  "message": "Requires authentication",
-  "documentation_url": "https://developer.github.com/v3/repos/#create"
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"message"</span>: <span style="color: #2d9574;">"Requires authentication"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"documentation_url"</span>: <span style="color: #2d9574;">"https://developer.github.com/v3/repos/#create"</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
 
-</section>
-<section >
-<ul>
-<li class="fragment appear">&#x2026; ?</li>
-<li class="fragment appear">Step 1: Create a personal access token and use it in place of password</li>
-
+<ul class="org-ul">
+<li>&#x2026; ?</li>
+<li>Step 1: Create a personal access token and use it in place of password</li>
 </ul>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >curl -X POST https://api.github.com/user/repos -d '{"name": "matchascoots"}' \
-     -u sgrove:<.... yeah right! ...>
-</code></pre>
+<pre class="src src-bash">curl -X POST https://api.github.com/user/repos -d <span style="color: #2d9574;">'{"name": "matchascoots"}'</span> <span style="color: #2d9574;">\</span>
+     -u sgrove:&lt;.... yeah right! ...&gt;
+</pre>
 </div>
 <div class="org-src-container">
-
-<pre><code class="json" >{
-  "name": "matchascoots",
-  "url": "https://github.com/sgrove/matchascoots"
-  "id": "....",
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"name"</span>: <span style="color: #2d9574;">"matchascoots"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"url"</span>: <span style="color: #2d9574;">"https://github.com/sgrove/matchascoots"</span>
+  <span style="color: #4f97d7; font-weight: bold;">"id"</span>: <span style="color: #2d9574;">"...."</span>,
   ...
-}
-</code></pre>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-</section>
-<section >
 <p>
 Et voilà! Our masterpiece:
 </p>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="javascript" >const createRepo = (name, token) =>
-  fetch("https://api.github.com/user/repos", {
-    method: "POST",
-    body: JSON.stringify({ name: name }),
-    headers: {
-      authorization: `Bearer ${token}`
-    }
-  });
-</code></pre>
+<pre class="src src-javascript"><span style="color: #4f97d7; font-weight: bold;">const</span> <span style="color: #7590db;">createRepo</span> = <span style="color: #4f97d7;">(</span>name, token<span style="color: #4f97d7;">)</span> =&gt;
+  fetch<span style="color: #4f97d7;">(</span><span style="color: #2d9574;">"https://api.github.com/user/repos"</span>, <span style="color: #bc6ec5;">{</span>
+    method: <span style="color: #2d9574;">"POST"</span>,
+    body: JSON.stringify<span style="color: #2d9574;">(</span><span style="color: #67b11d;">{</span> name: name <span style="color: #67b11d;">}</span><span style="color: #2d9574;">)</span>,
+    headers: <span style="color: #2d9574;">{</span>
+      authorization: <span style="color: #2d9574;">`Bearer ${token}`</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span><span style="color: #4f97d7;">)</span>;
+</pre>
 </div>
-</section>
-<section >
-<ol>
+<ol class="org-ol">
 <li><b>Create a GitHub repository</b></li>
 <li>Create a new Netlify site</li>
 <li>Buy a domain</li>
 <li>Deploy a placeholder page</li>
 <li>Start a viral social media campaign (i.e. tweet a link)</li>
 <li>Get PUMPED!</li>
-
 </ol>
-</section>
-<section >
-<ol>
+<ol class="org-ol">
 <li><del>Create a GitHub repository</del></li>
 <li><b>Create a new Netlify site</b></li>
 <li>Buy a domain</li>
 <li>Deploy a placeholder page</li>
 <li>Start a viral social media campaign (i.e. tweet a link)</li>
 <li>Get PUMPED!</li>
-
 </ol>
+</div>
+</div>
 
 
-</section>
-<section id="slide-org2b21aa7">
-<h3 id="org2b21aa7">2. Create a new site</h3>
+<div id="outline-container-org9a7e9fb" class="outline-3">
+<h3 id="org9a7e9fb">2. Create a new site</h3>
+<div class="outline-text-3" id="text-org9a7e9fb">
 <p>
 All our favorite provider*:
 </p>
 
-<p class="fragment (appear)">
+<p>
 Netlify!
 </p>
 
-<ul>
-<li class="fragment appear">totally not contractually obligated to say that</li>
-
+<ul class="org-ul">
+<li>totally not contractually obligated to say that</li>
 </ul>
-<p class="fragment (appear)">
-<a href="https://open-api.netlify.com/" class="fragment (appear)">https://open-api.netlify.com/</a>
+<p>
+<a href="https://open-api.netlify.com/">https://open-api.netlify.com/</a>
 </p>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >curl -X POST https://api.netlify.com/api/v1/sites -H 'Content-Type: application/json' -d '{
-  "id": "...",
-  "state": "...",
-  "plan": "...",
-  "name": "...",
-  "custom_domain": "...",
-  "domain_aliases": [
-    "..."
-  ],
-  "password": "...",
-  "notification_email": "...",
-  "url": "...",
-  "ssl_url": "...",
-  "admin_url": "...",
-  "screenshot_url": "...",
-  "created_at": "...",
-  "updated_at": "...",
-  "user_id": "...",
-  "session_id": "...",
-  "ssl": true,
-  "force_ssl": true,
-  "managed_dns": true,
-  "deploy_url": "...",
-  "published_deploy": {
-    "id": "...",
-    "site_id": "...",
-    "user_id": "...",
-    "build_id": "...",
-    "state": "...",
-    "name": "...",
-    "url": "...",
-    "ssl_url": "...",
-    "admin_url": "...",
-    "deploy_url": "...",
-    "deploy_ssl_url": "...",
-    "screenshot_url": "...",
-    "review_id": 0,
-    "draft": true,
-    "required": [
-      "..."
-    ],
-    "required_functions": [
-      "..."
-    ],
-    "error_message": "...",
-    "branch": "...",
-    "commit_ref": "...",
-    "commit_url": "...",
-    "skipped": true,
-    "created_at": "...",
-    "updated_at": "...",
-    "published_at": "...",
-    "title": "...",
-    "context": "...",
-    "locked": true,
-    "review_url": "...",
-    "site_capabilities": {
-      "large_media_enabled": true
-    }
-  },
-  "account_name": "...",
-  "account_slug": "...",
-  "git_provider": "...",
-  "deploy_hook": "...",
-  "capabilities": {
-    "property1": {},
-    "property2": {}
-  },
-  "processing_settings": {
-    "skip": true,
-    "css": {
-      "bundle": true,
-      "minify": true
-    },
-    "js": {
-      "bundle": true,
-      "minify": true
-    },
-    "images": {
-      "optimize": true
-    },
-    "html": {
-      "pretty_urls": true
-    }
-  },
-  "build_settings": {
-    "id": 0,
-    "provider": "...",
-    "deploy_key_id": "...",
-    "repo_path": "...",
-    "repo_branch": "...",
-    "dir": "...",
-    "cmd": "...",
-    "allowed_branches": [
-      "..."
-    ],
-    "public_repo": true,
-    "private_logs": true,
-    "repo_url": "...",
-    "env": {
-      "property1": "...",
-      "property2": "..."
-    },
-    "installation_id": 0
-  },
-  "id_domain": "...",
-  "default_hooks_data": {
-    "access_token": "..."
-  },
-  "build_image": "...",
-  "repo": {
-    "id": 0,
-    "provider": "...",
-    "deploy_key_id": "...",
-    "repo_path": "...",
-    "repo_branch": "...",
-    "dir": "...",
-    "cmd": "...",
-    "allowed_branches": [
-      "..."
-    ],
-    "public_repo": true,
-    "private_logs": true,
-    "repo_url": "...",
-    "env": {
-      "property1": "...",
-      "property2": "..."
-    },
-    "installation_id": 0
-  }
-}'
-</code></pre>
+<pre class="src src-bash">curl -X POST https://api.netlify.com/api/v1/sites -H <span style="color: #2d9574;">'Content-Type: application/json'</span> -d <span style="color: #2d9574;">'{</span>
+<span style="color: #2d9574;">  "id": "...",</span>
+<span style="color: #2d9574;">  "state": "...",</span>
+<span style="color: #2d9574;">  "plan": "...",</span>
+<span style="color: #2d9574;">  "name": "...",</span>
+<span style="color: #2d9574;">  "custom_domain": "...",</span>
+<span style="color: #2d9574;">  "domain_aliases": [</span>
+<span style="color: #2d9574;">    "..."</span>
+<span style="color: #2d9574;">  ],</span>
+<span style="color: #2d9574;">  "password": "...",</span>
+<span style="color: #2d9574;">  "notification_email": "...",</span>
+<span style="color: #2d9574;">  "url": "...",</span>
+<span style="color: #2d9574;">  "ssl_url": "...",</span>
+<span style="color: #2d9574;">  "admin_url": "...",</span>
+<span style="color: #2d9574;">  "screenshot_url": "...",</span>
+<span style="color: #2d9574;">  "created_at": "...",</span>
+<span style="color: #2d9574;">  "updated_at": "...",</span>
+<span style="color: #2d9574;">  "user_id": "...",</span>
+<span style="color: #2d9574;">  "session_id": "...",</span>
+<span style="color: #2d9574;">  "ssl": true,</span>
+<span style="color: #2d9574;">  "force_ssl": true,</span>
+<span style="color: #2d9574;">  "managed_dns": true,</span>
+<span style="color: #2d9574;">  "deploy_url": "...",</span>
+<span style="color: #2d9574;">  "published_deploy": {</span>
+<span style="color: #2d9574;">    "id": "...",</span>
+<span style="color: #2d9574;">    "site_id": "...",</span>
+<span style="color: #2d9574;">    "user_id": "...",</span>
+<span style="color: #2d9574;">    "build_id": "...",</span>
+<span style="color: #2d9574;">    "state": "...",</span>
+<span style="color: #2d9574;">    "name": "...",</span>
+<span style="color: #2d9574;">    "url": "...",</span>
+<span style="color: #2d9574;">    "ssl_url": "...",</span>
+<span style="color: #2d9574;">    "admin_url": "...",</span>
+<span style="color: #2d9574;">    "deploy_url": "...",</span>
+<span style="color: #2d9574;">    "deploy_ssl_url": "...",</span>
+<span style="color: #2d9574;">    "screenshot_url": "...",</span>
+<span style="color: #2d9574;">    "review_id": 0,</span>
+<span style="color: #2d9574;">    "draft": true,</span>
+<span style="color: #2d9574;">    "required": [</span>
+<span style="color: #2d9574;">      "..."</span>
+<span style="color: #2d9574;">    ],</span>
+<span style="color: #2d9574;">    "required_functions": [</span>
+<span style="color: #2d9574;">      "..."</span>
+<span style="color: #2d9574;">    ],</span>
+<span style="color: #2d9574;">    "error_message": "...",</span>
+<span style="color: #2d9574;">    "branch": "...",</span>
+<span style="color: #2d9574;">    "commit_ref": "...",</span>
+<span style="color: #2d9574;">    "commit_url": "...",</span>
+<span style="color: #2d9574;">    "skipped": true,</span>
+<span style="color: #2d9574;">    "created_at": "...",</span>
+<span style="color: #2d9574;">    "updated_at": "...",</span>
+<span style="color: #2d9574;">    "published_at": "...",</span>
+<span style="color: #2d9574;">    "title": "...",</span>
+<span style="color: #2d9574;">    "context": "...",</span>
+<span style="color: #2d9574;">    "locked": true,</span>
+<span style="color: #2d9574;">    "review_url": "...",</span>
+<span style="color: #2d9574;">    "site_capabilities": {</span>
+<span style="color: #2d9574;">      "large_media_enabled": true</span>
+<span style="color: #2d9574;">    }</span>
+<span style="color: #2d9574;">  },</span>
+<span style="color: #2d9574;">  "account_name": "...",</span>
+<span style="color: #2d9574;">  "account_slug": "...",</span>
+<span style="color: #2d9574;">  "git_provider": "...",</span>
+<span style="color: #2d9574;">  "deploy_hook": "...",</span>
+<span style="color: #2d9574;">  "capabilities": {</span>
+<span style="color: #2d9574;">    "property1": {},</span>
+<span style="color: #2d9574;">    "property2": {}</span>
+<span style="color: #2d9574;">  },</span>
+<span style="color: #2d9574;">  "processing_settings": {</span>
+<span style="color: #2d9574;">    "skip": true,</span>
+<span style="color: #2d9574;">    "css": {</span>
+<span style="color: #2d9574;">      "bundle": true,</span>
+<span style="color: #2d9574;">      "minify": true</span>
+<span style="color: #2d9574;">    },</span>
+<span style="color: #2d9574;">    "js": {</span>
+<span style="color: #2d9574;">      "bundle": true,</span>
+<span style="color: #2d9574;">      "minify": true</span>
+<span style="color: #2d9574;">    },</span>
+<span style="color: #2d9574;">    "images": {</span>
+<span style="color: #2d9574;">      "optimize": true</span>
+<span style="color: #2d9574;">    },</span>
+<span style="color: #2d9574;">    "html": {</span>
+<span style="color: #2d9574;">      "pretty_urls": true</span>
+<span style="color: #2d9574;">    }</span>
+<span style="color: #2d9574;">  },</span>
+<span style="color: #2d9574;">  "build_settings": {</span>
+<span style="color: #2d9574;">    "id": 0,</span>
+<span style="color: #2d9574;">    "provider": "...",</span>
+<span style="color: #2d9574;">    "deploy_key_id": "...",</span>
+<span style="color: #2d9574;">    "repo_path": "...",</span>
+<span style="color: #2d9574;">    "repo_branch": "...",</span>
+<span style="color: #2d9574;">    "dir": "...",</span>
+<span style="color: #2d9574;">    "cmd": "...",</span>
+<span style="color: #2d9574;">    "allowed_branches": [</span>
+<span style="color: #2d9574;">      "..."</span>
+<span style="color: #2d9574;">    ],</span>
+<span style="color: #2d9574;">    "public_repo": true,</span>
+<span style="color: #2d9574;">    "private_logs": true,</span>
+<span style="color: #2d9574;">    "repo_url": "...",</span>
+<span style="color: #2d9574;">    "env": {</span>
+<span style="color: #2d9574;">      "property1": "...",</span>
+<span style="color: #2d9574;">      "property2": "..."</span>
+<span style="color: #2d9574;">    },</span>
+<span style="color: #2d9574;">    "installation_id": 0</span>
+<span style="color: #2d9574;">  },</span>
+<span style="color: #2d9574;">  "id_domain": "...",</span>
+<span style="color: #2d9574;">  "default_hooks_data": {</span>
+<span style="color: #2d9574;">    "access_token": "..."</span>
+<span style="color: #2d9574;">  },</span>
+<span style="color: #2d9574;">  "build_image": "...",</span>
+<span style="color: #2d9574;">  "repo": {</span>
+<span style="color: #2d9574;">    "id": 0,</span>
+<span style="color: #2d9574;">    "provider": "...",</span>
+<span style="color: #2d9574;">    "deploy_key_id": "...",</span>
+<span style="color: #2d9574;">    "repo_path": "...",</span>
+<span style="color: #2d9574;">    "repo_branch": "...",</span>
+<span style="color: #2d9574;">    "dir": "...",</span>
+<span style="color: #2d9574;">    "cmd": "...",</span>
+<span style="color: #2d9574;">    "allowed_branches": [</span>
+<span style="color: #2d9574;">      "..."</span>
+<span style="color: #2d9574;">    ],</span>
+<span style="color: #2d9574;">    "public_repo": true,</span>
+<span style="color: #2d9574;">    "private_logs": true,</span>
+<span style="color: #2d9574;">    "repo_url": "...",</span>
+<span style="color: #2d9574;">    "env": {</span>
+<span style="color: #2d9574;">      "property1": "...",</span>
+<span style="color: #2d9574;">      "property2": "..."</span>
+<span style="color: #2d9574;">    },</span>
+<span style="color: #2d9574;">    "installation_id": 0</span>
+<span style="color: #2d9574;">  }</span>
+<span style="color: #2d9574;">}'</span>
+</pre>
 </div>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="bash" >* Connection state changed (MAX_CONCURRENT_STREAMS updated)!
-* We are completely uploaded and fine # <--- I love this!
-</code></pre>
+<pre class="src src-bash">* Connection state changed <span style="color: #4f97d7;">(</span>MAX_CONCURRENT_STREAMS updated<span style="color: #4f97d7;">)</span><span style="color: #a45bad;">!</span>
+* We are completely uploaded and fine <span style="color: #2aa1ae; background-color: #292e34;"># </span><span style="color: #2aa1ae; background-color: #292e34;">&lt;--- I love this!</span>
+</pre>
 </div>
 
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="bash" >< HTTP/2 401
-</code></pre>
+<pre class="src src-bash">&lt; HTTP/2 <span style="color: #a45bad;">401</span>
+</pre>
 </div>
 
-<p class="fragment (appear)">
+<p>
 "Hello darkness, my old friend&#x2026;"
 </p>
-</section>
-<section id="slide-org9f1ca3d">
-<h3 id="org9f1ca3d">Why is this so difficult?</h3>
+</div>
+</div>
+<div id="outline-container-org318bf9f" class="outline-3">
+<h3 id="org318bf9f">Why is this so difficult?</h3>
+<div class="outline-text-3" id="text-org318bf9f">
 <p>
 GitHub and Netlify have great APIs!
 </p>
-<p class="fragment (appear)">
+<p>
 In fact, they both have <b>great</b> APIs.
 </p>
-<p class="fragment (appear)">
+<p>
 Like, furreal:
 </p>
 <div class="org-src-container">
-
-<pre class="fragment (appear)"><code class="json" >{
-  "message": "Requires authentication",
-  "documentation_url": "https://developer.github.com/v3/repos/#create"
-}
-</code></pre>
+<pre class="src src-json"><span style="color: #4f97d7;">{</span>
+  <span style="color: #4f97d7; font-weight: bold;">"message"</span>: <span style="color: #2d9574;">"Requires authentication"</span>,
+  <span style="color: #4f97d7; font-weight: bold;">"documentation_url"</span>: <span style="color: #2d9574;">"https://developer.github.com/v3/repos/#create"</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-<p class="fragment (appear)">
+<p>
 <code>"documentation_url"</code>??
 </p>
 
-<ul>
-<li class="fragment appear">Good design</li>
-<li class="fragment appear">Good documentation</li>
-
+<ul class="org-ul">
+<li>Good design</li>
+<li>Good documentation</li>
 </ul>
-<p class="fragment (appear)">
+<p>
 &#x2026; Not every API will be so nice.
 </p>
-</section>
-<section >
 <p>
 Fundamental problems:
 </p>
-<ol>
+<ol class="org-ol">
 <li>API design is very open, tools can't help</li>
 <li>Auth is <b>hard</b></li>
-
 </ol>
-</section>
-<section >
 <p>
 Remember, we want to expose our startup-generating pipeline somewhere for us to hit later, publicly!
 </p>
 
-<p class="fragment (appear)">
+<p>
 We don't want to expose our GitHub token
 </p>
-<p class="fragment (appear)">
+<p>
 and our Netlify token
 </p>
-<p class="fragment (appear)">
+<p>
 and our other tokens&#x2026;
 </p>
-<p class="fragment (appear)">
+<p>
 So what can we do?
 </p>
-</section>
-<section >
-<ol>
-<li class="fragment appear">Let's write some server-side functions</li>
-<li class="fragment appear">That will call out to GitHub/Netlify</li>
-<li class="fragment appear">And will know our auth tokens via ENV variables</li>
-
+<ol class="org-ol">
+<li>Let's write some server-side functions</li>
+<li>That will call out to GitHub/Netlify</li>
+<li>And will know our auth tokens via ENV variables</li>
 </ol>
-</section>
-<section >
 <p>
 Except, let's not.
 </p>
 
-<p class="fragment (appear)">
+<p>
 We <b>can</b> overcome these issues with this, but&#x2026;
 </p>
 
-<ol>
-<li class="fragment appear">It's a lot of work.</li>
-<li class="fragment appear">It doesn't help with the first problem of exploring.</li>
-
+<ol class="org-ol">
+<li>It's a lot of work.</li>
+<li>It doesn't help with the first problem of exploring.</li>
 </ol>
-</section>
-<section >
 <p>
 Ok, new proposal: 
 </p>
@@ -693,436 +847,371 @@ Ok, new proposal:
 <p>
 let's solve these API problems, <b>too</b>.
 </p>
-</section>
-<section >
 <p>
 For those keeping score&#x2026;
 </p>
 
-<p class="fragment (appear)">
+<p>
 Here's our challenge stack we just pushed onto:
 </p>
 
-<ul>
-<li class="fragment appear">Matcha Scooters
-<ul>
+<ul class="org-ul">
+<li>Matcha Scooters
+<ul class="org-ul">
 <li>Set up startup infrastructure
-<ul>
+<ul class="org-ul">
 <li>Automate settings up startup infrastructure
-<ul>
+<ul class="org-ul">
 <li>Fix API explorability, docs, and auth</li>
-
 </ul></li>
-
 </ul></li>
-
 </ul></li>
-
 </ul>
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/rabbit_hole_2.png" alt="rabbit_hole_2.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/trust_me.png" alt="trust_me.png" />
 </p>
 </div>
-</section>
-<section >
 <p>
 We <b>will</b> get there.
 </p>
-<p class="fragment (appear)">
+<p>
 &#x2026; I think.
 </p>
-</section>
-<section id="slide-org34c5c48">
-<h3 id="org34c5c48">Fixing API explorability</h3>
+</div>
+</div>
+<div id="outline-container-org848d181" class="outline-3">
+<h3 id="org848d181">Fixing API explorability</h3>
+<div class="outline-text-3" id="text-org848d181">
 <p>
 Here's the plan:
 </p>
-<ol>
+<ol class="org-ol">
 <li>API must have a computer-readable spec from the beginning</li>
 <li>The spec must be complete and infallible</li>
-
 </ol>
-</section>
-<section >
 <p>
 GraphQL!
 </p>
-</section>
-<section >
-<ol>
+<ol class="org-ol">
 <li>API must have a computer-readable spec from the beginning</li>
 <li>The spec must be complete and infallible</li>
 <li>Build lots of great open tools on top of that spec</li>
-
 </ol>
-</section>
-<section >
 <p>
 [Spotify Demo]
 </p>
-</section>
-<section >
 <p>
 Now, let's recreate our previous two functions with this new tooling!
 </p>
-</section>
-<section >
 <p>
 boom.
 </p>
-</section>
-<section id="slide-orgc986c10">
-<h3 id="orgc986c10">Fixing API Auth</h3>
+</div>
+</div>
+<div id="outline-container-org5763ab4" class="outline-3">
+<h3 id="org5763ab4">Fixing API Auth</h3>
+<div class="outline-text-3" id="text-org5763ab4">
 <p>
 How do we solve the auth problem!?
 </p>
 
 
 <div class="figure">
-<p><img src="./img/simple_auth.png" alt="simple_auth.png" class="fragment (appear)" />
+<p><img src="./img/simple_auth.png" alt="simple_auth.png" />
 </p>
 </div>
 
-</section>
-<section >
 
 <div class="figure">
 <p><img src="./img/enterprise_grade_auth.png" alt="enterprise_grade_auth.png" />
 </p>
 </div>
-</section>
-<section >
 <p>
 Two benefits from this approach:
 </p>
-<ol>
+<ol class="org-ol">
 <li>Auth is captured securely in proxy</li>
 <li>API can be customized/molded to be a bit friendlier</li>
-
 </ol>
-</section>
-<section >
 <p>
 Can we do the same thing for GraphQL?
 </p>
-</section>
-<section >
 <p>
 Persisted queries.
 </p>
-</section>
-<section >
 <p>
 [Persisted queries demo]
 </p>
-</section>
-<section >
 <p>
 Let's pop the stack!
 </p>
-<ul>
+<ul class="org-ul">
 <li><del>Fix API explorability, docs, and auth</del></li>
 <li>Automate settings up startup infrastructure
-<ul>
+<ul class="org-ul">
 <li>1. <del>Create a GitHub repository</del></li>
 <li>1. <del>Create a new Netlify site</del></li>
 <li>1. Buy a domain</li>
 <li>1. Deploy a placeholder page</li>
 <li>1. Start a viral social media campaign (i.e. tweet a link)</li>
 <li>1. Get PUMPED!</li>
-
 </ul></li>
 <li>Set up startup infrastructure</li>
 <li>Matcha Scooters</li>
-
 </ul>
-</section>
-<section >
 <p>
 Let's do this!
 </p>
-</section>
-<section >
+<p>
+[GraphiQL tab!]
+</p>
 <div class="org-src-container">
-
-<pre><code class="json" >mutation CopyTemplateRepo($name: String!, $ownerId: String!) {
-  gitHub {
-    cloneTemplateRepository(
-      input: {
-        repositoryId: "MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="
+<pre class="src src-json">mutation CopyTemplateRepo<span style="color: #4f97d7;">(</span>$name: String!, $ownerId: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  gitHub <span style="color: #bc6ec5;">{</span>
+    cloneTemplateRepository<span style="color: #2d9574;">(</span>
+      input: <span style="color: #67b11d;">{</span>
+        repositoryId: <span style="color: #2d9574;">"MDEwOlJlcG9zaXRvcnkyMTU0MjUxNjY="</span>
         visibility: PUBLIC
         ownerId: $ownerId
         name: $name
-      }
-    ) {
-      repository {
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">)</span> <span style="color: #2d9574;">{</span>
+      repository <span style="color: #67b11d;">{</span>
         databaseId
         id
         nameWithLogin
-      }
-    }
-  }
-}
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-mutation CreateNetlifyDeployKey {
-  netlify {
-    makeRestCall {
-      post(path: "/api/v1/deploy_keys") {
+mutation CreateNetlifyDeployKey <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>path: <span style="color: #2d9574;">"/api/v1/deploy_keys"</span><span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
         jsonBody
-      }
-    }
-  }
-}
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-mutation AddDeployKeyToRepo($path: String!, $key: String!, $repoId: Int!) {
-  gitHub {
-    makeRestCall {
-      post(
-        path: $path # "/repos/dwwoelfel/netlify-test/keys"
-        jsonBody: {
+mutation AddDeployKeyToRepo<span style="color: #4f97d7;">(</span>$path: String!, $key: String!, $repoId: Int!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  gitHub <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: $path # <span style="color: #2d9574;">"/repos/dwwoelfel/netlify-test/keys"</span>
+        jsonBody: <span style="color: #b1951d;">{</span>
           id: $repoId
           key: $key
-          title: "Netlify"
-        }
-      ) {
+          title: <span style="color: #2d9574;">"Netlify"</span>
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
         jsonBody
-      }
-    }
-  }
-}
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-mutation CreateNetlifySite($siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!) {
-  netlify {
-    makeRestCall {
-      post(
-        path: "/api/v1/sites"
-        jsonBody: {
+mutation CreateNetlifySite<span style="color: #4f97d7;">(</span>$siteName: String!, $repo: String!, $cmd: String!, $deployKeyId: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: <span style="color: #2d9574;">"/api/v1/sites"</span>
+        jsonBody: <span style="color: #b1951d;">{</span>
           name: $siteName
-          repo: {
-            provider: "github"
-            id: 215425232
+          repo: <span style="color: #4f97d7;">{</span>
+            provider: <span style="color: #2d9574;">"github"</span>
+            id: <span style="color: #a45bad;">215425232</span>
             repo: $repo
-            private: false
-            branch: "master"
-            cmd: $cmd # "sed -i 's/{site-name}/Macha Scoot/g' index.html"
-            dir: "/"
+            private: <span style="color: #a45bad;">false</span>
+            branch: <span style="color: #2d9574;">"master"</span>
+            cmd: $cmd # <span style="color: #2d9574;">"sed -i 's/{site-name}/Macha Scoot/g' index.html"</span>
+            dir: <span style="color: #2d9574;">"/"</span>
             deploy_key_id: $deployKeyId
-          }
-        }
-      ) {
+          <span style="color: #4f97d7;">}</span>
+        <span style="color: #b1951d;">}</span>
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
         jsonBody
-      }
-    }
-  }
-}
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
 
-mutation DeployNetlifySite($path: String!) {
-  netlify {
-    makeRestCall {
-      post(
-        path: $path #"/api/v1/sites/8c47014f-7074-4afb-820c-758e1d105e76/deploys"
-      ) {
+mutation DeployNetlifySite<span style="color: #4f97d7;">(</span>$path: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  netlify <span style="color: #bc6ec5;">{</span>
+    makeRestCall <span style="color: #2d9574;">{</span>
+      post<span style="color: #67b11d;">(</span>
+        path: $path #"/api/v<span style="color: #a45bad;">1</span>/sites/<span style="color: #a45bad;">8c47014f</span>-<span style="color: #a45bad;">7074</span>-<span style="color: #a45bad;">4afb</span>-<span style="color: #a45bad;">820c</span>-<span style="color: #a45bad;">758e1d105e76</span>/deploys"
+      <span style="color: #67b11d;">)</span> <span style="color: #67b11d;">{</span>
         jsonBody
-      }
-    }
-  }
-}
-</code></pre>
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-</section>
-<section >
 <p>
 <a href="https://startup-in-a-box.netlify.com/">https://startup-in-a-box.netlify.com/</a>
 </p>
-<p class="fragment (appear)">
+<p>
 One
 </p>
-<p class="fragment (appear)">
+<p>
 Single
 </p>
-<p class="fragment (appear)">
+<p>
 Endpoint
 </p>
-<p class="fragment (appear)">
+<p>
 with all our auth, and operations.
 </p>
-<p class="fragment (appear)">
+<p>
 Success?
 </p>
-</section>
-<section >
 <p>
 Pop that stack!
 </p>
 
-<ul>
+<ul class="org-ul">
 <li><del>Fix API explorability, docs, and auth</del></li>
 <li><del>Automate settings up startup infrastructure</del>
-<ul>
+<ul class="org-ul">
 <li>1. <del>Create a GitHub repository</del></li>
 <li>1. <del>Create a new Netlify site</del></li>
 <li>1. <del>Buy a domain</del></li>
 <li>1. <del>Deploy a placeholder page</del></li>
 <li>1. <del>Start a viral social media campaign (i.e. tweet a link)</del></li>
 <li>1. <del>Get PUMPED!</del></li>
-
 </ul></li>
 <li>Set up startup infrastructure</li>
 <li>Matcha Scooters</li>
-
 </ul>
-</section>
-<section >
 <p>
 But we're not <b>quite</b> ready yet, I think.
 </p>
-<p class="fragment (appear)">
+<p>
 Inspiration strikes even when I'm not at my computer.
 </p>
-<p class="fragment (appear)">
+<p>
 Competition is fierce.
 </p>
-</section>
-<section >
 <p>
 But I always have my phone.
 </p>
-</section>
-<section >
 <p>
 Final goal:
 </p>
-<p class="fragment (appear)">
+<p>
 Trigger the pipeline with an incoming SMS from Twilio.
 </p>
-</section>
-<section >
 <div class="org-src-container">
-
-<pre><code class="javascript" >subscription TwilioSub($authToken: String!, $accountSid: String!, $inspirationalPhoneNumber: String!) {
-  twilio(
-    auth: { twilio: { authToken: $authToken, accountSid: $accountSid } }
-    webhookUrl: "https://startup-in-a-box.netlify.com/jamstack-what-an-amazing-demo-fn"
-  ) {
-    incomingSMS(input: {
+<pre class="src src-javascript">subscription TwilioSub<span style="color: #4f97d7;">(</span>$authToken: String!, $accountSid: String!, $inspirationalPhoneNumber: String!<span style="color: #4f97d7;">)</span> <span style="color: #4f97d7;">{</span>
+  twilio<span style="color: #bc6ec5;">(</span>
+    auth: <span style="color: #2d9574;">{</span> twilio: <span style="color: #67b11d;">{</span> authToken: $authToken, accountSid: $accountSid <span style="color: #67b11d;">}</span> <span style="color: #2d9574;">}</span>
+    webhookUrl: <span style="color: #2d9574;">"https://startup-in-a-box.netlify.com/jamstack-what-an-amazing-demo-fn"</span>
+  <span style="color: #bc6ec5;">)</span> <span style="color: #bc6ec5;">{</span>
+    incomingSMS<span style="color: #2d9574;">(</span>input: <span style="color: #67b11d;">{</span>
       to: $inspirationalPhoneNumber
-    }) {
-      sms {
+    <span style="color: #67b11d;">}</span><span style="color: #2d9574;">)</span> <span style="color: #2d9574;">{</span>
+      sms <span style="color: #67b11d;">{</span>
         body
         from
         to        
-      }
-    }
-  }
-}
-</code></pre>
+      <span style="color: #67b11d;">}</span>
+    <span style="color: #2d9574;">}</span>
+  <span style="color: #bc6ec5;">}</span>
+<span style="color: #4f97d7;">}</span>
+</pre>
 </div>
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li>Set up startup infrastructure</li>
 <li>Matcha Scooters</li>
-
 </ul>
-</section>
-<section >
 <p>
 Win?
 </p>
-</section>
-<section >
 <p>
 Win
 </p>
-<p class="fragment (appear)">
+<p>
 Win
 </p>
-<p class="fragment (appear)">
+<p>
 Win
 </p>
-</section>
-<section >
-<ul>
+<ul class="org-ul">
 <li><del>Set up startup infrastructure</del></li>
 <li>Matcha Scooters</li>
-
 </ul>
-</section>
-</section>
-<section>
-<section id="slide-org43746bc">
-<h2 id="org43746bc">What did we do?</h2>
-<ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdddd38e" class="outline-2">
+<h2 id="orgdddd38e">What did we do?</h2>
+<div class="outline-text-2" id="text-orgdddd38e">
+<ul class="org-ul">
 <li>We made APIs easy (and fun!) to explore, experiment with</li>
 <li>We automated an ad-hoc GraphQL pipeline from start to finish
-<ul>
+<ul class="org-ul">
 <li>Buys a domain</li>
 <li>Creates a GitHub repository</li>
 <li>Creates a Netlify site for the repository and domain</li>
 <li>Tweets out the new site</li>
 <li>Gets us stoked for the project with our JAM</li>
-
 </ul></li>
 <li>Extended the pipeline to be triggered by incoming SMS</li>
 <li>Actually purchased and deployed - live! - <a href="http://matchascoots.com">matchascoots.com</a></li>
-
 </ul>
-</section>
-</section>
-<section>
-<section id="slide-org52c8f21">
-<h2 id="org52c8f21">So what?</h2>
-<ul>
+</div>
+</div>
+<div id="outline-container-orgc158135" class="outline-2">
+<h2 id="orgc158135">So what?</h2>
+<div class="outline-text-2" id="text-orgc158135">
+<ul class="org-ul">
 <li>This is a fun side project, but the principle is the same for our jobs</li>
 <li>Building time-efficient pipeline on:
-<ul>
+<ul class="org-ul">
 <li>Salesforce</li>
 <li>Stripe</li>
 <li>Quickbooks</li>
 <li>Brex</li>
 <li>Slack</li>
-
 </ul></li>
-
 </ul>
-</section>
-<section >
 <p>
 But we need to make exploring APIs <b>fun</b> [GraphQL]
+</p>
+
+<p>
 We need to make productionizing ideas <b>fast</b> [Pipelines]
 </p>
-</section>
-</section>
-<section>
-<section id="slide-org5cac5c5">
-<h2 id="org5cac5c5">Thank you!</h2>
-<ul>
+</div>
+</div>
+<div id="outline-container-org67a18f6" class="outline-2">
+<h2 id="org67a18f6">Thank you!</h2>
+<div class="outline-text-2" id="text-org67a18f6">
+<ul class="org-ul">
 <li>Sean Grove (<a href="https://twitter.com/sgrove">@sgrove</a>)</li>
 <li>Cofounder of (<a href="https://twitter.com/onegraphio">@OneGraphIO</a>)</li>
-
 </ul>
 
 <div class="figure">
 <p><img src="./img/onegraph_website.png" alt="onegraph_website.png" />
 </p>
 </div>
+</div>
+</div>
 
-</section>
-</section>
-<section>
-<section id="slide-org7a0c330">
-<h2 id="org7a0c330">Misc</h2>
+<div id="outline-container-org76d9c9d" class="outline-2">
+<h2 id="org76d9c9d">Misc</h2>
+<div class="outline-text-2" id="text-org76d9c9d">
 <p>
 "All of us have ideas that come to us from time to time that we'd like to work on, but even though we live in a golden age, putting the pieces together is still super cumbersome."
 "I get dozens of good ideas per week! There's no way I can spend a bunch of time on each one. So either I have to start jettisoning my great ideas&#x2026;. or, make each idea faster"
@@ -1130,9 +1219,8 @@ We need to make productionizing ideas <b>fast</b> [Pipelines]
 "Matcha scooters, obviously"
 </p>
 
-<ul>
+<ul class="org-ul">
 <li>End the talk by also playing some rap song at the end of the pipeline, "all I do is win win win"</li>
-
 </ul>
 <p>
 "Yeah, moving bits around is cool, but changing the physical world is cooler. Like, sound waves."
@@ -1143,10 +1231,9 @@ We need to make productionizing ideas <b>fast</b> [Pipelines]
 <p>
 Every JAMstack app at its core does 2 things for users:
 </p>
-<ul>
+<ul class="org-ul">
 <li>reads data from sources (DB, Stripe, Salesforce, Shopify, etc.)</li>
 <li>effects the world on their behalf (sending emails, submitting purchases, etc.)</li>
-
 </ul>
 
 <p>
@@ -1154,16 +1241,14 @@ Yet combining APIs into a coherent unit is intensely manual &amp; fiddly.
 Instead, let's combine multiple persisted queries in GraphQL to succinctly encompass all of the chaining work.
 We'll build one such sequence to expose as a single call for our JAMstack app that:
 </p>
-<ul>
+<ul class="org-ul">
 <li>takes a domain-name input from a user</li>
 <li>purchases the domain</li>
 <li>creates a GitHub project</li>
 <li>deploys a placeholder on Netlify</li>
-
 </ul>
 <div class="org-src-container">
-
-<pre><code class="graphql" >mutation WinWinWin {
+<pre class="src src-graphql">mutation WinWinWin {
   spotify {
     playTrack(
       input: {
@@ -1177,13 +1262,12 @@ We'll build one such sequence to expose as a single call for our JAMstack app th
     }
   }
 }
-</code></pre>
+</pre>
 </div>
 
 
 <div class="org-src-container">
-
-<pre><code class="graphql" >query MyQuery {
+<pre class="src src-graphql">query MyQuery {
   spotify {
     search(data: { query: "all I do is win" }) {
       tracks {
@@ -1215,42 +1299,15 @@ mutation WinWinWin {
     }
   }
 }
-</code></pre>
-</div>
-</section>
-</section>
+</pre>
 </div>
 </div>
-<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
-<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
-
-<script>
-// Full list of configuration options available here:
-// https://github.com/hakimel/reveal.js#configuration
-Reveal.initialize({
-
-controls: true,
-progress: true,
-history: true,
-center: true,
-slideNumber: 'c',
-rollingLinks: false,
-keyboard: true,
-overview: true,
-
-theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
-transitionSpeed: 'default',
-multiplex: {
-    secret: '', // null if client
-    id: '', // id, obtained from socket.io server
-    url: '' // Location of socket.io server
-},
-
-// Optional libraries used to extend on reveal.js
-dependencies: [
- { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
-});
-</script>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Sean Grove</p>
+<p class="date">Created: 2019-12-13 Fri 11:56</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
 </body>
 </html>
